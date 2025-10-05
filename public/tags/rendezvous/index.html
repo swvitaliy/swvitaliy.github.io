@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+  <html data-color-scheme="auto">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rendezvous · swvit&#39;s blog</title>
+
+
+
+
+
+<link rel="stylesheet" href="/css/rocinante.min.css" />
+<link rel="shortcut icon" href="/icons/favicon.png">
+
+
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/rendezvous/index.xml" title="swvit's blog" />
+<body>
+    <header><h2>
+  
+    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  
+</h2>
+</header>
+    <main>
+    <div class="combined-title-pagination">
+      <h1><a href="/tags/">Tags</a> / Rendezvous</h1>
+      
+    </div>
+    <hr>
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/consistent_rendezvous_hashing/">Consistetent hasing and Rendezvous hashing (HRW)</a></h1>
+        </div>
+        
+        <div class="date"><h5>Aug 17, 2025</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <h2 id="rendezvous-hashing">Rendezvous hashing</h2>
+<p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.</p>
+<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/consistent_rendezvous_hashing/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+    <div class="paginator">
+        
+            <a class="older disabled">« Older posts</a>
+        
+
+        
+            <a class="newer disabled">Newer posts »</a>
+        
+    </div>
+
+    </main>
+    <footer></footer>
+    
+    <script>
+      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
+    </script>
+      <script src="/js/rocinante.min.js"></script></body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+  <html data-color-scheme="auto">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Consistetent hasing and Rendezvous hashing (HRW) · swvit&#39;s blog</title>
+
+
+
+
+
+<link rel="stylesheet" href="/css/rocinante.min.css" />
+<link rel="shortcut icon" href="/icons/favicon.png">
+
+
+<body>
+    <header><h2>
+  
+    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  
+</h2>
+</header>
+    <main>
+
+    <div class="post">
+        <div class="title-group">
+            <div class="title">
+                <h1>Consistetent hasing and Rendezvous hashing (HRW)</h1>
+            </div>
+            <div class="date"><h5>Aug 17, 2025</h5></div>
+        </div>
+        <article class="content">
+            <h2 id="rendezvous-hashing">Rendezvous hashing</h2>
+<p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.</p>
+<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+<p>При использовании rendezvous hash примерно 1/N ключей будут перераспределены при добавлении/удалении ключа. В случае с consistent hash это примерно 10-15%.</p>
+<h2 id="wrh---weighted-rendezvous-hashing">WRH - Weighted Rendezvous Hashing</h2>
+<h2 id="применение">Применение</h2>
+<ol>
+<li>redis-go для выбора узла в shardedClient</li>
+<li>nginx</li>
+<li></li>
+</ol>
+<hr>
+<h2 id="referencies">Referencies</h2>
+<ol>
+<li><a href="https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740" target="_blank">https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740</a></li>
+<li><a href="https://habr.com/ru/companies/mygames/articles/669390/" target="_blank">https://habr.com/ru/companies/mygames/articles/669390/</a></li>
+<li><a href="https://randorithms.com/2020/12/26/rendezvous-hashing.html" target="_blank">https://randorithms.com/2020/12/26/rendezvous-hashing.html</a></li>
+<li><a href="https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/" target="_blank">https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/</a></li>
+<li><a href="https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf" target="_blank">https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf</a></li>
+<li><a href="https://github.com/dgryski/go-rendezvous/blob/master/rdv.go" target="_blank">https://github.com/dgryski/go-rendezvous/blob/master/rdv.go</a></li>
+<li></li>
+</ol>
+
+        </article>
+        
+            <div class="tags">
+                <span title="Tags">🏷</span>
+                <div class="horizontal-links links">
+                    <a href="/tags/dsa/">Dsa</a><a href="/tags/consistent/">Consistent</a><a href="/tags/rendezvous/">Rendezvous</a><a href="/tags/hashing/">Hashing</a><a href="/tags/go/">Go</a>
+                </div>
+            </div>
+        
+    </article>
+
+
+    </main>
+    <footer>
+  <div class="content-container">
+    <div class="content">Программист и пароход. Делаю всякое.
+
+
+  <p class="horizontal-links"><a href="/"
+       
+       
+      >Home</a><a href="/posts"
+       
+       
+      >Posts</a><a href="/notes"
+       
+       
+      >Notes</a><a href="/projects"
+       
+       
+      >Projects</a><a href="/tags"
+       
+       
+      >Tags</a><a href="/about"
+       
+       
+      >About</a></p>
+
+</div>
+  </div>
+</footer>
+    
+    <script>
+      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
+    </script>
+      <script src="/js/rocinante.min.js"></script></body>
+</html>

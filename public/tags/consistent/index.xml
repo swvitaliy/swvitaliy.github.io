@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Consistent on swvit&#39;s blog</title>
+    <link>http://localhost:1313/tags/consistent/</link>
+    <description>Recent content in Consistent on swvit&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 17 Aug 2025 10:00:00 +0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/consistent/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Consistetent hasing and Rendezvous hashing (HRW)</title>
+      <link>http://localhost:1313/posts/consistent_rendezvous_hashing/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/consistent_rendezvous_hashing/</guid>
+      <description>&lt;h2 id=&#34;rendezvous-hashing&#34;&gt;Rendezvous hashing&lt;/h2&gt;&#xA;&lt;p&gt;Rendezvous hashing (&lt;strong&gt;HRW - Highest Random Weight hashing&lt;/strong&gt;) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.&lt;/p&gt;&#xA;&lt;p&gt;На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число &lt;code&gt;n&lt;/code&gt; в бакет под номером &lt;code&gt;k&lt;/code&gt;, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

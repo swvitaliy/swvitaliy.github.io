@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+  <html data-color-scheme="auto">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title> · swvit&#39;s blog</title>
+
+
+
+
+
+<link rel="stylesheet" href="/css/rocinante.min.css" />
+<link rel="shortcut icon" href="/icons/favicon.png">
+
+
+<body>
+    <header><h2>
+  
+    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  
+</h2>
+</header>
+    <main>
+
+    <div class="post">
+        <div class="title-group">
+            <div class="title">
+                <h1></h1>
+            </div>
+            <div class="date"><h5></h5></div>
+        </div>
+        <article class="content">
+            <h2 id="contents">Contents</h2>
+<ol>
+<li>Сравнение конкурентной и неконкурентной версий</li>
+<li>Сравнение с оптимизациями для bulk операций</li>
+<li>Сравнение с RB-tree</li>
+<li>Сравнение с RB-tree (конкурентных версий)</li>
+</ol>
+<h2 id="сравнение-с-bst-avl-b-tree">Сравнение с BST (AVL, B-Tree)</h2>
+<p>При вставке/удалении узла мы не меняем всю структуру данных как это происходит в BST или, например, в куче (при реализации приоритетной очереди), а меняем только лишь сам узел. Это позволяет эффективно испоьзовать конкурентный доступ для этой структуры и так же lock-free доступ.</p>
+<p>Возможность реализации параллельного доступа без блокировок дает, а так же большая локальность данных по сравнению с BST дает этой структуре преимущество в многопрессорной среде.</p>
+<p>В оригинальной статье [<a href="#references">2</a>], [<a href="#references">6</a>] есть сравнения с 2-3, avl,  splay деревьями, которые говорят в пользу скип листа. Но они выполнялись в 1990-м году на том железе и, кроме того, на одноядерном компьютере. Так же, там нет сравнения с B-Tree. Поэтому сделать бенчмарки было бы любопытно (наверняка их проводили, не нашел в сети).</p>
+<p>Идея пропуска шагов так же применима и на деревья поиска <a href="#references">3</a>.</p>
+
+        </article>
+        
+    </article>
+
+
+    </main>
+    <footer>
+  <div class="content-container">
+    <div class="content">Программист и пароход. Делаю всякое.
+
+
+  <p class="horizontal-links"><a href="/"
+       
+       
+      >Home</a><a href="/posts"
+       
+       
+      >Posts</a><a href="/notes"
+       
+       
+      >Notes</a><a href="/projects"
+       
+       
+      >Projects</a><a href="/tags"
+       
+       
+      >Tags</a><a href="/about"
+       
+       
+      >About</a></p>
+
+</div>
+  </div>
+</footer>
+    
+    <script>
+      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
+    </script>
+      <script src="/js/rocinante.min.js"></script></body>
+</html>

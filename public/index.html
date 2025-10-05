@@ -25,30 +25,28 @@
     <main>
     
     
-    About section. Enter details about you here.
+    Программист и пароход. Делаю всякое.
 
 
-  <p class="horizontal-links"><a href="/Resume.pdf"
+  <p class="horizontal-links"><a href="/"
        
        
-      >Resume</a><a href="/contact"
+      >Home</a><a href="/posts"
        
-        class="email-hook" id="about-email" title="Click to show email" 
-      >Email</a></p>
-
-  <p class="horizontal-links"><a href="https://github.com/"
-        target="_blank" 
        
-      >Github</a><a href="https://mastodon.social/"
-        target="_blank" 
+      >Posts</a><a href="/notes"
        
-      >Mastodon</a><a href="https://twitter.com/"
-        target="_blank" 
        
-      >Twitter</a><a href="https://instagram.com/"
-        target="_blank" 
+      >Notes</a><a href="/projects"
        
-      >Instagram</a></p>
+       
+      >Projects</a><a href="/tags"
+       
+       
+      >Tags</a><a href="/about"
+       
+       
+      >About</a></p>
 
 
     <hr>
@@ -56,17 +54,43 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
-            <h1><a href="/posts/test-copy-3/">My First Post3</a></h1>
+            <h1><a href="/posts/consistent_rendezvous_hashing/">Consistetent hasing and Rendezvous hashing (HRW)</a></h1>
         </div>
         
-        <div class="date"><h5>Feb 14, 2024</h5></div>
+        <div class="date"><h5>Aug 17, 2025</h5></div>
         
     </div class="title-group">
 
     <div class="content">
-        <h2 id="11introduction">11Introduction</h2>
-<p>This is <strong>bold</strong> text, and this is <em>emphasized</em> text.</p>
-<p>Visit the <a href="https://gohugo.io" target="_blank">Hugo</a> website!</p>
+        <h2 id="rendezvous-hashing">Rendezvous hashing</h2>
+<p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.</p>
+<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/consistent_rendezvous_hashing/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/knowledgebase-normalization/">knowledgebase normalization</a></h1>
+        </div>
+        
+        <div class="date"><h5>Jun 21, 2025</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        
         
     </div>
     
@@ -80,17 +104,15 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
-            <h1><a href="/posts/test-copy-2/">wwMy First Post</a></h1>
+            <h1><a href="/posts/lsm-tree/">ss-table and lms</a></h1>
         </div>
         
-        <div class="date"><h5>Jan 24, 2024</h5></div>
+        <div class="date"><h5>Jul 02, 2024</h5></div>
         
     </div class="title-group">
 
     <div class="content">
-        <h2 id="introduction222">Introduction222</h2>
-<p>This is <strong>bold</strong> text, and this is <em>emphasized</em> text.</p>
-<p>Visit the <a href="https://gohugo.io" target="_blank">Hugo</a> website!</p>
+        
         
     </div>
     
@@ -104,7 +126,7 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
-            <h1><a href="/posts/test/">My First Post</a></h1>
+            <h1><a href="/posts/skip-list/">Skip-list</a></h1>
         </div>
         
         <div class="date"><h5>Jan 14, 2024</h5></div>
@@ -112,9 +134,35 @@
     </div class="title-group">
 
     <div class="content">
-        <h2 id="introduction">Introduction</h2>
-<p>This is <strong>bold</strong> text, and this is <em>emphasized</em> text.</p>
-<p>Visit the <a href="https://gohugo.io" target="_blank">Hugo</a> website!</p>
+        <p>Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.</p>
+<h2 id="описание-структуры-данных">Описание структуры данных</h2>
+<p>Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя <code>Next</code> на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/skip-list/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/berkley_algorithm/"></a></h1>
+        </div>
+        
+        <div class="date"><h5></h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <p>Таненбаум - Распределенные Системы</p>
         
     </div>
     
@@ -128,17 +176,73 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
-            <h1><a href="/posts/test-copy/">My First Post1</a></h1>
+            <h1><a href="/posts/consistent_collection_ordering/"></a></h1>
         </div>
         
-        <div class="date"><h5>Jan 14, 2024</h5></div>
+        <div class="date"><h5></h5></div>
         
     </div class="title-group">
 
     <div class="content">
-        <h2 id="introduction">Introduction</h2>
-<p>This is <strong>bold</strong> text, and this is <em>emphasized</em> text.</p>
-<p>Visit the <a href="https://gohugo.io" target="_blank">Hugo</a> website!</p>
+        <p><a href="https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a" target="_blank">https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a</a></p>
+<p>Если система сильно распределенная и <strong>нет единого сервера-арбитра</strong>, используют CRDT (Conflict-free Replicated Data Types) или упорядочивающие структуры вроде <strong>Logoot / LSEQ</strong> (из мира collaborative editing). Но в твоем случае наличие сервера сильно упрощает задачу.</p>
+        
+    </div>
+    
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/skip-list_benchmarks/"></a></h1>
+        </div>
+        
+        <div class="date"><h5></h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <h2 id="contents">Contents</h2>
+<ol>
+<li>Сравнение конкурентной и неконкурентной версий</li>
+<li>Сравнение с оптимизациями для bulk операций</li>
+<li>Сравнение с RB-tree</li>
+<li>Сравнение с RB-tree (конкурентных версий)</li>
+</ol>
+<h2 id="сравнение-с-bst-avl-b-tree">Сравнение с BST (AVL, B-Tree)</h2>
+<p>При вставке/удалении узла мы не меняем всю структуру данных как это происходит в BST или, например, в куче (при реализации приоритетной очереди), а меняем только лишь сам узел. Это позволяет эффективно испоьзовать конкурентный доступ для этой структуры и так же lock-free доступ.</p>
+<p>Возможность реализации параллельного доступа без блокировок дает, а так же большая локальность данных по сравнению с BST дает этой структуре преимущество в многопрессорной среде.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/skip-list_benchmarks/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/ss-table/"></a></h1>
+        </div>
+        
+        <div class="date"><h5></h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        
         
     </div>
     

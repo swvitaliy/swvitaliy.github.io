@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+  <html data-color-scheme="auto">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Skip-list · swvit&#39;s blog</title>
+
+
+
+
+
+<link rel="stylesheet" href="/css/rocinante.min.css" />
+<link rel="shortcut icon" href="/icons/favicon.png">
+
+
+<body>
+    <header><h2>
+  
+    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  
+</h2>
+</header>
+    <main>
+
+    <div class="post">
+        <div class="title-group">
+            <div class="title">
+                <h1>Skip-list</h1>
+            </div>
+            <div class="date"><h5>Jan 14, 2024</h5></div>
+        </div>
+        <article class="content">
+            <p>Skip-list &ndash; это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.</p>
+<h2 id="описание-структуры-данных">Описание структуры данных</h2>
+<p>Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя <code>Next</code> на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> (  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">p</span>        = <span style="color:#ae81ff">0.5</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">maxLevel</span> = <span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Key</span> <span style="color:#a6e22e">cmp</span>.<span style="color:#a6e22e">Ordered</span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Value</span> <span style="color:#66d9ef">any</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>] <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">key</span>   <span style="color:#a6e22e">K</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value</span> <span style="color:#a6e22e">V</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">next</span>  []<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>При создании узла ему выделяется рандомное значение от 1 до <code>maxLevel</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">randomLevel</span>() <span style="color:#66d9ef">uint64</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">lvl</span> <span style="color:#66d9ef">uint64</span> = <span style="color:#ae81ff">1</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">rand</span>.<span style="color:#a6e22e">Float64</span>() &lt; <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">lvl</span> &lt; <span style="color:#a6e22e">maxLevel</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">lvl</span><span style="color:#f92672">++</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">lvl</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Отдельно нужно хранить номер верхнего уровня для всей структуры <code>SkipList</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">SkipList</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>] <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">level</span> <span style="color:#66d9ef">uint64</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">head</span>  <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="принципы-работы">Принципы работы</h2>
+<h3 id="поиск">Поиск</h3>
+<p>Поиск выполняется в операциях удаления и вставки, поэтому сначала имеет смысл разобрать его.
+При поиске элемента мы начинаем с верхнего уровня ссылок, переходя от элемента к элементу на этом уровне до тех пор пока не наткнемся на нулевой указатель или на подходящий элемент (больший или равный искомому).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">SearchNode</span>(<span style="color:#a6e22e">target</span> <span style="color:#a6e22e">K</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>] {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">--</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">target</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>Если элемент равен искомому, то возвращаем его. В противном случае, возвращаем нулевой указатель.</p>
+<h3 id="вставка">Вставка</h3>
+<p>При вставке в skip-list сначала мы формируем путь поиска, по которому мы идем из head к искомому элементу.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">Insert</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">value</span> <span style="color:#a6e22e">V</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>] {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">update</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">--</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>  
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>Если найден ключ равный искомому - обновляем значение и выходим</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#ae81ff">0</span>]  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">value</span> = <span style="color:#a6e22e">value</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Создаем массив ссылок на элементы (на следующем шаге будем использовать ссылки <code>Next[i]</code> из них)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">lvl</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">randomLevel</span>()  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> <span style="color:#a6e22e">lvl</span> &gt; <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">lvl</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> = <span style="color:#a6e22e">lvl</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Создаем новый узел, ссылки из предыдущих элементов на следущие устанавливаем на этот новый узел. Ссылки на следующие элементы устанавливаем для этого нового узла</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#a6e22e">newNode</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]{  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">key</span>:   <span style="color:#a6e22e">key</span>,  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value</span>: <span style="color:#a6e22e">value</span>,  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">next</span>:  make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">lvl</span>),  
+</span></span><span style="display:flex;"><span>}  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> uint64(<span style="color:#ae81ff">0</span>); <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">lvl</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">newNode</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">newNode</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="удаление">Удаление</h3>
+<p>При удалении нам так же как и при вставке нужно сначала найти удаляемый элемент и сформировать массив элементов, которые следует обновить</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">Delete</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>) <span style="color:#66d9ef">bool</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">update</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">--</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#ae81ff">0</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>  
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>Затем нужно обновить список ссылок предыдущих элементов на следущие</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> uint64(<span style="color:#ae81ff">0</span>); <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">node</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">update</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Затем нужно уменьшить верхний уровень, если он имеет нулевой указатель на следующий элемент</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> &gt; <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span><span style="color:#f92672">--</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<p><a href="github.com/swvitaliy/goalgo/skip-list/skip-list.go">Итоговая реализация скип-листа на гитхаб</a></p>
+
+        </article>
+        
+            <div class="tags">
+                <span title="Tags">🏷</span>
+                <div class="horizontal-links links">
+                    <a href="/tags/dsa/">Dsa</a><a href="/tags/skip-list/">Skip-List</a><a href="/tags/go/">Go</a>
+                </div>
+            </div>
+        
+    </article>
+
+
+    </main>
+    <footer>
+  <div class="content-container">
+    <div class="content">Программист и пароход. Делаю всякое.
+
+
+  <p class="horizontal-links"><a href="/"
+       
+       
+      >Home</a><a href="/posts"
+       
+       
+      >Posts</a><a href="/notes"
+       
+       
+      >Notes</a><a href="/projects"
+       
+       
+      >Projects</a><a href="/tags"
+       
+       
+      >Tags</a><a href="/about"
+       
+       
+      >About</a></p>
+
+</div>
+  </div>
+</footer>
+    
+    <script>
+      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
+    </script>
+      <script src="/js/rocinante.min.js"></script></body>
+</html>

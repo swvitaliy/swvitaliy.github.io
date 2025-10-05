@@ -6,35 +6,63 @@
     <description>Recent content on swvit&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 14 Feb 2024 07:07:07 +0100</lastBuildDate>
+    <lastBuildDate>Sun, 17 Aug 2025 10:00:00 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>My First Post3</title>
-      <link>http://localhost:1313/posts/test-copy-3/</link>
-      <pubDate>Wed, 14 Feb 2024 07:07:07 +0100</pubDate>
-      <guid>http://localhost:1313/posts/test-copy-3/</guid>
-      <description>&lt;h2 id=&#34;11introduction&#34;&gt;11Introduction&lt;/h2&gt;&#xA;&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;&#xA;&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34; target=&#34;_blank&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;</description>
+      <title>Consistetent hasing and Rendezvous hashing (HRW)</title>
+      <link>http://localhost:1313/posts/consistent_rendezvous_hashing/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/consistent_rendezvous_hashing/</guid>
+      <description>&lt;h2 id=&#34;rendezvous-hashing&#34;&gt;Rendezvous hashing&lt;/h2&gt;&#xA;&lt;p&gt;Rendezvous hashing (&lt;strong&gt;HRW - Highest Random Weight hashing&lt;/strong&gt;) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.&lt;/p&gt;&#xA;&lt;p&gt;На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число &lt;code&gt;n&lt;/code&gt; в бакет под номером &lt;code&gt;k&lt;/code&gt;, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.&lt;/p&gt;</description>
     </item>
     <item>
-      <title>wwMy First Post</title>
-      <link>http://localhost:1313/posts/test-copy-2/</link>
-      <pubDate>Wed, 24 Jan 2024 07:07:07 +0100</pubDate>
-      <guid>http://localhost:1313/posts/test-copy-2/</guid>
-      <description>&lt;h2 id=&#34;introduction222&#34;&gt;Introduction222&lt;/h2&gt;&#xA;&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;&#xA;&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34; target=&#34;_blank&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;</description>
+      <title>knowledgebase normalization</title>
+      <link>http://localhost:1313/posts/knowledgebase-normalization/</link>
+      <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/knowledgebase-normalization/</guid>
+      <description></description>
     </item>
     <item>
-      <title>My First Post</title>
-      <link>http://localhost:1313/posts/test/</link>
-      <pubDate>Sun, 14 Jan 2024 08:07:07 +0100</pubDate>
-      <guid>http://localhost:1313/posts/test/</guid>
-      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;&#xA;&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34; target=&#34;_blank&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;</description>
+      <title>ss-table and lms</title>
+      <link>http://localhost:1313/posts/lsm-tree/</link>
+      <pubDate>Tue, 02 Jul 2024 12:02:24 +0400</pubDate>
+      <guid>http://localhost:1313/posts/lsm-tree/</guid>
+      <description></description>
     </item>
     <item>
-      <title>My First Post1</title>
-      <link>http://localhost:1313/posts/test-copy/</link>
-      <pubDate>Sun, 14 Jan 2024 07:07:07 +0100</pubDate>
-      <guid>http://localhost:1313/posts/test-copy/</guid>
-      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;&#xA;&lt;p&gt;This is &lt;strong&gt;bold&lt;/strong&gt; text, and this is &lt;em&gt;emphasized&lt;/em&gt; text.&lt;/p&gt;&#xA;&lt;p&gt;Visit the &lt;a href=&#34;https://gohugo.io&#34; target=&#34;_blank&#34;&gt;Hugo&lt;/a&gt; website!&lt;/p&gt;</description>
+      <title>Skip-list</title>
+      <link>http://localhost:1313/posts/skip-list/</link>
+      <pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate>
+      <guid>http://localhost:1313/posts/skip-list/</guid>
+      <description>&lt;p&gt;Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.&lt;/p&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;p&gt;Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя &lt;code&gt;Next&lt;/code&gt; на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/berkley_algorithm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/berkley_algorithm/</guid>
+      <description>&lt;p&gt;Таненбаум - Распределенные Системы&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/consistent_collection_ordering/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/consistent_collection_ordering/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a&#34; target=&#34;_blank&#34;&gt;https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;Если система сильно распределенная и &lt;strong&gt;нет единого сервера-арбитра&lt;/strong&gt;, используют CRDT (Conflict-free Replicated Data Types) или упорядочивающие структуры вроде &lt;strong&gt;Logoot / LSEQ&lt;/strong&gt; (из мира collaborative editing). Но в твоем случае наличие сервера сильно упрощает задачу.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/skip-list_benchmarks/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/skip-list_benchmarks/</guid>
+      <description>&lt;h2 id=&#34;contents&#34;&gt;Contents&lt;/h2&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;Сравнение конкурентной и неконкурентной версий&lt;/li&gt;&#xA;&lt;li&gt;Сравнение с оптимизациями для bulk операций&lt;/li&gt;&#xA;&lt;li&gt;Сравнение с RB-tree&lt;/li&gt;&#xA;&lt;li&gt;Сравнение с RB-tree (конкурентных версий)&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;h2 id=&#34;сравнение-с-bst-avl-b-tree&#34;&gt;Сравнение с BST (AVL, B-Tree)&lt;/h2&gt;&#xA;&lt;p&gt;При вставке/удалении узла мы не меняем всю структуру данных как это происходит в BST или, например, в куче (при реализации приоритетной очереди), а меняем только лишь сам узел. Это позволяет эффективно испоьзовать конкурентный доступ для этой структуры и так же lock-free доступ.&lt;/p&gt;&#xA;&lt;p&gt;Возможность реализации параллельного доступа без блокировок дает, а так же большая локальность данных по сравнению с BST дает этой структуре преимущество в многопрессорной среде.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>http://localhost:1313/posts/ss-table/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/posts/ss-table/</guid>
+      <description></description>
     </item>
   </channel>
 </rss>

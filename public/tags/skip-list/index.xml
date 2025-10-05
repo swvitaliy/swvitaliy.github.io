@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Skip-List on swvit&#39;s blog</title>
+    <link>http://localhost:1313/tags/skip-list/</link>
+    <description>Recent content in Skip-List on swvit&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 14 Jan 2024 08:07:07 +0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/skip-list/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Skip-list</title>
+      <link>http://localhost:1313/posts/skip-list/</link>
+      <pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate>
+      <guid>http://localhost:1313/posts/skip-list/</guid>
+      <description>&lt;p&gt;Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.&lt;/p&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;p&gt;Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя &lt;code&gt;Next&lt;/code&gt; на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

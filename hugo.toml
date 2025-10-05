@@ -10,36 +10,47 @@ pagerSize = 3
 
 [params]
   colorScheme = "auto" # "light" or "dark" or "auto". Defaults to light.
-  mainSections = ["posts"]
+  mainSections = ["posts", "projects"]
   email = "mail@example.com"
   favicon = "/icons/favicon.png"
   about = """
-About section. Enter details about you here.
+Программист и пароход. Делаю всякое.
 """
 
   [[params.links]]
     [[params.links.link]]
-      name = "Resume"
-      href = "/Resume.pdf"
+      name = "Home"
+      href = "/"
     [[params.links.link]]
-      name = "Email"
-      href = "/contact"
-      smart_email_link = true
+      name = "Posts"
+      href = "/posts"
+    [[params.links.link]]
+      name = "Notes"
+      href = "/notes"
+    [[params.links.link]]
+      name = "Projects"
+      href = "/projects"
+    [[params.links.link]]
+      name = "Tags"
+      href = "/tags"
+    [[params.links.link]]
+      name = "About"
+      href = "/about"
 
-  [[params.links]]
-    [[params.links.link]]
-      name = "Github"
-      href = "https://github.com/"
-      new_tab = true
-    [[params.links.link]]
-      name = "Mastodon"
-      href = "https://mastodon.social/"
-      new_tab = true
-    [[params.links.link]]
-      name = "Twitter"
-      href = "https://twitter.com/"
-      new_tab = true
-    [[params.links.link]]
-      name = "Instagram"
-      href = "https://instagram.com/"
-      new_tab = true
+  # [[params.links]]
+  #   [[params.links.link]]
+  #     name = "Github"
+  #     href = "https://github.com/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Mastodon"
+  #     href = "https://mastodon.social/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Twitter"
+  #     href = "https://twitter.com/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Instagram"
+  #     href = "https://instagram.com/"
+  #     new_tab = true

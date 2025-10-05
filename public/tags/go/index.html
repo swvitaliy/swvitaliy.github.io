@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+  <html data-color-scheme="auto">
+<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Go · swvit&#39;s blog</title>
+
+
+
+
+
+<link rel="stylesheet" href="/css/rocinante.min.css" />
+<link rel="shortcut icon" href="/icons/favicon.png">
+
+
+<link rel="alternate" type="application/rss+xml" href="http://localhost:1313/tags/go/index.xml" title="swvit's blog" />
+<body>
+    <header><h2>
+  
+    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  
+</h2>
+</header>
+    <main>
+    <div class="combined-title-pagination">
+      <h1><a href="/tags/">Tags</a> / Go</h1>
+      
+    </div>
+    <hr>
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/consistent_rendezvous_hashing/">Consistetent hasing and Rendezvous hashing (HRW)</a></h1>
+        </div>
+        
+        <div class="date"><h5>Aug 17, 2025</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <h2 id="rendezvous-hashing">Rendezvous hashing</h2>
+<p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.</p>
+<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/consistent_rendezvous_hashing/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/lsm-tree/">ss-table and lms</a></h1>
+        </div>
+        
+        <div class="date"><h5>Jul 02, 2024</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        
+        
+    </div>
+    
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
+            <h1><a href="/posts/skip-list/">Skip-list</a></h1>
+        </div>
+        
+        <div class="date"><h5>Jan 14, 2024</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <p>Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.</p>
+<h2 id="описание-структуры-данных">Описание структуры данных</h2>
+<p>Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя <code>Next</code> на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.</p>
+        
+    </div>
+    
+        
+            <div class="read-more">
+                <a href="/posts/skip-list/">Read more ›</a>
+            </div>
+        
+    
+
+</article>
+
+
+    <div class="paginator">
+        
+            <a class="older disabled">« Older posts</a>
+        
+
+        
+            <a class="newer disabled">Newer posts »</a>
+        
+    </div>
+
+    </main>
+    <footer></footer>
+    
+    <script>
+      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
+    </script>
+      <script src="/js/rocinante.min.js"></script></body>
+</html>
