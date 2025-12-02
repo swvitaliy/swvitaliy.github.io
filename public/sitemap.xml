@@ -2,31 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/tags/dsa/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/go/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/lsm-tree/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/skip-list/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/posts/ss-table/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/ss-table/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2025-10-26T22:25:07+04:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/tags/consistent/</loc>
     <lastmod>2025-08-17T10:00:00+04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/consistent_rendezvous_hashing/</loc>
     <lastmod>2025-08-17T10:00:00+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/dsa/</loc>
-    <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/go/</loc>
-    <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/hashing/</loc>
     <lastmod>2025-08-17T10:00:00+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/tags/rendezvous/</loc>
-    <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/</loc>
-    <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
     <lastmod>2025-08-17T10:00:00+04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/tags/knowledgebase/</loc>
@@ -47,16 +59,10 @@
     <loc>http://localhost:1313/tags/lms/</loc>
     <lastmod>2024-07-02T12:02:24+04:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/tags/ss-table/</loc>
-    <lastmod>2024-07-02T12:02:24+04:00</lastmod>
-  </url><url>
     <loc>http://localhost:1313/posts/lsm-tree/</loc>
     <lastmod>2024-07-02T12:02:24+04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/skip-list/</loc>
-    <lastmod>2024-01-14T08:07:07+04:00</lastmod>
-  </url><url>
-    <loc>http://localhost:1313/tags/skip-list/</loc>
     <lastmod>2024-01-14T08:07:07+04:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/berkley_algorithm/</loc>
@@ -65,7 +71,7 @@
   </url><url>
     <loc>http://localhost:1313/posts/skip-list_benchmarks/</loc>
   </url><url>
-    <loc>http://localhost:1313/posts/ss-table/</loc>
+    <loc>http://localhost:1313/posts/skip-list_bulk_optimisation/</loc>
   </url><url>
     <loc>http://localhost:1313/categories/</loc>
   </url>

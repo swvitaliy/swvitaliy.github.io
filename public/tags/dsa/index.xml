@@ -6,8 +6,15 @@
     <description>Recent content in Dsa on swvit&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 17 Aug 2025 10:00:00 +0400</lastBuildDate>
+    <lastBuildDate>Sun, 26 Oct 2025 22:25:07 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/dsa/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ss-table</title>
+      <link>http://localhost:1313/posts/ss-table/</link>
+      <pubDate>Sun, 26 Oct 2025 22:25:07 +0400</pubDate>
+      <guid>http://localhost:1313/posts/ss-table/</guid>
+      <description>&lt;h2 id=&#34;введение-зачем-нужно&#34;&gt;Введение (зачем нужно)&lt;/h2&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;h2 id=&#34;создание-из-skip-list&#34;&gt;Создание из skip-list&lt;/h2&gt;</description>
+    </item>
     <item>
       <title>Consistetent hasing and Rendezvous hashing (HRW)</title>
       <link>http://localhost:1313/posts/consistent_rendezvous_hashing/</link>
@@ -27,7 +34,7 @@
       <link>http://localhost:1313/posts/skip-list/</link>
       <pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate>
       <guid>http://localhost:1313/posts/skip-list/</guid>
-      <description>&lt;p&gt;Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.&lt;/p&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;p&gt;Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя &lt;code&gt;Next&lt;/code&gt; на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Skip-list - это &lt;strong&gt;вероятностная структура данных&lt;/strong&gt;, похожая по функционалу на сбалансированные деревья поиска, однако отличается от них тем, что не имеет явного этапа балансировки. Это позволяет реализовать конкурентную версию skip-list без глобальной блокировки всей структуры данных. Более того, возможна lock-free реализация вовсе без блокировок (см. &lt;a href=&#34;https://arxiv.org/abs/2102.01044&#34; target=&#34;_blank&#34;&gt;jiffy&lt;/a&gt;).&lt;/p&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;p&gt;Каждый узел представляет из себя узел связного списка. Вместо указателя &lt;code&gt;Next&lt;/code&gt; на следующий элемент массив таких указателей. В данном массиве в элементе &lt;code&gt;Next[i]&lt;/code&gt; содержится указатель на следующий элемент i-го уровня. Размер этого массива является вероятностной величиной, ограниченной некоторым значением.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

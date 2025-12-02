@@ -54,6 +54,30 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
+            <h1><a href="/posts/ss-table/">ss-table</a></h1>
+        </div>
+        
+        <div class="date"><h5>Oct 26, 2025</h5></div>
+        
+    </div class="title-group">
+
+    <div class="content">
+        <h2 id="введение-зачем-нужно">Введение (зачем нужно)</h2>
+<h2 id="описание-структуры-данных">Описание структуры данных</h2>
+<h2 id="создание-из-skip-list">Создание из skip-list</h2>
+        
+    </div>
+    
+        
+    
+
+</article>
+
+
+
+<article class="post-list">
+    <div class="title-group">
+        <div class="title">
             <h1><a href="/posts/consistent_rendezvous_hashing/">Consistetent hasing and Rendezvous hashing (HRW)</a></h1>
         </div>
         
@@ -134,9 +158,9 @@
     </div class="title-group">
 
     <div class="content">
-        <p>Skip-list - это вероятностная структура данных, которая похожа по функционалу сбалансированные деревья, однако отличается от них тем, помимо представления данных, что не имеет явного этапа балансировки. Вместо этого в момент вставки нового элемента мы выбираем длину списка ссылок (а значит пропусков) случайным образом. Поэтому статистически при большом количестве вставок поиск по этой структуре данных работает за log(N), как и операции вставки и удаления, которые содержат в себе поиск.</p>
+        <p>Skip-list - это <strong>вероятностная структура данных</strong>, похожая по функционалу на сбалансированные деревья поиска, однако отличается от них тем, что не имеет явного этапа балансировки. Это позволяет реализовать конкурентную версию skip-list без глобальной блокировки всей структуры данных. Более того, возможна lock-free реализация вовсе без блокировок (см. <a href="https://arxiv.org/abs/2102.01044" target="_blank">jiffy</a>).</p>
 <h2 id="описание-структуры-данных">Описание структуры данных</h2>
-<p>Каждый узел представляет из себя узел связного списка за исключением того, что вместо указателя <code>Next</code> на следующий элемент есть массив таких указателей. Поскольку размер этого массива является вероятностной величиной он ограничен определенным значением.</p>
+<p>Каждый узел представляет из себя узел связного списка. Вместо указателя <code>Next</code> на следующий элемент массив таких указателей. В данном массиве в элементе <code>Next[i]</code> содержится указатель на следующий элемент i-го уровня. Размер этого массива является вероятностной величиной, ограниченной некоторым значением.</p>
         
     </div>
     
@@ -234,7 +258,7 @@
 <article class="post-list">
     <div class="title-group">
         <div class="title">
-            <h1><a href="/posts/ss-table/"></a></h1>
+            <h1><a href="/posts/skip-list_bulk_optimisation/"></a></h1>
         </div>
         
         <div class="date"><h5></h5></div>
@@ -242,10 +266,41 @@
     </div class="title-group">
 
     <div class="content">
-        
+        <h2 id="bulk-operations">Bulk operations</h2>
+<h3 id="bulkinsert">BulkInsert</h3>
+<p>Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за <code>O(N)</code> (сложность в совокупности - сложность сортировки):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkInsert</span>(<span style="color:#a6e22e">sortedKeys</span> []<span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Уровень каждого элемента можно назначить заранее</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">nodes</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>, len(<span style="color:#a6e22e">sortedKeys</span>))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">k</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">sortedKeys</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">h</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">randomHeight</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">nodes</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Node</span>{<span style="color:#a6e22e">key</span>: <span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">forward</span>: make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">Pointer</span>[<span style="color:#a6e22e">Node</span>], <span style="color:#a6e22e">h</span>)}
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Для каждого уровня соединяем узлы линейно</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">level</span> &lt; <span style="color:#a6e22e">maxLevel</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">prev</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span> = <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nodes</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">level</span> &lt; len(<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">forward</span>) {
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">prev</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">n</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">prev</span> = <span style="color:#a6e22e">n</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">prev</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Store</span>(<span style="color:#66d9ef">nil</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">StoreInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>, int32(<span style="color:#a6e22e">maxLevel</span>))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="rangedelete">RangeDelete</h3>
+<p>Если нужно удалить диапазон <code>[low, high]</code>,<br>
+можно пройти один раз от <code>FindGE(low)</code> до <code>&gt; high</code> и пометить всё:</p>
         
     </div>
     
+        
+            <div class="read-more">
+                <a href="/posts/skip-list_bulk_optimisation/">Read more ›</a>
+            </div>
         
     
 
