@@ -5,4 +5,4 @@ tags = [ "go", "BWT", "burrows_wheeler", "strings", "algorithms" ]
 
 draft = true
 +++
-
+\
