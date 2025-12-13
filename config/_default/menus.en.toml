@@ -24,4 +24,8 @@
     action = "search"
     icon = "search"
 
+[[footer]]
+  name = "archive"
+  url = "https://old.swvit.com"
+
 
