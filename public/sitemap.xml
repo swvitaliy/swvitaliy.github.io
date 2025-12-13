@@ -5,54 +5,14 @@
     
   
     
-      <url>
-            <loc>http://localhost:1313/posts/consistent_collection_ordering/</loc>
-            <lastmod>2025-12-13T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/posts/</loc>
-            <lastmod>2025-12-13T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/</loc>
-            <lastmod>2025-12-13T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/posts/bwt_optimisations/</loc>
-            <lastmod>2025-11-17T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-  
-    
-  
-    
   
     
       <url>
             <loc>http://localhost:1313/posts/bwt/</loc>
             <lastmod>2025-08-17T10:00:00+04:00</lastmod>
           </url>
+    
+  
     
   
     
@@ -71,10 +31,28 @@
     
   
     
+      <url>
+            <loc>http://localhost:1313/posts/</loc>
+            <lastmod>2025-08-17T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+  
+    
   
     
       <url>
-            <loc>http://localhost:1313/posts/knowledgebase-normalization/</loc>
+            <loc>http://localhost:1313/</loc>
+            <lastmod>2025-08-17T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/notes/berkley_algorithm/</loc>
             <lastmod>2025-06-21T21:00:00+04:00</lastmod>
           </url>
     
@@ -86,14 +64,34 @@
     
   
     
+      <url>
+            <loc>http://localhost:1313/projects/knowledgebase-normalization/</loc>
+            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/notes/</loc>
+            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
   
     
   
     
       <url>
-            <loc>http://localhost:1313/posts/lsm-tree/</loc>
-            <lastmod>2024-07-02T12:02:24+04:00</lastmod>
+            <loc>http://localhost:1313/projects/</loc>
+            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
           </url>
+    
+  
+    
+  
+    
+  
     
   
     
@@ -103,13 +101,6 @@
           </url>
     
   
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/posts/skip-list_bulk_optimisation/</loc>
-            <lastmod>2024-01-14T08:07:07+04:00</lastmod>
-          </url>
     
   
     

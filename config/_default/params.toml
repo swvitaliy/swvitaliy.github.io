@@ -1,0 +1,4 @@
+colorScheme = "slate"
+
+homepage.layout = "page"
+homepage.showRecent = true

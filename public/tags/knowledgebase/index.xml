@@ -5,14 +5,14 @@
     <link>http://localhost:1313/tags/knowledgebase/</link>
     <description>Recent content in Knowledgebase on swvit&#39;s blog</description>
     <generator>Hugo</generator>
-    <language>en-us</language>
+    <language>en</language>
     <lastBuildDate>Sat, 21 Jun 2025 21:00:00 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/knowledgebase/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>knowledgebase normalization</title>
-      <link>http://localhost:1313/posts/knowledgebase-normalization/</link>
+      <link>http://localhost:1313/projects/knowledgebase-normalization/</link>
       <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/posts/knowledgebase-normalization/</guid>
+      <guid>http://localhost:1313/projects/knowledgebase-normalization/</guid>
       <description></description>
     </item>
   </channel>

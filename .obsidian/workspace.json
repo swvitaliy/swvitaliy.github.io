@@ -4,17 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "bec0fc209d9166f0",
+        "id": "70266d2bea72a2f1",
         "type": "tabs",
         "children": [
           {
-            "id": "407ae55b98abd174",
+            "id": "d5dd0301960eda9b",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "content/posts/bwt/index.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "index"
             }
           }
         ]
@@ -136,7 +140,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "content/posts/skip-list/index.md",
+                "file": "content/posts/bwt/index.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -151,8 +155,8 @@
             "state": {
               "type": "calendar",
               "state": {},
-              "icon": "lucide-ghost",
-              "title": "calendar"
+              "icon": "calendar-with-checkmark",
+              "title": "Calendar"
             }
           },
           {
@@ -190,52 +194,51 @@
   },
   "active": "7930aa6d9fbba6a4",
   "lastOpenFiles": [
-    "Excalidraw/Drawing 2025-08-17 19.59.21.excalidraw.md",
-    "Untitled.base",
-    "public/index.xml",
-    "public/tags/python/index.xml",
-    "public/tags/index.xml",
-    "public/tags/go/page/1/index.html",
-    "public/tags/go/page/1",
-    "public/tags/go/page",
-    "public/tags/go/index.xml",
-    "public/tags/go/index.html",
-    "public/tags/go",
+    "content/projects/spaced_repetition/index.md",
+    "content/projects/knowledgebase-normalization/index.md",
+    "content/projects/nginx_json_rpc/index.md",
+    "public/tags/json-rpc/page/1/index.html",
+    "public/tags/json-rpc/page/1",
+    "public/tags/json-rpc/page",
+    "public/tags/json-rpc/index.xml",
+    "public/tags/json-rpc/index.html",
+    "public/tags/json-rpc",
+    "public/tags/jso/page/1/index.html",
+    "public/tags/jso/page/1",
+    "public/tags/jso/page",
+    "public/tags/jso/index.xml",
+    "content/projects/simple_dns/index.md",
+    "content/posts/skip-list/index.md",
+    "content/posts/bwt/index.md",
+    "drafts/bwt_optimisations/index.md",
+    "drafts/skip-list_benchmarks/index.md",
+    "content/posts/consistent_rendezvous_hashing/index.md",
+    "drafts/lock-free_skip-list/lock-free_skip-list.md",
+    "content/projects/simple_dns.md",
+    "content/posts/berkley_algorithm/index.md",
     "public/posts/skip-list/sl_search.svg",
     "public/posts/skip-list/sl_levels.svg",
     "public/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
-    "public/apple-touch-icon.png",
-    "public/android-chrome-192x192.png",
+    "public/icons/favicon.png",
+    "public/favicon-32x32.png",
     "public/favicon-16x16.png",
-    "content/posts/consistent_collection_ordering/index.md",
-    "content/posts/bwt/index.md",
-    "content/posts/bwt_optimisations/index.md",
-    "drafts/ss-table/index.md",
+    "public/apple-touch-icon.png",
+    "public/android-chrome-512x512.png",
+    "public/android-chrome-192x192.png",
+    "content/Untitled.md",
     "content/posts/skip-list_bulk_optimisation/index.md",
-    "content/posts/skip-list/index.md",
     "content/posts/skip-list/Drawing 2025-10-05 16.34.37.excalidraw.md",
-    "drafts/skip-list_benchmarks/index.md",
-    "content/posts/lsm-tree/index.md",
-    "drafts/berkley_algorithm/index.md",
-    "content/posts/consistent_rendezvous_hashing/index.md",
+    "drafts/lsm-tree/index.md",
+    "drafts/Алгоритм разборчивой невесты.md",
+    "Excalidraw/Drawing 2025-08-17 19.59.21.excalidraw.md",
+    "drafts/consistent_collection_ordering/index.md",
+    "drafts/ss-table/index.md",
     "content/test/index.md",
     "content/posts/_index.md",
-    "public/favicon-32x32.png",
-    "public/android-chrome-512x512.png",
     "themes/congo/static/favicon-32x32.png",
-    "themes/congo/static/favicon-16x16.png",
     "themes/congo/exampleSite/content/docs/version-2/upgrade/index.zh-Hans.md",
     "themes/congo/exampleSite/content/docs/version-2/upgrade/index.md",
     "themes/congo/exampleSite/content/docs/version-2/upgrade/index.ja.md",
-    "themes/congo/exampleSite/content/tags/advanced/_index.zh-CN.md",
-    "themes/congo/exampleSite/content/tags/advanced/_index.md",
-    "themes/congo/exampleSite/content/tags/advanced/_index.ja.md",
-    "themes/congo/exampleSite/content/tags/advanced/_index.es.md",
-    "themes/congo/exampleSite/content/samples/rich-content/index.zh-Hans.md",
-    "themes/congo/exampleSite/content/samples/rich-content/index.md",
-    "themes/congo/exampleSite/content/samples/rich-content/index.ja.md",
-    "themes/congo/exampleSite/content/samples/rich-content/index.es.md",
-    "themes/congo/exampleSite/content/samples/rich-content/index.de.md",
     "content/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/Untitled.canvas"

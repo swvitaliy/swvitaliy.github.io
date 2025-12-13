@@ -1,5 +1,5 @@
 +++
-title = 'Consistetent hasing and Rendezvous hashing (HRW)'
+title = 'Consistetent and Rendezvous hashing (HRW)'
 date = 2025-08-17T10:00:00+04:00
 tags = [ "dsa", "consistent", "rendezvous", "hashing", "go" ]
 
@@ -14,11 +14,15 @@ Rendezvous hashing (**HRW - Highest Random Weight hashing**) относится 
 
 На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число `n` в бакет под номером `k`, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.
 
-![[randezvous.excalidraw.svg]]
+![](./randezvous.excalidraw.svg)
 
 При использовании rendezvous hash примерно 1/N ключей будут перераспределены при добавлении/удалении ключа. В случае с consistent hash это примерно 10-15%.
 
 ## Consistent Hashing
+
+// TODO нарисовать key ring
+
+// TODO нарисовать vnodes
 
 Для начала стоит рассмотреть консистентное кеширование, чтобы понять решаемую проблему. 
 
@@ -148,9 +152,16 @@ func rendezvousHash(key string, nodes []string) string {
 
 ## Применение randezvous
 
-1. redis-go для выбора узла в shardedClient
-2. nginx
+// TODO more examples
+
+// TODO scenarios 
+
+5. redis-go для выбора узла в shardedClient
+6. nginx (where?)
+7. 
 ## Применение consistent hashing
+
+// TODO scenarios
 
 1. Apache Kafka
 2. Apache Cassandra
@@ -166,4 +177,3 @@ func rendezvousHash(key string, nodes []string) string {
 4. https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/
 5. https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf
 6. https://github.com/dgryski/go-rendezvous/blob/master/rdv.go
-7. 
