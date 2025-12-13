@@ -6,15 +6,8 @@
     <description>Recent content in Ss-Table on swvit&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 26 Oct 2025 22:25:07 +0400</lastBuildDate>
+    <lastBuildDate>Tue, 02 Jul 2024 12:02:24 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/ss-table/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>ss-table</title>
-      <link>http://localhost:1313/posts/ss-table/</link>
-      <pubDate>Sun, 26 Oct 2025 22:25:07 +0400</pubDate>
-      <guid>http://localhost:1313/posts/ss-table/</guid>
-      <description>&lt;h2 id=&#34;введение-зачем-нужно&#34;&gt;Введение (зачем нужно)&lt;/h2&gt;&#xA;&lt;h2 id=&#34;описание-структуры-данных&#34;&gt;Описание структуры данных&lt;/h2&gt;&#xA;&lt;h2 id=&#34;создание-из-skip-list&#34;&gt;Создание из skip-list&lt;/h2&gt;</description>
-    </item>
     <item>
       <title>ss-table and lms</title>
       <link>http://localhost:1313/posts/lsm-tree/</link>

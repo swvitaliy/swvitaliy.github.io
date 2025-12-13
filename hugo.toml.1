@@ -1,0 +1,58 @@
+baseURL = "https://swvit.com/"
+languageCode = "en-us"
+title = "swvit's blog"
+#theme = "rocinante"
+theme = "congo"
+pagerSize = 3
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe= true
+
+[params]
+  # colorScheme = "auto" # "light" or "dark" or "auto". Defaults to light.
+
+  mainSections = ["posts", "projects"]
+  email = "mail@example.com"
+  favicon = "/icons/favicon.png"
+  about = """
+Программист и пароход. Делаю всякое.
+"""
+
+  [[params.links]]
+    [[params.links.link]]
+      name = "Home"
+      href = "/"
+    [[params.links.link]]
+      name = "Posts"
+      href = "/posts"
+    [[params.links.link]]
+      name = "Notes"
+      href = "/notes"
+    [[params.links.link]]
+      name = "Projects"
+      href = "/projects"
+    [[params.links.link]]
+      name = "Tags"
+      href = "/tags"
+    [[params.links.link]]
+      name = "About"
+      href = "/about"
+
+  # [[params.links]]
+  #   [[params.links.link]]
+  #     name = "Github"
+  #     href = "https://github.com/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Mastodon"
+  #     href = "https://mastodon.social/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Twitter"
+  #     href = "https://twitter.com/"
+  #     new_tab = true
+  #   [[params.links.link]]
+  #     name = "Instagram"
+  #     href = "https://instagram.com/"
+  #     new_tab = true

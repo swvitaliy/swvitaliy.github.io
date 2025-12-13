@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CRDT on swvit&#39;s blog</title>
+    <link>http://localhost:1313/tags/crdt/</link>
+    <description>Recent content in CRDT on swvit&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 13 Dec 2025 10:00:00 +0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/crdt/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CRDT LSEQ</title>
+      <link>http://localhost:1313/posts/consistent_collection_ordering/</link>
+      <pubDate>Sat, 13 Dec 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/consistent_collection_ordering/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a&#34; target=&#34;_blank&#34; rel=&#34;noreferrer&#34;&gt;https://chatgpt.com/share/68e277c6-f40c-8005-a3b1-ed4fbbd2b06a&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;Если система сильно распределенная и &lt;strong&gt;нет единого сервера-арбитра&lt;/strong&gt;, используют CRDT (Conflict-free Replicated Data Types) или упорядочивающие структуры вроде &lt;strong&gt;Logoot / LSEQ&lt;/strong&gt; (из мира collaborative editing). Но в твоем случае наличие сервера сильно упрощает задачу.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

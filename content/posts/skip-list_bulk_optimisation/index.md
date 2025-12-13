@@ -1,3 +1,10 @@
++++
+title = 'Skip-list bulk operations'
+date = 2024-01-14T08:07:07+04:00
+tags = [ "dsa", "skip-list", "go" ]
+
+draft = true
++++
 ## Bulk operations
 
 ### BulkInsert

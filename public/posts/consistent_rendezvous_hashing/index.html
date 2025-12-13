@@ -1,103 +1,539 @@
-<!DOCTYPE html>
-
-  <html data-color-scheme="auto">
-<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Consistetent hasing and Rendezvous hashing (HRW) · swvit&#39;s blog</title>
 
 
 
 
 
-<link rel="stylesheet" href="/css/rocinante.min.css" />
-<link rel="shortcut icon" href="/icons/favicon.png">
 
 
-<body>
-    <header><h2>
+<!doctype html>
+<html
+  lang="en-us"
+  dir="ltr"
+  class="scroll-smooth"
+  data-default-appearance="light"
+  data-auto-appearance="true"
+><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FFFFFF" />
   
-    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  <title>Consistetent hasing and Rendezvous hashing (HRW) &middot; swvit&#39;s blog</title>
+    <meta name="title" content="Consistetent hasing and Rendezvous hashing (HRW) &middot; swvit&#39;s blog" />
   
-</h2>
+  
+  
+  
+  
+  <script
+    type="text/javascript"
+    src="http://localhost:1313/js/appearance.min.8a082f81b27f3cb2ee528df0b0bdc39787034cf2cc34d4669fbc9977c929023c.js"
+    integrity="sha256-iggvgbJ/PLLuUo3wsL3Dl4cDTPLMNNRmn7yZd8kpAjw="
+  ></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  <link
+    type="text/css"
+    rel="stylesheet"
+    href="http://localhost:1313/css/main.bundle.min.a645f3fa02b2ca20e7ef61b236048d95cc9bc2e5b2faf1f0ac0aa85431187c1c.css"
+    integrity="sha256-pkXz&#43;gKyyiDn72GyNgSNlcybwuWy&#43;vHwrAqoVDEYfBw="
+  />
+  
+  
+  
+  
+  
+  
+  
+  <meta
+    name="description"
+    content="
+      
+        Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
+Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.
+      
+    "
+  />
+  
+  
+  
+  
+    <link rel="canonical" href="http://localhost:1313/posts/consistent_rendezvous_hashing/" />
+  
+  
+  
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="http://localhost:1313/posts/consistent_rendezvous_hashing/">
+  <meta property="og:site_name" content="swvit&#39;s blog">
+  <meta property="og:title" content="Consistetent hasing and Rendezvous hashing (HRW)">
+  <meta property="og:description" content="Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
+Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-08-17T10:00:00+04:00">
+    <meta property="article:modified_time" content="2025-08-17T10:00:00+04:00">
+    <meta property="article:tag" content="Dsa">
+    <meta property="article:tag" content="Consistent">
+    <meta property="article:tag" content="Rendezvous">
+    <meta property="article:tag" content="Hashing">
+    <meta property="article:tag" content="Go">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Consistetent hasing and Rendezvous hashing (HRW)">
+  <meta name="twitter:description" content="Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
+Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "articleSection": "Posts",
+    "name": "Consistetent hasing and Rendezvous hashing (HRW)",
+    "headline": "Consistetent hasing and Rendezvous hashing (HRW)",
+    
+    "abstract": "\u003ch2 id=\u0022rendezvous-hashing\u0022 class=\u0022relative group\u0022\u003eRendezvous hashing \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#rendezvous-hashing\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003eRendezvous hashing (\u003cstrong\u003eHRW - Highest Random Weight hashing\u003c\/strong\u003e) относится с\u003c\/p\u003e\n\u003cp\u003eЗто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении\/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.\u003c\/p\u003e\n\u003cp\u003eНа вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число \u003ccode\u003en\u003c\/code\u003e в бакет под номером \u003ccode\u003ek\u003c\/code\u003e, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.\u003c\/p\u003e",
+    "inLanguage": "en-us",
+    "url" : "http:\/\/localhost:1313\/posts\/consistent_rendezvous_hashing\/",
+    "author" : {
+      "@type": "Person",
+      "name": ""
+    },
+    "copyrightYear": "2025",
+    "dateCreated": "2025-08-17T10:00:00\u002b04:00",
+    "datePublished": "2025-08-17T10:00:00\u002b04:00",
+    
+    "dateModified": "2025-08-17T10:00:00\u002b04:00",
+    
+    "keywords": ["dsa","consistent","rendezvous","hashing","go"],
+    
+    "mainEntityOfPage": "true",
+    "wordCount": "833"
+  }
+  </script>
+    
+    <script type="application/ld+json">
+    {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+     {
+       "@type": "ListItem",
+       "item": "http://localhost:1313/",
+       "name": "Swvit's Blog",
+       "position": 1
+     },
+     {
+       "@type": "ListItem",
+       "item": "http://localhost:1313/posts/",
+       "name": "Posts",
+       "position": 2
+     },
+     {
+       "@type": "ListItem",
+       "name": "Consistetent Hasing and Rendezvous Hashing ( Hrw)",
+       "position": 3
+     }
+   ]
+ }
+  </script>
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+</head>
+<body
+    class="m-auto flex h-screen max-w-7xl flex-col bg-neutral px-6 text-lg leading-7 text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32"
+  >
+    <div id="the-top" class="absolute flex self-center">
+      <a
+        class="-translate-y-8 rounded-b-lg bg-primary-200 px-3 py-1 text-sm focus:translate-y-0 dark:bg-neutral-600"
+        href="#main-content"
+        ><span class="pe-2 font-bold text-primary-600 dark:text-primary-400">&darr;</span
+        >Skip to main content</a
+      >
+    </div>
+    
+    
+      <header class="py-6 font-semibold text-neutral-900 dark:text-neutral sm:py-10 print:hidden">
+  <nav class="flex items-start justify-between sm:items-center">
+    
+    <div class="flex flex-row items-center">
+      
+  <a
+    class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+    rel="me"
+    href="/"
+    >swvit&rsquo;s blog</a
+  >
+
+    </div>
+    
+    
+  </nav>
 </header>
-    <main>
 
-    <div class="post">
-        <div class="title-group">
-            <div class="title">
-                <h1>Consistetent hasing and Rendezvous hashing (HRW)</h1>
-            </div>
-            <div class="date"><h5>Aug 17, 2025</h5></div>
+    
+    <div class="relative flex grow flex-col">
+      <main id="main-content" class="grow">
+        
+  <article>
+    <header class="max-w-prose">
+      
+      <h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+        Consistetent hasing and Rendezvous hashing (HRW)
+      </h1>
+      
+        <div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
+          
+
+
+
+
+
+  
+  
+
+
+
+  
+
+  
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+
+  <div class="flex flex-row flex-wrap items-center">
+    
+    
+      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">August 17, 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">4 mins</span>
+    
+
+    
+    
+      <span class="ps-2"><span class="flex">
+  <span
+    class="ms-1 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Draft
+  </span>
+</span>
+</span>
+    
+  </div>
+
+  
+  
+
+
         </div>
-        <article class="content">
-            <h2 id="rendezvous-hashing">Rendezvous hashing</h2>
-<p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа.</p>
+      
+      
+    </header>
+    <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
+      
+      <div class="min-h-0 min-w-0 max-w-prose grow">
+        <h2 id="rendezvous-hashing" class="relative group">Rendezvous hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) относится с</p>
+<p>Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.</p>
 <p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+<p>![[randezvous.excalidraw.svg]]</p>
 <p>При использовании rendezvous hash примерно 1/N ключей будут перераспределены при добавлении/удалении ключа. В случае с consistent hash это примерно 10-15%.</p>
-<h2 id="wrh---weighted-rendezvous-hashing">WRH - Weighted Rendezvous Hashing</h2>
-<h2 id="применение">Применение</h2>
-<ol>
+<h2 id="consistent-hashing" class="relative group">Consistent Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#consistent-hashing" aria-label="Anchor">#</a></span></h2><p>Для начала стоит рассмотреть консистентное кеширование, чтобы понять решаемую проблему.</p>
+<p>При Consistent Hashing для начала мы вычисляем хеши для каждого узла, сохраняем их в отсортированном виде в массив - строим кольцо ключей.</p>
+<p>Затем, когда нам нужно получить соответствие ключу его узла, просто ищем бинпоиском позицию большую или равную ключу узла.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ringPoint</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hash</span> <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">node</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">buildRing</span>(<span style="color:#a6e22e">nodes</span> []<span style="color:#66d9ef">string</span>) []<span style="color:#a6e22e">ringPoint</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">ring</span> []<span style="color:#a6e22e">ringPoint</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nodes</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">nodeHash</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sha1Sum</span>(<span style="color:#a6e22e">node</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">ring</span> = append(<span style="color:#a6e22e">ring</span>, <span style="color:#a6e22e">ringPoint</span>{<span style="color:#a6e22e">nodeHash</span>, <span style="color:#a6e22e">node</span>})
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">slices</span>.<span style="color:#a6e22e">StableSort</span>(<span style="color:#a6e22e">ring</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ring</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">hash</span> &gt; <span style="color:#a6e22e">ring</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">hash</span>
+</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ring</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ConsistentHash</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">ring</span> []<span style="color:#a6e22e">ringPoint</span>) <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keyHash</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sha1Sum</span>(<span style="color:#a6e22e">key</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">idx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Search</span>(len(<span style="color:#a6e22e">ring</span>), <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ring</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">hash</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">keyHash</span>
+</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">==</span> len(<span style="color:#a6e22e">ring</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">idx</span> = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ring</span>[<span style="color:#a6e22e">idx</span>].<span style="color:#a6e22e">node</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Основной недостаток такой прямолинейной реализации в том, что ключи узлов распределяются на кольце произвольным образом - не равномерно. Кроме того, например, при добавлении узла в кольцо ключей, он добавляется между 2-мя последовательными узлами, перераспределяя в себя некоторое количество последовательных хешей, что может быть не всегда удобно на практике.</p>
+<p>Чтобы избежать этого недостатка добавим понятие виртуальных ключей (vnodes). Для этого сделаем сопоставление 2-го подрядка - для каждого реального узла добавим несколько 100 виртуальных ключей. Количество vnodes для каждого реального узла одинаковое. Распределение хешей vnodes так же произвольное, но за счет того, что их много и интервалы между ними маленькие распределение теперь будет около равномерным.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">HashRing</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">replicas</span> <span style="color:#66d9ef">int</span>                
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keys</span>     []<span style="color:#66d9ef">uint32</span>            
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hashMap</span>  <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">uint32</span>]<span style="color:#66d9ef">string</span> 
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">HashRing</span>) <span style="color:#a6e22e">AddNode</span>(<span style="color:#a6e22e">node</span> <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">replicas</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">vnodeID</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">fmt</span>.<span style="color:#a6e22e">Sprintf</span>(<span style="color:#e6db74">&#34;%s#%d&#34;</span>, <span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">i</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">hash</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">hashKey</span>(<span style="color:#a6e22e">vnodeID</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span> = append(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>, <span style="color:#a6e22e">hash</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">hashMap</span>[<span style="color:#a6e22e">hash</span>] = <span style="color:#a6e22e">node</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">slices</span>.<span style="color:#a6e22e">StableSort</span>(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>] &lt; <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">j</span>] })
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">HashRing</span>) <span style="color:#a6e22e">RemoveNode</span>(<span style="color:#a6e22e">node</span> <span style="color:#66d9ef">string</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">newKeys</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[:<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">k</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">hashMap</span>[<span style="color:#a6e22e">k</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">node</span> {
+</span></span><span style="display:flex;"><span>			delete(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">hashMap</span>, <span style="color:#a6e22e">k</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">newKeys</span> = append(<span style="color:#a6e22e">newKeys</span>, <span style="color:#a6e22e">k</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span> = <span style="color:#a6e22e">newKeys</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">HashRing</span>) <span style="color:#a6e22e">GetNode</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#e6db74">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hash</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">hashKey</span>(<span style="color:#a6e22e">key</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">idx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Search</span>(len(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>), <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">hash</span>
+</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">idx</span> <span style="color:#f92672">==</span> len(<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">idx</span> = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">hashMap</span>[<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">idx</span>]]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="wrh---weighted-rendezvous-hashing" class="relative group">WRH - Weighted Rendezvous Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#wrh---weighted-rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p>В отличие от консистентного кеша рандеву не хранит кольцевой буфер. Вместо этого он миксует ключ, для которого ищется узел (бакет) и имя этого узла и для каждого из узлов находит значение хеша. Среди всех таких значений выбирается максимальное, которое и выбирается как значение бакета для ключика (его остаток от деления).</p>
+<p>Пример простейшей реализации рандеву хеша:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">rendezvousHash</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">nodes</span> []<span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maxHash</span> <span style="color:#66d9ef">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chosen</span> <span style="color:#66d9ef">string</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nodes</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">keyNodeHash</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sha1Sum</span>(<span style="color:#a6e22e">key</span> <span style="color:#f92672">+</span> <span style="color:#a6e22e">node</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">chosen</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;&#34;</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">keyNodeHash</span> &gt; <span style="color:#a6e22e">maxHash</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">maxHash</span> = <span style="color:#a6e22e">keyNodeHash</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">chosen</span> = <span style="color:#a6e22e">node</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">chosen</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Почему это работает? Максимум - это точечная операция, не использующая данные о других узлах.</p>
+<p>Когда добавляется новый узел перераспределяются в него только те ключики, для которых хеш с этим узлом стал максимальным. То же самое происходит при удалении узла. Если перед удалением хеш ключика не был максимален с данным узлом, то этот ключик не будет перераспределен.</p>
+<p>При этом, в отличие от консистентного кеша, не нужно пересчитывать кольцо и не происходит массовых перестановок.</p>
+<p>Из-за равномерного распределения хешей мы имеем что и максимальное значение так же будет равномерно распределено.</p>
+<p>Главный недостаток randezvous по сравнению с consistent hashing заключается в необходимости вычисления хеша по каждому узлу при вычислении бакета для ключа. В consistent hashing нам достаточно 1 раз вычислить хеш ключика + предварительно вычислить hash nodes/vnodes. Для большого количества узлов мы будем иметь линейное увеличение нагрузки для вычисления каждого бакета по ключу.</p>
+<p>Так же поиск в кольце хешей выполняется через бинпоиск, тогда как в рандеву поиск линеен, что так же может сыграть свою роль при увеличении количества узлов.</p>
+<p>В consistent hashing вы можете распределить vnodes неравномерно так, чтобы на некоторые узлы нагручка приходила больге, чем на остальные (горячие ключи). В randezvous так сделать нельзя.</p>
+<h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><ol>
 <li>redis-go для выбора узла в shardedClient</li>
 <li>nginx</li>
-<li></li>
+</ol>
+<h2 id="применение-consistent-hashing" class="relative group">Применение consistent hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-consistent-hashing" aria-label="Anchor">#</a></span></h2><ol>
+<li>Apache Kafka</li>
+<li>Apache Cassandra</li>
+<li>Raik</li>
 </ol>
 <hr>
-<h2 id="referencies">Referencies</h2>
-<ol>
-<li><a href="https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740" target="_blank">https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740</a></li>
-<li><a href="https://habr.com/ru/companies/mygames/articles/669390/" target="_blank">https://habr.com/ru/companies/mygames/articles/669390/</a></li>
-<li><a href="https://randorithms.com/2020/12/26/rendezvous-hashing.html" target="_blank">https://randorithms.com/2020/12/26/rendezvous-hashing.html</a></li>
-<li><a href="https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/" target="_blank">https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/</a></li>
-<li><a href="https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf" target="_blank">https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf</a></li>
-<li><a href="https://github.com/dgryski/go-rendezvous/blob/master/rdv.go" target="_blank">https://github.com/dgryski/go-rendezvous/blob/master/rdv.go</a></li>
+<h2 id="referencies" class="relative group">Referencies <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#referencies" aria-label="Anchor">#</a></span></h2><ol>
+<li><a href="https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740" target="_blank" rel="noreferrer">https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740</a></li>
+<li><a href="https://habr.com/ru/companies/mygames/articles/669390/" target="_blank" rel="noreferrer">https://habr.com/ru/companies/mygames/articles/669390/</a></li>
+<li><a href="https://randorithms.com/2020/12/26/rendezvous-hashing.html" target="_blank" rel="noreferrer">https://randorithms.com/2020/12/26/rendezvous-hashing.html</a></li>
+<li><a href="https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/" target="_blank" rel="noreferrer">https://pvk.ca/Blog/2017/09/24/rendezvous-hashing-my-baseline-consistent-distribution-method/</a></li>
+<li><a href="https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf" target="_blank" rel="noreferrer">https://www.eecs.umich.edu/techreports/cse/96/CSE-TR-316-96.pdf</a></li>
+<li><a href="https://github.com/dgryski/go-rendezvous/blob/master/rdv.go" target="_blank" rel="noreferrer">https://github.com/dgryski/go-rendezvous/blob/master/rdv.go</a></li>
 <li></li>
 </ol>
 
-        </article>
-        
-            <div class="tags">
-                <span title="Tags">🏷</span>
-                <div class="horizontal-links links">
-                    <a href="/tags/dsa/">Dsa</a><a href="/tags/consistent/">Consistent</a><a href="/tags/rendezvous/">Rendezvous</a><a href="/tags/hashing/">Hashing</a><a href="/tags/go/">Go</a>
-                </div>
-            </div>
-        
-    </article>
-
-
-    </main>
-    <footer>
-  <div class="content-container">
-    <div class="content">Программист и пароход. Делаю всякое.
-
-
-  <p class="horizontal-links"><a href="/"
-       
-       
-      >Home</a><a href="/posts"
-       
-       
-      >Posts</a><a href="/notes"
-       
-       
-      >Notes</a><a href="/projects"
-       
-       
-      >Projects</a><a href="/tags"
-       
-       
-      >Tags</a><a href="/about"
-       
-       
-      >About</a></p>
-
-</div>
-  </div>
-</footer>
+      </div>
+    </section>
+    <footer class="max-w-prose pt-8 print:hidden">
+      
+  <div class="flex">
     
-    <script>
-      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
-    </script>
-      <script src="/js/rocinante.min.js"></script></body>
+    
+    
+    <div class="place-self-center">
+      
+      
+      <div class="text-2xl sm:text-lg">
+</div>
+    </div>
+  </div>
+
+
+      
+
+      
+  
+    
+    
+    
+    <div class="pt-8">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="flex justify-between pt-3">
+        <span>
+          
+            <a class="group flex" href="http://localhost:1313/posts/knowledgebase-normalization/">
+              <span
+                class="me-2 text-neutral-700 transition-transform group-hover:-translate-x-[2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
+                ><span class="ltr:inline rtl:hidden">&larr;</span
+                ><span class="ltr:hidden rtl:inline">&rarr;</span></span
+              >
+              <span class="flex flex-col">
+                <span
+                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
+                  >knowledgebase normalization</span
+                >
+                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
+                  
+                    <time datetime="2025-06-21 21:00:00 &#43;0400 &#43;04">June 21, 2025</time>
+                  
+                </span>
+              </span>
+            </a>
+          
+        </span>
+        <span>
+          
+            <a class="group flex text-right" href="http://localhost:1313/posts/bwt/">
+              <span class="flex flex-col">
+                <span
+                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
+                  >Burrows-Wheeler Transformation (BWT)</span
+                >
+                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
+                  
+                    <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">August 17, 2025</time>
+                  
+                </span>
+              </span>
+              <span
+                class="ms-2 text-neutral-700 transition-transform group-hover:-translate-x-[-2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
+                ><span class="ltr:inline rtl:hidden">&rarr;</span
+                ><span class="ltr:hidden rtl:inline">&larr;</span></span
+              >
+            </a>
+          
+        </span>
+      </div>
+    </div>
+  
+
+
+      
+    </footer>
+  </article>
+
+      </main>
+      
+        <div
+          class="pointer-events-none absolute bottom-0 end-0 top-[100vh] w-12"
+          id="to-top"
+          hidden="true"
+        >
+          <a
+            href="#the-top"
+            class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 backdrop-blur hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400"
+            aria-label="Scroll to top"
+            title="Scroll to top"
+          >
+            &uarr;
+          </a>
+        </div>
+      <footer class="py-10 print:hidden">
+  
+  
+  <div class="flex items-center justify-between">
+    <div>
+      
+      
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+            &copy;
+            2025
+            
+        </p>
+      
+      
+      
+        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+          
+          
+          Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
+            href="https://gohugo.io/" target="_blank" rel="noopener noreferrer">Hugo</a> &amp; <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href="https://github.com/jpanther/congo" target="_blank" rel="noopener noreferrer">Congo</a>
+        </p>
+      
+    </div>
+    <div class="flex flex-row items-center">
+      
+      
+      
+      
+    </div>
+  </div>
+  
+  
+</footer>
+
+    </div>
+  </body>
 </html>

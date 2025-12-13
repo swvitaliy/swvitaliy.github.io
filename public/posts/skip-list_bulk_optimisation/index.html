@@ -1,39 +1,305 @@
-<!DOCTYPE html>
-
-  <html data-color-scheme="auto">
-<script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title> · swvit&#39;s blog</title>
 
 
 
 
 
-<link rel="stylesheet" href="/css/rocinante.min.css" />
-<link rel="shortcut icon" href="/icons/favicon.png">
 
 
-<body>
-    <header><h2>
+<!doctype html>
+<html
+  lang="en-us"
+  dir="ltr"
+  class="scroll-smooth"
+  data-default-appearance="light"
+  data-auto-appearance="true"
+><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#FFFFFF" />
   
-    <a href="http://localhost:1313/">‹ swvit&#39;s blog</a>
+  <title>Skip-list bulk operations &middot; swvit&#39;s blog</title>
+    <meta name="title" content="Skip-list bulk operations &middot; swvit&#39;s blog" />
   
-</h2>
+  
+  
+  
+  
+  <script
+    type="text/javascript"
+    src="http://localhost:1313/js/appearance.min.8a082f81b27f3cb2ee528df0b0bdc39787034cf2cc34d4669fbc9977c929023c.js"
+    integrity="sha256-iggvgbJ/PLLuUo3wsL3Dl4cDTPLMNNRmn7yZd8kpAjw="
+  ></script>
+  
+  
+  
+  
+  
+  
+  
+  
+  <link
+    type="text/css"
+    rel="stylesheet"
+    href="http://localhost:1313/css/main.bundle.min.a645f3fa02b2ca20e7ef61b236048d95cc9bc2e5b2faf1f0ac0aa85431187c1c.css"
+    integrity="sha256-pkXz&#43;gKyyiDn72GyNgSNlcybwuWy&#43;vHwrAqoVDEYfBw="
+  />
+  
+  
+  
+  
+  
+  
+  
+  <meta
+    name="description"
+    content="
+      
+        Bulk operations #BulkInsert #Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за O(N) (сложность в совокупности - сложность сортировки):
+func (sl *SkipList) BulkInsert(sortedKeys []int) {
+    // Уровень каждого элемента можно назначить заранее
+    nodes := make([]*Node, len(sortedKeys))
+    for i, k := range sortedKeys {
+        h := randomHeight()
+        nodes[i] = &amp;Node{key: k, forward: make([]*atomic.Pointer[Node], h)}
+    }
+
+    // Для каждого уровня соединяем узлы линейно
+    for level := 0; level &lt; maxLevel; level&#43;&#43; {
+        var prev *Node = sl.head
+        for _, n := range nodes {
+            if level &lt; len(n.forward) {
+                prev.forward[level].Store(n)
+                prev = n
+            }
+        }
+        prev.forward[level].Store(nil)
+    }
+
+    atomic.StoreInt32(&amp;sl.level, int32(maxLevel))
+}
+RangeDelete #Если нужно удалить диапазон [low, high],
+можно пройти один раз от FindGE(low) до &gt; high и пометить всё:
+      
+    "
+  />
+  
+  
+  
+  
+    <link rel="canonical" href="http://localhost:1313/posts/skip-list_bulk_optimisation/" />
+  
+  
+  
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:url" content="http://localhost:1313/posts/skip-list_bulk_optimisation/">
+  <meta property="og:site_name" content="swvit&#39;s blog">
+  <meta property="og:title" content="Skip-list bulk operations">
+  <meta property="og:description" content="Bulk operations #BulkInsert #Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за O(N) (сложность в совокупности - сложность сортировки):
+func (sl *SkipList) BulkInsert(sortedKeys []int) { // Уровень каждого элемента можно назначить заранее nodes := make([]*Node, len(sortedKeys)) for i, k := range sortedKeys { h := randomHeight() nodes[i] = &amp;Node{key: k, forward: make([]*atomic.Pointer[Node], h)} } // Для каждого уровня соединяем узлы линейно for level := 0; level &lt; maxLevel; level&#43;&#43; { var prev *Node = sl.head for _, n := range nodes { if level &lt; len(n.forward) { prev.forward[level].Store(n) prev = n } } prev.forward[level].Store(nil) } atomic.StoreInt32(&amp;sl.level, int32(maxLevel)) } RangeDelete #Если нужно удалить диапазон [low, high],
+можно пройти один раз от FindGE(low) до &gt; high и пометить всё:">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-01-14T08:07:07+04:00">
+    <meta property="article:modified_time" content="2024-01-14T08:07:07+04:00">
+    <meta property="article:tag" content="Dsa">
+    <meta property="article:tag" content="Skip-List">
+    <meta property="article:tag" content="Go">
+
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Skip-list bulk operations">
+  <meta name="twitter:description" content="Bulk operations #BulkInsert #Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за O(N) (сложность в совокупности - сложность сортировки):
+func (sl *SkipList) BulkInsert(sortedKeys []int) { // Уровень каждого элемента можно назначить заранее nodes := make([]*Node, len(sortedKeys)) for i, k := range sortedKeys { h := randomHeight() nodes[i] = &amp;Node{key: k, forward: make([]*atomic.Pointer[Node], h)} } // Для каждого уровня соединяем узлы линейно for level := 0; level &lt; maxLevel; level&#43;&#43; { var prev *Node = sl.head for _, n := range nodes { if level &lt; len(n.forward) { prev.forward[level].Store(n) prev = n } } prev.forward[level].Store(nil) } atomic.StoreInt32(&amp;sl.level, int32(maxLevel)) } RangeDelete #Если нужно удалить диапазон [low, high],
+можно пройти один раз от FindGE(low) до &gt; high и пометить всё:">
+
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "articleSection": "Posts",
+    "name": "Skip-list bulk operations",
+    "headline": "Skip-list bulk operations",
+    
+    "abstract": "\u003ch2 id=\u0022bulk-operations\u0022 class=\u0022relative group\u0022\u003eBulk operations \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#bulk-operations\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch3 id=\u0022bulkinsert\u0022 class=\u0022relative group\u0022\u003eBulkInsert \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#bulkinsert\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003cp\u003eМожно отсортировать входные данные, если они не были отсортированы, и построить skip-list за \u003ccode\u003eO(N)\u003c\/code\u003e (сложность в совокупности - сложность сортировки):\u003c\/p\u003e\n\u003cdiv class=\u0022highlight\u0022\u003e\u003cpre tabindex=\u00220\u0022 style=\u0022color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\u0022\u003e\u003ccode class=\u0022language-go\u0022 data-lang=\u0022go\u0022\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#66d9ef\u0022\u003efunc\u003c\/span\u003e (\u003cspan style=\u0022color:#a6e22e\u0022\u003esl\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eSkipList\u003c\/span\u003e) \u003cspan style=\u0022color:#a6e22e\u0022\u003eBulkInsert\u003c\/span\u003e(\u003cspan style=\u0022color:#a6e22e\u0022\u003esortedKeys\u003c\/span\u003e []\u003cspan style=\u0022color:#66d9ef\u0022\u003eint\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#75715e\u0022\u003e\/\/ Уровень каждого элемента можно назначить заранее\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#a6e22e\u0022\u003enodes\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e:=\u003c\/span\u003e make([]\u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eNode\u003c\/span\u003e, len(\u003cspan style=\u0022color:#a6e22e\u0022\u003esortedKeys\u003c\/span\u003e))\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#66d9ef\u0022\u003efor\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003ei\u003c\/span\u003e, \u003cspan style=\u0022color:#a6e22e\u0022\u003ek\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e:=\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003erange\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003esortedKeys\u003c\/span\u003e {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003eh\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e:=\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003erandomHeight\u003c\/span\u003e()\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003enodes\u003c\/span\u003e[\u003cspan style=\u0022color:#a6e22e\u0022\u003ei\u003c\/span\u003e] = \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eNode\u003c\/span\u003e{\u003cspan style=\u0022color:#a6e22e\u0022\u003ekey\u003c\/span\u003e: \u003cspan style=\u0022color:#a6e22e\u0022\u003ek\u003c\/span\u003e, \u003cspan style=\u0022color:#a6e22e\u0022\u003eforward\u003c\/span\u003e: make([]\u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eatomic\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003ePointer\u003c\/span\u003e[\u003cspan style=\u0022color:#a6e22e\u0022\u003eNode\u003c\/span\u003e], \u003cspan style=\u0022color:#a6e22e\u0022\u003eh\u003c\/span\u003e)}\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#75715e\u0022\u003e\/\/ Для каждого уровня соединяем узлы линейно\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#66d9ef\u0022\u003efor\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e:=\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e; \u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e \u0026lt; \u003cspan style=\u0022color:#a6e22e\u0022\u003emaxLevel\u003c\/span\u003e; \u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003e {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003evar\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003eprev\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eNode\u003c\/span\u003e = \u003cspan style=\u0022color:#a6e22e\u0022\u003esl\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003ehead\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003efor\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003e_\u003c\/span\u003e, \u003cspan style=\u0022color:#a6e22e\u0022\u003en\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e:=\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003erange\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003enodes\u003c\/span\u003e {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e \u0026lt; len(\u003cspan style=\u0022color:#a6e22e\u0022\u003en\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003eforward\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e                \u003cspan style=\u0022color:#a6e22e\u0022\u003eprev\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003eforward\u003c\/span\u003e[\u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e].\u003cspan style=\u0022color:#a6e22e\u0022\u003eStore\u003c\/span\u003e(\u003cspan style=\u0022color:#a6e22e\u0022\u003en\u003c\/span\u003e)\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e                \u003cspan style=\u0022color:#a6e22e\u0022\u003eprev\u003c\/span\u003e = \u003cspan style=\u0022color:#a6e22e\u0022\u003en\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003eprev\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003eforward\u003c\/span\u003e[\u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e].\u003cspan style=\u0022color:#a6e22e\u0022\u003eStore\u003c\/span\u003e(\u003cspan style=\u0022color:#66d9ef\u0022\u003enil\u003c\/span\u003e)\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    \u003cspan style=\u0022color:#a6e22e\u0022\u003eatomic\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003eStoreInt32\u003c\/span\u003e(\u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003esl\u003c\/span\u003e.\u003cspan style=\u0022color:#a6e22e\u0022\u003elevel\u003c\/span\u003e, int32(\u003cspan style=\u0022color:#a6e22e\u0022\u003emaxLevel\u003c\/span\u003e))\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e}\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/code\u003e\u003c\/pre\u003e\u003c\/div\u003e\u003ch3 id=\u0022rangedelete\u0022 class=\u0022relative group\u0022\u003eRangeDelete \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#rangedelete\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003cp\u003eЕсли нужно удалить диапазон \u003ccode\u003e[low, high]\u003c\/code\u003e,\u003cbr\u003e\nможно пройти один раз от \u003ccode\u003eFindGE(low)\u003c\/code\u003e до \u003ccode\u003e\u0026gt; high\u003c\/code\u003e и пометить всё:\u003c\/p\u003e",
+    "inLanguage": "en-us",
+    "url" : "http:\/\/localhost:1313\/posts\/skip-list_bulk_optimisation\/",
+    "author" : {
+      "@type": "Person",
+      "name": ""
+    },
+    "copyrightYear": "2024",
+    "dateCreated": "2024-01-14T08:07:07\u002b04:00",
+    "datePublished": "2024-01-14T08:07:07\u002b04:00",
+    
+    "dateModified": "2024-01-14T08:07:07\u002b04:00",
+    
+    "keywords": ["dsa","skip-list","go"],
+    
+    "mainEntityOfPage": "true",
+    "wordCount": "479"
+  }
+  </script>
+    
+    <script type="application/ld+json">
+    {
+   "@context": "https://schema.org",
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+     {
+       "@type": "ListItem",
+       "item": "http://localhost:1313/",
+       "name": "Swvit's Blog",
+       "position": 1
+     },
+     {
+       "@type": "ListItem",
+       "item": "http://localhost:1313/posts/",
+       "name": "Posts",
+       "position": 2
+     },
+     {
+       "@type": "ListItem",
+       "name": "Skip List Bulk Operations",
+       "position": 3
+     }
+   ]
+ }
+  </script>
+
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+  
+  
+
+  
+  
+</head>
+<body
+    class="m-auto flex h-screen max-w-7xl flex-col bg-neutral px-6 text-lg leading-7 text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32"
+  >
+    <div id="the-top" class="absolute flex self-center">
+      <a
+        class="-translate-y-8 rounded-b-lg bg-primary-200 px-3 py-1 text-sm focus:translate-y-0 dark:bg-neutral-600"
+        href="#main-content"
+        ><span class="pe-2 font-bold text-primary-600 dark:text-primary-400">&darr;</span
+        >Skip to main content</a
+      >
+    </div>
+    
+    
+      <header class="py-6 font-semibold text-neutral-900 dark:text-neutral sm:py-10 print:hidden">
+  <nav class="flex items-start justify-between sm:items-center">
+    
+    <div class="flex flex-row items-center">
+      
+  <a
+    class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
+    rel="me"
+    href="/"
+    >swvit&rsquo;s blog</a
+  >
+
+    </div>
+    
+    
+  </nav>
 </header>
-    <main>
 
-    <div class="post">
-        <div class="title-group">
-            <div class="title">
-                <h1></h1>
-            </div>
-            <div class="date"><h5></h5></div>
+    
+    <div class="relative flex grow flex-col">
+      <main id="main-content" class="grow">
+        
+  <article>
+    <header class="max-w-prose">
+      
+      <h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
+        Skip-list bulk operations
+      </h1>
+      
+        <div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
+          
+
+
+
+
+
+  
+  
+
+
+
+  
+
+  
+  
+    
+  
+
+  
+
+  
+
+  
+    
+  
+
+  
+
+
+  <div class="flex flex-row flex-wrap items-center">
+    
+    
+      <time datetime="2024-01-14 08:07:07 &#43;0400 &#43;04">January 14, 2024</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">3 mins</span>
+    
+
+    
+    
+      <span class="ps-2"><span class="flex">
+  <span
+    class="ms-1 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
+  >
+    Draft
+  </span>
+</span>
+</span>
+    
+  </div>
+
+  
+  
+
+
         </div>
-        <article class="content">
-            <h2 id="bulk-operations">Bulk operations</h2>
-<h3 id="bulkinsert">BulkInsert</h3>
-<p>Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за <code>O(N)</code> (сложность в совокупности - сложность сортировки):</p>
+      
+      
+    </header>
+    <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
+      
+      <div class="min-h-0 min-w-0 max-w-prose grow">
+        <h2 id="bulk-operations" class="relative group">Bulk operations <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulk-operations" aria-label="Anchor">#</a></span></h2><h3 id="bulkinsert" class="relative group">BulkInsert <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulkinsert" aria-label="Anchor">#</a></span></h3><p>Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за <code>O(N)</code> (сложность в совокупности - сложность сортировки):</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkInsert</span>(<span style="color:#a6e22e">sortedKeys</span> []<span style="color:#66d9ef">int</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Уровень каждого элемента можно назначить заранее</span>
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">nodes</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>, len(<span style="color:#a6e22e">sortedKeys</span>))
@@ -56,8 +322,7 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">StoreInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>, int32(<span style="color:#a6e22e">maxLevel</span>))
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="rangedelete">RangeDelete</h3>
-<p>Если нужно удалить диапазон <code>[low, high]</code>,<br>
+</span></span></code></pre></div><h3 id="rangedelete" class="relative group">RangeDelete <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rangedelete" aria-label="Anchor">#</a></span></h3><p>Если нужно удалить диапазон <code>[low, high]</code>,<br>
 можно пройти один раз от <code>FindGE(low)</code> до <code>&gt; high</code> и пометить всё:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkDeleteRange</span>(<span style="color:#a6e22e">low</span>, <span style="color:#a6e22e">high</span> <span style="color:#66d9ef">int</span>) {
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">findGE</span>(<span style="color:#a6e22e">low</span>)
@@ -87,19 +352,16 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">next</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="batcheddelete">BatchedDelete</h3>
-<p>Если ключи неупорядочены:</p>
+</span></span></code></pre></div><h3 id="batcheddelete" class="relative group">BatchedDelete <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#batcheddelete" aria-label="Anchor">#</a></span></h3><p>Если ключи неупорядочены:</p>
 <ol>
 <li>Сначала отсортировать ключи</li>
 <li>Проходить список один раз, параллельно с массивом ключей</li>
 </ol>
 <p>Это превращает <code>K x log N</code> поисков в один линейный проход O(N + K) + сортировка ключей <code>K log K</code>.</p>
 <p>// TODO реализовать BatchedDelete</p>
-<h3 id="bulksearch">BulkSearch</h3>
-<p>Массовые запросы (например, <code>SearchMany(keys)</code>) могут разделять общий путь поиска и не начинать с головы каждый раз.</p>
+<h3 id="bulksearch" class="relative group">BulkSearch <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulksearch" aria-label="Anchor">#</a></span></h3><p>Массовые запросы (например, <code>SearchMany(keys)</code>) могут разделять общий путь поиска и не начинать с головы каждый раз.</p>
 <p>// TODO реализовать SearchMany</p>
-<h3 id="shared-traversal">Shared Traversal</h3>
-<ol>
+<h3 id="shared-traversal" class="relative group">Shared Traversal <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#shared-traversal" aria-label="Anchor">#</a></span></h3><ol>
 <li>Для каждого <code>key</code> — продолжаем поиск с предыдущего найденного узла</li>
 <li>Так каждый элемент ищет в среднем <code>O(log(N/K))</code> вместо <code>O(log N)</code></li>
 </ol>
@@ -121,15 +383,13 @@
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="simd--prefetch">SIMD / prefetch</h3>
-<p>В CPU-ориентированных реализациях (например, Redis или ClickHouse):</p>
+</span></span></code></pre></div><h3 id="simd--prefetch" class="relative group">SIMD / prefetch <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#simd--prefetch" aria-label="Anchor">#</a></span></h3><p>В CPU-ориентированных реализациях (например, Redis или ClickHouse):</p>
 <ul>
 <li>при поиске батчей ключей можно использовать <strong>prefetch</strong> инструкцию CPU,</li>
 <li>заранее подгружая cache line для следующего узла (особенно на уровне 0).</li>
 </ul>
 <p>// TODO Реализация SIMD / prefetch оптимизации</p>
-<h3 id="композиционные-оптимизации">Композиционные оптимизации</h3>
-<ul>
+<h3 id="композиционные-оптимизации" class="relative group">Композиционные оптимизации <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%ba%d0%be%d0%bc%d0%bf%d0%be%d0%b7%d0%b8%d1%86%d0%b8%d0%be%d0%bd%d0%bd%d1%8b%d0%b5-%d0%be%d0%bf%d1%82%d0%b8%d0%bc%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d0%b8" aria-label="Anchor">#</a></span></h3><ul>
 <li>
 <p><strong>Batch-friendly random level generator</strong> — использовать предсказуемые высоты для соседних ключей, чтобы структура оставалась статистически ровной при bulk вставке.</p>
 <p>// TODO Batch-friendly random level generator</p>
@@ -141,46 +401,119 @@
 <p><strong>Immutable bulk merge</strong> — при массовом добавлении лучше построить новый skip list и потом атомарно заменить указатель на голову (copy-on-write подход).</p>
 </li>
 </ul>
-<h2 id="jitty">Jitty</h2>
-<p><a href="https://arxiv.org/abs/2102.01044#" target="_blank">https://arxiv.org/abs/2102.01044#</a></p>
+<h2 id="jitty" class="relative group">Jitty <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#jitty" aria-label="Anchor">#</a></span></h2><p><a href="https://arxiv.org/abs/2102.01044#" target="_blank" rel="noreferrer">https://arxiv.org/abs/2102.01044#</a></p>
 
-        </article>
-        
-    </article>
-
-
-    </main>
-    <footer>
-  <div class="content-container">
-    <div class="content">Программист и пароход. Делаю всякое.
-
-
-  <p class="horizontal-links"><a href="/"
-       
-       
-      >Home</a><a href="/posts"
-       
-       
-      >Posts</a><a href="/notes"
-       
-       
-      >Notes</a><a href="/projects"
-       
-       
-      >Projects</a><a href="/tags"
-       
-       
-      >Tags</a><a href="/about"
-       
-       
-      >About</a></p>
-
-</div>
-  </div>
-</footer>
+      </div>
+    </section>
+    <footer class="max-w-prose pt-8 print:hidden">
+      
+  <div class="flex">
     
-    <script>
-      const emailId = atob("bWFpbEBleGFtcGxlLmNvbQ==");
-    </script>
-      <script src="/js/rocinante.min.js"></script></body>
+    
+    
+    <div class="place-self-center">
+      
+      
+      <div class="text-2xl sm:text-lg">
+</div>
+    </div>
+  </div>
+
+
+      
+
+      
+  
+    
+    
+    
+    <div class="pt-8">
+      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
+      <div class="flex justify-between pt-3">
+        <span>
+          
+        </span>
+        <span>
+          
+            <a class="group flex text-right" href="http://localhost:1313/posts/skip-list/">
+              <span class="flex flex-col">
+                <span
+                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
+                  >Skip-list</span
+                >
+                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
+                  
+                    <time datetime="2024-01-14 08:07:07 &#43;0400 &#43;04">January 14, 2024</time>
+                  
+                </span>
+              </span>
+              <span
+                class="ms-2 text-neutral-700 transition-transform group-hover:-translate-x-[-2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
+                ><span class="ltr:inline rtl:hidden">&rarr;</span
+                ><span class="ltr:hidden rtl:inline">&larr;</span></span
+              >
+            </a>
+          
+        </span>
+      </div>
+    </div>
+  
+
+
+      
+    </footer>
+  </article>
+
+      </main>
+      
+        <div
+          class="pointer-events-none absolute bottom-0 end-0 top-[100vh] w-12"
+          id="to-top"
+          hidden="true"
+        >
+          <a
+            href="#the-top"
+            class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 backdrop-blur hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400"
+            aria-label="Scroll to top"
+            title="Scroll to top"
+          >
+            &uarr;
+          </a>
+        </div>
+      <footer class="py-10 print:hidden">
+  
+  
+  <div class="flex items-center justify-between">
+    <div>
+      
+      
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+            &copy;
+            2025
+            
+        </p>
+      
+      
+      
+        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+          
+          
+          Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
+            href="https://gohugo.io/" target="_blank" rel="noopener noreferrer">Hugo</a> &amp; <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href="https://github.com/jpanther/congo" target="_blank" rel="noopener noreferrer">Congo</a>
+        </p>
+      
+    </div>
+    <div class="flex flex-row items-center">
+      
+      
+      
+      
+    </div>
+  </div>
+  
+  
+</footer>
+
+    </div>
+  </body>
 </html>
