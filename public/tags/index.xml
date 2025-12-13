@@ -6,27 +6,62 @@
     <description>Recent content in Tags on swvit&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 17 Aug 2025 10:00:00 +0400</lastBuildDate>
+    <lastBuildDate>Sun, 30 Nov 2025 10:00:00 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Example</title>
+      <link>http://localhost:1313/tags/example/</link>
+      <pubDate>Sun, 30 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/example/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Markov Chains</title>
+      <link>http://localhost:1313/tags/markov-chains/</link>
+      <pubDate>Sun, 30 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/markov-chains/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Dns</title>
+      <link>http://localhost:1313/tags/dns/</link>
+      <pubDate>Wed, 26 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/dns/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Algorithms</title>
       <link>http://localhost:1313/tags/algorithms/</link>
-      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/algorithms/</guid>
       <description></description>
     </item>
     <item>
       <title>Burrows_wheeler</title>
       <link>http://localhost:1313/tags/burrows_wheeler/</link>
-      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/burrows_wheeler/</guid>
       <description></description>
     </item>
     <item>
       <title>BWT</title>
       <link>http://localhost:1313/tags/bwt/</link>
-      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/bwt/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Go</title>
+      <link>http://localhost:1313/tags/go/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/go/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Strings</title>
+      <link>http://localhost:1313/tags/strings/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/strings/</guid>
       <description></description>
     </item>
     <item>
@@ -44,13 +79,6 @@
       <description></description>
     </item>
     <item>
-      <title>Go</title>
-      <link>http://localhost:1313/tags/go/</link>
-      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/tags/go/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Hashing</title>
       <link>http://localhost:1313/tags/hashing/</link>
       <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
@@ -62,13 +90,6 @@
       <link>http://localhost:1313/tags/rendezvous/</link>
       <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/rendezvous/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Strings</title>
-      <link>http://localhost:1313/tags/strings/</link>
-      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/tags/strings/</guid>
       <description></description>
     </item>
     <item>
@@ -86,31 +107,10 @@
       <description></description>
     </item>
     <item>
-      <title>Knowledgebase</title>
-      <link>http://localhost:1313/tags/knowledgebase/</link>
-      <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/tags/knowledgebase/</guid>
-      <description></description>
-    </item>
-    <item>
       <title>Ntp</title>
       <link>http://localhost:1313/tags/ntp/</link>
       <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/ntp/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Obsidian</title>
-      <link>http://localhost:1313/tags/obsidian/</link>
-      <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/tags/obsidian/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Python</title>
-      <link>http://localhost:1313/tags/python/</link>
-      <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/tags/python/</guid>
       <description></description>
     </item>
     <item>
@@ -121,9 +121,37 @@
       <description></description>
     </item>
     <item>
+      <title>Python</title>
+      <link>http://localhost:1313/tags/python/</link>
+      <pubDate>Sun, 18 Aug 2024 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/python/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Spaced-Repetition</title>
+      <link>http://localhost:1313/tags/spaced-repetition/</link>
+      <pubDate>Sun, 18 Aug 2024 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/spaced-repetition/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Knowledgebase</title>
+      <link>http://localhost:1313/tags/knowledgebase/</link>
+      <pubDate>Fri, 21 Jun 2024 21:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/knowledgebase/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Obsidian</title>
+      <link>http://localhost:1313/tags/obsidian/</link>
+      <pubDate>Fri, 21 Jun 2024 21:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/obsidian/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Utils</title>
       <link>http://localhost:1313/tags/utils/</link>
-      <pubDate>Sat, 21 Jun 2025 21:00:00 +0400</pubDate>
+      <pubDate>Fri, 21 Jun 2024 21:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/utils/</guid>
       <description></description>
     </item>

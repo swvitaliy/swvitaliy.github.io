@@ -17,8 +17,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#FFFFFF" />
   
-  <title>Consistetent and Rendezvous hashing (HRW) &middot; swvit&#39;s blog</title>
-    <meta name="title" content="Consistetent and Rendezvous hashing (HRW) &middot; swvit&#39;s blog" />
+  <title>Consistent and Rendezvous Hashing &middot; swvit&#39;s blog</title>
+    <meta name="title" content="Consistent and Rendezvous Hashing &middot; swvit&#39;s blog" />
   
   
   
@@ -54,8 +54,7 @@
     name="description"
     content="
       
-        Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
-Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+        Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
 На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.
       
     "
@@ -82,9 +81,8 @@
   
   <meta property="og:url" content="http://localhost:1313/posts/consistent_rendezvous_hashing/">
   <meta property="og:site_name" content="swvit&#39;s blog">
-  <meta property="og:title" content="Consistetent and Rendezvous hashing (HRW)">
-  <meta property="og:description" content="Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
-Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+  <meta property="og:title" content="Consistent and Rendezvous Hashing">
+  <meta property="og:description" content="Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
 На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
@@ -99,9 +97,8 @@
 
   
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Consistetent and Rendezvous hashing (HRW)">
-  <meta name="twitter:description" content="Rendezvous hashing #Rendezvous hashing (HRW - Highest Random Weight hashing) относится с
-Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
+  <meta name="twitter:title" content="Consistent and Rendezvous Hashing">
+  <meta name="twitter:description" content="Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
 На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
 
   
@@ -110,10 +107,10 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "Posts",
-    "name": "Consistetent and Rendezvous hashing (HRW)",
-    "headline": "Consistetent and Rendezvous hashing (HRW)",
+    "name": "Consistent and Rendezvous Hashing",
+    "headline": "Consistent and Rendezvous Hashing",
     
-    "abstract": "\u003ch2 id=\u0022rendezvous-hashing\u0022 class=\u0022relative group\u0022\u003eRendezvous hashing \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#rendezvous-hashing\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003eRendezvous hashing (\u003cstrong\u003eHRW - Highest Random Weight hashing\u003c\/strong\u003e) относится с\u003c\/p\u003e\n\u003cp\u003eЗто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении\/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.\u003c\/p\u003e\n\u003cp\u003eНа вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число \u003ccode\u003en\u003c\/code\u003e в бакет под номером \u003ccode\u003ek\u003c\/code\u003e, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.\u003c\/p\u003e",
+    "abstract": "\u003ch2 id=\u0022rendezvous-hashing\u0022 class=\u0022relative group\u0022\u003eRendezvous hashing \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#rendezvous-hashing\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003e\u003cstrong\u003eRendezvous hashing, Highest Random Weight hashing, HRW\u003c\/strong\u003e - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении\/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.\u003c\/p\u003e\n\u003cp\u003eНа вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число \u003ccode\u003en\u003c\/code\u003e в бакет под номером \u003ccode\u003ek\u003c\/code\u003e, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.\u003c\/p\u003e",
     "inLanguage": "en",
     "url" : "http:\/\/localhost:1313\/posts\/consistent_rendezvous_hashing\/",
     "author" : {
@@ -129,7 +126,7 @@
     "keywords": ["dsa","consistent","rendezvous","hashing","go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "850"
+    "wordCount": "848"
   }
   </script>
     
@@ -152,7 +149,7 @@
      },
      {
        "@type": "ListItem",
-       "name": "Consistetent and Rendezvous Hashing ( Hrw)",
+       "name": "Consistent and Rendezvous Hashing",
        "position": 3
      }
    ]
@@ -279,7 +276,7 @@
     <header class="max-w-prose">
       
       <h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-        Consistetent and Rendezvous hashing (HRW)
+        Consistent and Rendezvous Hashing
       </h1>
       
         <div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
@@ -342,8 +339,7 @@
     <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
       
       <div class="min-h-0 min-w-0 max-w-prose grow">
-        <h2 id="rendezvous-hashing" class="relative group">Rendezvous hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p>Rendezvous hashing (<strong>HRW - Highest Random Weight hashing</strong>) относится с</p>
-<p>Зто алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.</p>
+        <h2 id="rendezvous-hashing" class="relative group">Rendezvous hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p><strong>Rendezvous hashing, Highest Random Weight hashing, HRW</strong> - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.</p>
 <p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
 <p>
 
@@ -462,7 +458,7 @@
 <p>В consistent hashing вы можете распределить vnodes неравномерно так, чтобы на некоторые узлы нагручка приходила больге, чем на остальные (горячие ключи). В randezvous так сделать нельзя.</p>
 <h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
 <p>// TODO scenarios</p>
-<ol start="5">
+<ol>
 <li>redis-go для выбора узла в shardedClient</li>
 <li>nginx (where?)</li>
 <li></li>
@@ -538,11 +534,11 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Burrows-Wheeler Transformation (BWT)</span
+                  >Burrows-Wheeler Transformation</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time>
+                    <time datetime="2025-11-02 10:00:00 &#43;0400 &#43;04">2 November 2025</time>
                   
                 </span>
               </span>

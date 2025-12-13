@@ -8,8 +8,55 @@
   
     
       <url>
+            <loc>http://localhost:1313/projects/</loc>
+            <lastmod>2025-11-30T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/projects/simple_markov_chains/</loc>
+            <lastmod>2025-11-30T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/</loc>
+            <lastmod>2025-11-30T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+  
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/projects/simple_dns/</loc>
+            <lastmod>2025-11-26T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+  
+    
+  
+    
+      <url>
             <loc>http://localhost:1313/posts/bwt/</loc>
-            <lastmod>2025-08-17T10:00:00+04:00</lastmod>
+            <lastmod>2025-11-02T10:00:00+04:00</lastmod>
+          </url>
+    
+  
+    
+  
+    
+  
+    
+      <url>
+            <loc>http://localhost:1313/posts/</loc>
+            <lastmod>2025-11-02T10:00:00+04:00</lastmod>
           </url>
     
   
@@ -32,27 +79,7 @@
   
     
       <url>
-            <loc>http://localhost:1313/posts/</loc>
-            <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-  
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/</loc>
-            <lastmod>2025-08-17T10:00:00+04:00</lastmod>
-          </url>
-    
-  
-    
-  
-    
-      <url>
-            <loc>http://localhost:1313/notes/berkley_algorithm/</loc>
+            <loc>http://localhost:1313/posts/berkley_algorithm/</loc>
             <lastmod>2025-06-21T21:00:00+04:00</lastmod>
           </url>
     
@@ -64,16 +91,13 @@
     
   
     
-      <url>
-            <loc>http://localhost:1313/projects/knowledgebase-normalization/</loc>
-            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
-          </url>
+  
     
   
     
       <url>
-            <loc>http://localhost:1313/notes/</loc>
-            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
+            <loc>http://localhost:1313/projects/spaced_repetition/</loc>
+            <lastmod>2024-08-18T10:00:00+04:00</lastmod>
           </url>
     
   
@@ -83,11 +107,9 @@
   
     
       <url>
-            <loc>http://localhost:1313/projects/</loc>
-            <lastmod>2025-06-21T21:00:00+04:00</lastmod>
+            <loc>http://localhost:1313/projects/knowledgebase_normalization/</loc>
+            <lastmod>2024-06-21T21:00:00+04:00</lastmod>
           </url>
-    
-  
     
   
     

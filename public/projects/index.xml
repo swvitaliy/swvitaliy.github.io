@@ -6,8 +6,15 @@
     <description>Recent content in Projects on swvit&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 26 Nov 2025 10:00:00 +0400</lastBuildDate>
+    <lastBuildDate>Sun, 30 Nov 2025 10:00:00 +0400</lastBuildDate>
     <atom:link href="http://localhost:1313/projects/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Simple Markov Chains</title>
+      <link>http://localhost:1313/projects/simple_markov_chains/</link>
+      <pubDate>Sun, 30 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/projects/simple_markov_chains/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Simple DNS</title>
       <link>http://localhost:1313/projects/simple_dns/</link>
@@ -24,16 +31,9 @@
     </item>
     <item>
       <title>Knowledgebase Normalization</title>
-      <link>http://localhost:1313/projects/knowledgebase-normalization/</link>
+      <link>http://localhost:1313/projects/knowledgebase_normalization/</link>
       <pubDate>Fri, 21 Jun 2024 21:00:00 +0400</pubDate>
-      <guid>http://localhost:1313/projects/knowledgebase-normalization/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>nginx json-rpc2 plugin</title>
-      <link>http://localhost:1313/projects/nginx_json_rpc/</link>
-      <pubDate>Sat, 20 May 2023 10:00:00 +0300</pubDate>
-      <guid>http://localhost:1313/projects/nginx_json_rpc/</guid>
+      <guid>http://localhost:1313/projects/knowledgebase_normalization/</guid>
       <description></description>
     </item>
   </channel>

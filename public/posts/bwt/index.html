@@ -17,8 +17,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#FFFFFF" />
   
-  <title>Burrows-Wheeler Transformation (BWT) &middot; swvit&#39;s blog</title>
-    <meta name="title" content="Burrows-Wheeler Transformation (BWT) &middot; swvit&#39;s blog" />
+  <title>Burrows-Wheeler Transformation &middot; swvit&#39;s blog</title>
+    <meta name="title" content="Burrows-Wheeler Transformation &middot; swvit&#39;s blog" />
   
   
   
@@ -54,7 +54,7 @@
     name="description"
     content="
       
-        Один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
+        Burrows-Wheeler Transformation (BWT) - один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
 В данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.
 Описание #Суффиксный массив #Постороение #Поиск #FM-Index #Optimisations #bitvector rank #batch search #Concurrency #Benchmarks #References #
 
@@ -84,15 +84,15 @@
   
   <meta property="og:url" content="http://localhost:1313/posts/bwt/">
   <meta property="og:site_name" content="swvit&#39;s blog">
-  <meta property="og:title" content="Burrows-Wheeler Transformation (BWT)">
-  <meta property="og:description" content="Один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
+  <meta property="og:title" content="Burrows-Wheeler Transformation">
+  <meta property="og:description" content="Burrows-Wheeler Transformation (BWT) - один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
 В данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.
 Описание #Суффиксный массив #Постороение #Поиск #FM-Index #Optimisations #bitvector rank #batch search #Concurrency #Benchmarks #References #">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2025-08-17T10:00:00+04:00">
-    <meta property="article:modified_time" content="2025-08-17T10:00:00+04:00">
+    <meta property="article:published_time" content="2025-11-02T10:00:00+04:00">
+    <meta property="article:modified_time" content="2025-11-02T10:00:00+04:00">
     <meta property="article:tag" content="Go">
     <meta property="article:tag" content="BWT">
     <meta property="article:tag" content="Burrows_wheeler">
@@ -101,8 +101,8 @@
 
   
   <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Burrows-Wheeler Transformation (BWT)">
-  <meta name="twitter:description" content="Один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
+  <meta name="twitter:title" content="Burrows-Wheeler Transformation">
+  <meta name="twitter:description" content="Burrows-Wheeler Transformation (BWT) - один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.
 В данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.
 Описание #Суффиксный массив #Постороение #Поиск #FM-Index #Optimisations #bitvector rank #batch search #Concurrency #Benchmarks #References #">
 
@@ -112,10 +112,10 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "articleSection": "Posts",
-    "name": "Burrows-Wheeler Transformation (BWT)",
-    "headline": "Burrows-Wheeler Transformation (BWT)",
+    "name": "Burrows-Wheeler Transformation",
+    "headline": "Burrows-Wheeler Transformation",
     
-    "abstract": "\u003cp\u003eОдин из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.\u003c\/p\u003e\n\u003cp\u003eВ данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.\u003c\/p\u003e\n\u003ch2 id=\u0022описание\u0022 class=\u0022relative group\u0022\u003eОписание \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%be%d0%bf%d0%b8%d1%81%d0%b0%d0%bd%d0%b8%d0%b5\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch3 id=\u0022суффиксный-массив\u0022 class=\u0022relative group\u0022\u003eСуффиксный массив \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d1%81%d1%83%d1%84%d1%84%d0%b8%d0%ba%d1%81%d0%bd%d1%8b%d0%b9-%d0%bc%d0%b0%d1%81%d1%81%d0%b8%d0%b2\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch2 id=\u0022постороение\u0022 class=\u0022relative group\u0022\u003eПостороение \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%bf%d0%be%d1%81%d1%82%d0%be%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022поиск\u0022 class=\u0022relative group\u0022\u003eПоиск \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%bf%d0%be%d0%b8%d1%81%d0%ba\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022fm-index\u0022 class=\u0022relative group\u0022\u003eFM-Index \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#fm-index\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022optimisations\u0022 class=\u0022relative group\u0022\u003eOptimisations \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#optimisations\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch3 id=\u0022bitvector-rank\u0022 class=\u0022relative group\u0022\u003ebitvector rank \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#bitvector-rank\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch3 id=\u0022batch-search\u0022 class=\u0022relative group\u0022\u003ebatch search \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#batch-search\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch2 id=\u0022concurrency\u0022 class=\u0022relative group\u0022\u003eConcurrency \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#concurrency\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022benchmarks\u0022 class=\u0022relative group\u0022\u003eBenchmarks \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#benchmarks\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022references\u0022 class=\u0022relative group\u0022\u003eReferences \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#references\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003col\u003e\n\u003cli\u003e\u003c\/li\u003e\n\u003c\/ol\u003e",
+    "abstract": "\u003cp\u003eBurrows-Wheeler Transformation (BWT) - один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.\u003c\/p\u003e\n\u003cp\u003eВ данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.\u003c\/p\u003e\n\u003ch2 id=\u0022описание\u0022 class=\u0022relative group\u0022\u003eОписание \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%be%d0%bf%d0%b8%d1%81%d0%b0%d0%bd%d0%b8%d0%b5\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch3 id=\u0022суффиксный-массив\u0022 class=\u0022relative group\u0022\u003eСуффиксный массив \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d1%81%d1%83%d1%84%d1%84%d0%b8%d0%ba%d1%81%d0%bd%d1%8b%d0%b9-%d0%bc%d0%b0%d1%81%d1%81%d0%b8%d0%b2\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch2 id=\u0022постороение\u0022 class=\u0022relative group\u0022\u003eПостороение \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%bf%d0%be%d1%81%d1%82%d0%be%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022поиск\u0022 class=\u0022relative group\u0022\u003eПоиск \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#%d0%bf%d0%be%d0%b8%d1%81%d0%ba\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022fm-index\u0022 class=\u0022relative group\u0022\u003eFM-Index \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#fm-index\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022optimisations\u0022 class=\u0022relative group\u0022\u003eOptimisations \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#optimisations\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch3 id=\u0022bitvector-rank\u0022 class=\u0022relative group\u0022\u003ebitvector rank \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#bitvector-rank\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch3 id=\u0022batch-search\u0022 class=\u0022relative group\u0022\u003ebatch search \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#batch-search\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h3\u003e\u003ch2 id=\u0022concurrency\u0022 class=\u0022relative group\u0022\u003eConcurrency \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#concurrency\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022benchmarks\u0022 class=\u0022relative group\u0022\u003eBenchmarks \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#benchmarks\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003ch2 id=\u0022references\u0022 class=\u0022relative group\u0022\u003eReferences \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#references\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003col\u003e\n\u003cli\u003e\u003c\/li\u003e\n\u003c\/ol\u003e",
     "inLanguage": "en",
     "url" : "http:\/\/localhost:1313\/posts\/bwt\/",
     "author" : {
@@ -123,15 +123,15 @@
       "name": ""
     },
     "copyrightYear": "2025",
-    "dateCreated": "2025-08-17T10:00:00\u002b04:00",
-    "datePublished": "2025-08-17T10:00:00\u002b04:00",
+    "dateCreated": "2025-11-02T10:00:00\u002b04:00",
+    "datePublished": "2025-11-02T10:00:00\u002b04:00",
     
-    "dateModified": "2025-08-17T10:00:00\u002b04:00",
+    "dateModified": "2025-11-02T10:00:00\u002b04:00",
     
     "keywords": ["go","BWT","burrows_wheeler","strings","algorithms"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "80"
+    "wordCount": "84"
   }
   </script>
     
@@ -154,7 +154,7 @@
      },
      {
        "@type": "ListItem",
-       "name": "Burrows Wheeler Transformation ( Bwt)",
+       "name": "Burrows Wheeler Transformation",
        "position": 3
      }
    ]
@@ -281,7 +281,7 @@
     <header class="max-w-prose">
       
       <h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-        Burrows-Wheeler Transformation (BWT)
+        Burrows-Wheeler Transformation
       </h1>
       
         <div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
@@ -317,7 +317,7 @@
   <div class="flex flex-row flex-wrap items-center">
     
     
-      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">1 min</span>
+      <time datetime="2025-11-02 10:00:00 &#43;0400 &#43;04">2 November 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">1 min</span>
     
 
     
@@ -344,7 +344,7 @@
     <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
       
       <div class="min-h-0 min-w-0 max-w-prose grow">
-        <p>Один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.</p>
+        <p>Burrows-Wheeler Transformation (BWT) - один из самых интересных алгоритмов, на мой взгляд. Он имеет широкое применение в биоиннформатике (поиск шаблонов по геному), сжатии данных (bzip2), индексирование текста (FM-Index) и многих других.</p>
 <p>В данной статье, я постараюсь продемонстрировать применение BWT для задачи поиска множества шаблонов в большом тексте, описаны оптимизации, рассмотрена конкурентная реализация, а так же проведены бенчмарки версии без оптимизации, с оптимизациями и параллельной реализации в задаче поиска текста.</p>
 <h2 id="описание" class="relative group">Описание <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%be%d0%bf%d0%b8%d1%81%d0%b0%d0%bd%d0%b8%d0%b5" aria-label="Anchor">#</a></span></h2><h3 id="суффиксный-массив" class="relative group">Суффиксный массив <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d1%81%d1%83%d1%84%d1%84%d0%b8%d0%ba%d1%81%d0%bd%d1%8b%d0%b9-%d0%bc%d0%b0%d1%81%d1%81%d0%b8%d0%b2" aria-label="Anchor">#</a></span></h3><h2 id="постороение" class="relative group">Постороение <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d0%be%d1%81%d1%82%d0%be%d1%80%d0%be%d0%b5%d0%bd%d0%b8%d0%b5" aria-label="Anchor">#</a></span></h2><h2 id="поиск" class="relative group">Поиск <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d0%be%d0%b8%d1%81%d0%ba" aria-label="Anchor">#</a></span></h2><h2 id="fm-index" class="relative group">FM-Index <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#fm-index" aria-label="Anchor">#</a></span></h2><h2 id="optimisations" class="relative group">Optimisations <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#optimisations" aria-label="Anchor">#</a></span></h2><h3 id="bitvector-rank" class="relative group">bitvector rank <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bitvector-rank" aria-label="Anchor">#</a></span></h3><h3 id="batch-search" class="relative group">batch search <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#batch-search" aria-label="Anchor">#</a></span></h3><h2 id="concurrency" class="relative group">Concurrency <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#concurrency" aria-label="Anchor">#</a></span></h2><h2 id="benchmarks" class="relative group">Benchmarks <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#benchmarks" aria-label="Anchor">#</a></span></h2><h2 id="references" class="relative group">References <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#references" aria-label="Anchor">#</a></span></h2><ol>
 <li></li>
@@ -388,7 +388,7 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Consistetent and Rendezvous hashing (HRW)</span
+                  >Consistent and Rendezvous Hashing</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
