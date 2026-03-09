@@ -1,0 +1,7 @@
+
+article .prose {
+  max-width: 120ch;
+}
+article .max-w-prose {
+  max-width: 120ch;
+}

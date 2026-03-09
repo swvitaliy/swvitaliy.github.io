@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "70266d2bea72a2f1",
+        "id": "5583758fb6658182",
         "type": "tabs",
         "children": [
           {
-            "id": "d5dd0301960eda9b",
+            "id": "2cf00fab6caf8c26",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/bwt/index.md",
+                "file": "content/posts/skip-list/index.md",
                 "mode": "source",
                 "source": false
               },
@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 371.5
+    "width": 360.5
   },
   "right": {
     "id": "6ec33a7f881f8184",
@@ -140,7 +140,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "content/posts/bwt/index.md",
+                "file": "content/posts/skip-list/index.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -174,7 +174,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 431.5
+    "width": 435.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -192,54 +192,53 @@
       "remotely-save:Remotely Save": false
     }
   },
-  "active": "d5dd0301960eda9b",
+  "active": "7930aa6d9fbba6a4",
   "lastOpenFiles": [
+    "content/posts/bwt/index.md",
+    "content/posts/bwt/images/cyclic_rotation.png",
+    "content/posts/skip-list/Drawing 2025-10-05 16.34.37.excalidraw.md",
+    "content/posts/consistent_rendezvous_hashing/index.md",
+    "content/posts/skip-list/index.md",
+    "content/posts/skip-list/sl_levels.svg",
+    "drafts/posts/kafka_rebalance_benchmark/index.md",
+    "content/posts/bwt/images/sorting.png",
+    "drafts/posts/skip-list_benchmarks/index.md",
+    "drafts/posts/skip-list_benchmarks",
+    "drafts/posts/skip-list-bulk-opearations/index.md",
+    "drafts/posts/consistent_collection_ordering/index.md",
+    "public/posts/simple_markov_chains/index.html",
+    "public/posts/simple_markov_chains",
+    "public/posts/simple_dns/index.html",
+    "public/posts/simple_dns",
+    "drafts/posts/2025-01-05_concurrency_patterns_in_go/2025-01-05_concurrency_patterns_in_go.md",
+    "drafts/posts/2025-01-05_Bron–Kerbosch Algorithm/2025-01-05_Bron–Kerbosch Algorithm.md",
+    "drafts/posts/2025-01-03_fail_tolerance/2025-01-03_cache_strategies.md",
+    "drafts/posts/2025-01-05_redis_based_task_queue/2025-01-05_redis_based_task_queue.md",
+    "drafts/posts/Алгоритм разборчивой невесты.md",
+    "drafts/posts/spaced_repetition/index.md",
+    "drafts/posts/simple_markov_chains/index.md",
+    "drafts/posts/simple_dns/index.md",
+    "drafts/posts/knowledgebase_normalization/index.md",
+    "drafts/posts/lms-tree_mem_table",
     "public/index.xml",
-    "public/page/1/index.html",
-    "public/page/1",
-    "public/page",
-    "public/index.html",
-    "public/tags/utils/page/1/index.html",
-    "public/tags/time/page/1/index.html",
-    "public/tags/strings/page/1/index.html",
-    "public/tags/skip-list/page/1/index.html",
-    "public/tags/spaced-repetition/page/1/index.html",
-    "public/tags/python/page/1/index.html",
-    "public/posts/bwt/images/cyclic_rotation.png",
+    "public/tags/index.xml",
+    "public/tags/dsa/index.xml",
+    "public/tags/consistent/index.xml",
+    "public/favicon-16x16.png",
     "public/posts/bwt/images/sorting.png",
+    "public/posts/bwt/images/cyclic_rotation.png",
     "public/posts/skip-list/sl_search.svg",
     "public/posts/skip-list/sl_levels.svg",
     "public/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
     "public/icons/favicon.png",
-    "public/favicon-32x32.png",
-    "public/favicon-16x16.png",
-    "public/apple-touch-icon.png",
-    "public/android-chrome-512x512.png",
-    "content/posts/bwt/index.md",
-    "content/posts/consistent_rendezvous_hashing/index.md",
     "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
-    "drafts/posts/2025-12-13_CMS/index.md",
-    "content/posts/skip-list/index.md",
-    "drafts/posts/2025-12-13_combinatory/index.md",
-    "drafts/posts/2025-01-03_fail_tolerance/2025-01-03_cache_strategies.md",
-    "drafts/posts/2025-01-05_Bron–Kerbosch Algorithm/2025-01-05_Bron–Kerbosch Algorithm.md",
-    "drafts/posts/2025-01-05_concurrency_patterns_in_go/2025-01-05_concurrency_patterns_in_go.md",
-    "content/projects/simple_dns/index.md",
-    "drafts/posts/consistent_collection_ordering/index.md",
-    "content/projects/simple_markov_chains/index.md",
-    "content/projects/spaced_repetition/index.md",
-    "content/projects/knowledgebase_normalization/index.md",
-    "drafts/posts/kafka_rebalance_benchmark/index.md",
-    "drafts/projects/nginx_json_rpc/index.md",
-    "drafts/bwt_optimisations/index.md",
-    "drafts/skip-list_benchmarks/index.md",
-    "drafts/lock-free_skip-list/lock-free_skip-list.md",
-    "content/projects/simple_dns.md",
-    "content/posts/berkley_algorithm/index.md",
-    "content/Untitled.md",
-    "content/posts/skip-list_bulk_optimisation/index.md",
-    "content/posts/skip-list/Drawing 2025-10-05 16.34.37.excalidraw.md",
-    "drafts/posts/lsm-tree/index.md",
+    "themes/congo/exampleSite/content/docs/version-2/upgrade/index.zh-Hans.md",
+    "themes/congo/exampleSite/content/docs/version-2/upgrade/index.md",
+    "themes/congo/exampleSite/content/docs/version-2/upgrade/index.ja.md",
+    "themes/congo/exampleSite/content/tags/advanced/_index.zh-CN.md",
+    "themes/congo/exampleSite/content/tags/advanced/_index.md",
+    "themes/congo/exampleSite/content/tags/advanced/_index.ja.md",
+    "themes/congo/exampleSite/content/tags/advanced/_index.es.md",
     "content/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/Untitled.canvas"

@@ -5,3 +5,5 @@ title = "swvit's blog"
 theme = "congo"
 pagerSize = 3
 
+[params]
+  customCSS = ["css/custom.css"]

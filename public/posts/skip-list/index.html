@@ -36,12 +36,14 @@
   
   
   
+    
+  
   
   <link
     type="text/css"
     rel="stylesheet"
-    href="http://localhost:1313/css/main.bundle.min.4ff2f0d9317584d683b4e7eb63d3e970d4ea49cb3f93ac06e520d4c4fd5d4816.css"
-    integrity="sha256-T/Lw2TF1hNaDtOfrY9PpcNTqScs/k6wG5SDUxP1dSBY="
+    href="http://localhost:1313/css/main.bundle.min.071fe94b19e90e329a8823ebbdfba57afcb8992a4739df9796aa1ebf04ecc076.css"
+    integrity="sha256-Bx/pSxnpDjKaiCPrvfulevy4mSpHOd&#43;XlqoevwTswHY="
   />
   
   
@@ -124,7 +126,7 @@
     "keywords": ["dsa","skip-list","go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1690"
+    "wordCount": "2336"
   }
   </script>
     
@@ -310,7 +312,7 @@
   <div class="flex flex-row flex-wrap items-center">
     
     
-      <time datetime="2024-01-14 08:07:07 &#43;0400 &#43;04">14 January 2024</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">8 mins</span>
+      <time datetime="2024-01-14 08:07:07 &#43;0400 &#43;04">14 January 2024</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">11 mins</span>
     
 
     
@@ -360,7 +362,8 @@
 </span></span><span style="display:flex;"><span>    }  
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">lvl</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>
+</span></span></code></pre></div><p>Для данной реализации и вероятности 0.5 получим вероятность попадания узла на уровень k равен 0.5^k.</p>
+<p>
 
 
 
@@ -400,6 +403,8 @@
 </span></span><span style="display:flex;"><span>       }  
 </span></span><span style="display:flex;"><span>    }
 </span></span></code></pre></div><p>Если элемент равен искомому, то возвращаем его. В противном случае, возвращаем нулевой указатель.</p>
+<p>Почему можно безопасно перемещаться по всей skip list структуре?</p>
+<p>При поиске мы идем слева направо, сверху вниз. Если даже какой-то элемент был добавлен он не поменяет порядка уже существующих элементов. Поиск все рано найдет нужный узел.</p>
 <h3 id="вставка" class="relative group">Вставка <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%b2%d1%81%d1%82%d0%b0%d0%b2%d0%ba%d0%b0" aria-label="Anchor">#</a></span></h3><p>При вставке в skip-list сначала мы формируем путь поиска, по которому мы идем из head к искомому элементу (массив <code>update</code>).</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">Insert</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">value</span> <span style="color:#a6e22e">V</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>] {  
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">update</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">maxLevel</span>)  
@@ -465,10 +470,7 @@
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> &gt; <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span><span style="color:#f92672">--</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="concurrency" class="relative group">Concurrency <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#concurrency" aria-label="Anchor">#</a></span></h2><p>Поскольку в структуре skip list каждый уровень - это связный список, то в отличие от деревьев тут нет операции ребалансировки, затрагивающей все дерево. Вместо этого мы имеем локальные операции вставки и удаления, затрагивающие соседние узлы. Поэтому skip list хорошо подходит для lock-free алгоритмов.</p>
-<p>При конкурентной реализации skip list используем атомарные указатели и соответствующие операции для них, а так же операцию CompareAndSwap.</p>
-<p>// TODO Concurrency</p>
-<h2 id="маркер-удаления" class="relative group">Маркер удаления <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bc%d0%b0%d1%80%d0%ba%d0%b5%d1%80-%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d1%8f" aria-label="Anchor">#</a></span></h2><p>Для ускорения операции удаления можно применить оптимизацию - помечать удаляемый элемент маркером (lazy deletion). Добавим маркер удаления узла</p>
+</span></span></code></pre></div><h2 id="маркер-удаления" class="relative group">Маркер удаления <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bc%d0%b0%d1%80%d0%ba%d0%b5%d1%80-%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d1%8f" aria-label="Anchor">#</a></span></h2><p>Для ускорения операции удаления можно применить оптимизацию - помечать удаляемый элемент маркером (lazy deletion). Добавим маркер удаления узла</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>] <span style="color:#66d9ef">struct</span> {  
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">key</span>    <span style="color:#a6e22e">K</span>  
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value</span>  <span style="color:#a6e22e">V</span>  
@@ -519,123 +521,239 @@
 </span></span><span style="display:flex;"><span>        }
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="bulk-operations" class="relative group">Bulk operations <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulk-operations" aria-label="Anchor">#</a></span></h2><h3 id="bulkinsert" class="relative group">BulkInsert <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulkinsert" aria-label="Anchor">#</a></span></h3><p>Можно отсортировать входные данные, если они не были отсортированы, и построить skip-list за <code>O(N)</code> (сложность в совокупности - сложность сортировки):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkInsert</span>(<span style="color:#a6e22e">sortedKeys</span> []<span style="color:#66d9ef">int</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Уровень каждого элемента можно назначить заранее</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">nodes</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>, len(<span style="color:#a6e22e">sortedKeys</span>))
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">k</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">sortedKeys</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">h</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">randomHeight</span>()
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">nodes</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">Node</span>{<span style="color:#a6e22e">key</span>: <span style="color:#a6e22e">k</span>, <span style="color:#a6e22e">forward</span>: make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">Pointer</span>[<span style="color:#a6e22e">Node</span>], <span style="color:#a6e22e">h</span>)}
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Для каждого уровня соединяем узлы линейно</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">level</span> &lt; <span style="color:#a6e22e">maxLevel</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">++</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">prev</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span> = <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nodes</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">level</span> &lt; len(<span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">forward</span>) {
-</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">prev</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Store</span>(<span style="color:#a6e22e">n</span>)
-</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">prev</span> = <span style="color:#a6e22e">n</span>
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">prev</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Store</span>(<span style="color:#66d9ef">nil</span>)
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">StoreInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>, int32(<span style="color:#a6e22e">maxLevel</span>))
+</span></span></code></pre></div><h2 id="lock-free-concurrency" class="relative group">Lock-free concurrency <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#lock-free-concurrency" aria-label="Anchor">#</a></span></h2><p>Поскольку в структуре skip list каждый уровень - это связный список, то в отличие от деревьев тут нет операции ребалансировки, затрагивающей все дерево. Вместо этого мы имеем локальные операции вставки и удаления, затрагивающие соседние узлы. Поэтому skip list хорошо подходит для lock-free алгоритмов.</p>
+<p>При конкурентной реализации skip list используем атомарные указатели и соответствующие операции для них. Для доступа к узлу необходимо выполнять операцию CompareAndSwap.</p>
+<p>Опишем структуру</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>] <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">key</span>   <span style="color:#a6e22e">K</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">value</span> <span style="color:#a6e22e">V</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">next</span>  []<span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">Pointer</span>[<span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]]  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">level</span> <span style="color:#66d9ef">int32</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="rangedelete" class="relative group">RangeDelete <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rangedelete" aria-label="Anchor">#</a></span></h3><p>Если нужно удалить диапазон <code>[low, high]</code>,<br>
-можно пройти один раз от <code>FindGE(low)</code> до <code>&gt; high</code> и пометить всё:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkDeleteRange</span>(<span style="color:#a6e22e">low</span>, <span style="color:#a6e22e">high</span> <span style="color:#66d9ef">int</span>) {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">_</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">findGE</span>(<span style="color:#a6e22e">low</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">high</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">marked</span>.<span style="color:#a6e22e">Store</span>(<span style="color:#66d9ef">true</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ConcurrentSkipList</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>] <span style="color:#66d9ef">struct</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">head</span>           <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">level</span>          <span style="color:#66d9ef">int32</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">levelGenerator</span> <span style="color:#a6e22e">levelGenerator</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Операция <code>FindGE</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">FindGE</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">int</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">curr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> int(<span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">LoadInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span>)) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">level</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">--</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">next</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">next</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">next</span>.<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">key</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">curr</span> = <span style="color:#a6e22e">next</span>
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">next</span> = <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">next</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">Load</span>() <span style="color:#75715e">// next == nil || next.Key &gt;= key</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">next</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">next</span>.<span style="color:#a6e22e">marked</span>.<span style="color:#a6e22e">Load</span>() {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">next</span> = <span style="color:#a6e22e">next</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">next</span>
+</span></span></code></pre></div><p><code>levelGenerator</code> в представленной структуре представляет из себя интерфейс, реализующий единственный метод <code>NextLevel</code>. При реализации bulk операций сможем заменить его.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">levelGenerator</span> <span style="color:#66d9ef">interface</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">NextLevel</span>() <span style="color:#66d9ef">uint64</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="batcheddelete" class="relative group">BatchedDelete <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#batcheddelete" aria-label="Anchor">#</a></span></h3><p>Если ключи неупорядочены:</p>
+</span></span></code></pre></div><h3 id="маркер-удаления-упакованный-в-указатель-и-cas" class="relative group">Маркер удаления, упакованный в указатель и CAS <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bc%d0%b0%d1%80%d0%ba%d0%b5%d1%80-%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d1%8f-%d1%83%d0%bf%d0%b0%d0%ba%d0%be%d0%b2%d0%b0%d0%bd%d0%bd%d1%8b%d0%b9-%d0%b2-%d1%83%d0%ba%d0%b0%d0%b7%d0%b0%d1%82%d0%b5%d0%bb%d1%8c-%d0%b8-cas" aria-label="Anchor">#</a></span></h3><p>Маркер удаления, который был описан выше мы немного поменяем его реализацию. Для него мы применим следующую оптимизацию. Заметим, что нижние несколько бит адреса в современных процессорных архитектурах не заполнены (адреса выровнены). Мы можем использовать эти биты, а именно крайний правый бит, для хранения флага маркера удаления</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">packPointer</span>[<span style="color:#a6e22e">T</span> <span style="color:#66d9ef">any</span>](<span style="color:#a6e22e">p</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">T</span>, <span style="color:#a6e22e">marked</span> <span style="color:#66d9ef">bool</span>) <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">up</span> <span style="color:#f92672">:=</span> uintptr(<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">p</span>))  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">marked</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">up</span> <span style="color:#f92672">|=</span> <span style="color:#ae81ff">1</span>  
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">up</span> <span style="color:#f92672">&amp;^=</span> <span style="color:#ae81ff">1</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">up</span>)
+</span></span><span style="display:flex;"><span>}  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">unpackPointer</span>[<span style="color:#a6e22e">T</span> <span style="color:#66d9ef">any</span>](<span style="color:#a6e22e">p</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">T</span>, <span style="color:#66d9ef">bool</span>) {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">up</span> <span style="color:#f92672">:=</span> uintptr(<span style="color:#a6e22e">p</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">marked</span> <span style="color:#f92672">:=</span> (<span style="color:#a6e22e">up</span> <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ptr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">up</span> <span style="color:#f92672">&amp;^</span> <span style="color:#ae81ff">1</span>) <span style="color:#75715e">// очистка бита  </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (<span style="color:#f92672">*</span><span style="color:#a6e22e">T</span>)(<span style="color:#a6e22e">ptr</span>), <span style="color:#a6e22e">marked</span>  
+</span></span><span style="display:flex;"><span>}  
+</span></span></code></pre></div><p>Тогда операция CAS с учетом маркера удаления, хранящегося на нижних битах адреса принимает следующий вид:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">casNext</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>](<span style="color:#a6e22e">n</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">level</span> <span style="color:#66d9ef">int32</span>, <span style="color:#a6e22e">oldNode</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">oldMarked</span> <span style="color:#66d9ef">bool</span>, <span style="color:#a6e22e">newNode</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">newMarked</span> <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">bool</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">oldPtr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">packPointer</span>(<span style="color:#a6e22e">oldNode</span>, <span style="color:#a6e22e">oldMarked</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">newPtr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">packPointer</span>(<span style="color:#a6e22e">newNode</span>, <span style="color:#a6e22e">newMarked</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">CompareAndSwap</span>((<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>)(<span style="color:#a6e22e">oldPtr</span>), (<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>)(<span style="color:#a6e22e">newPtr</span>))  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="поиск-1" class="relative group">Поиск <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d0%be%d0%b8%d1%81%d0%ba-1" aria-label="Anchor">#</a></span></h3><p>Функция <code>find</code> выполняет:</p>
 <ol>
-<li>Сначала отсортировать ключи</li>
-<li>Проходить список один раз, параллельно с массивом ключей</li>
+<li>Находит позицию для ключа <code>key</code>.</li>
+<li>Заполняет массивы предшественников (<code>preds</code>) и последователей (<code>succs</code>) на каждом уровне.</li>
+<li>Помогает удалять логически удалённые узлы (marked nodes).</li>
 </ol>
-<p>Это превращает <code>K x log N</code> поисков в один линейный проход O(N + K) + сортировка ключей <code>K log K</code>.</p>
-<p>// TODO реализовать BatchedDelete</p>
-<h3 id="bulksearch" class="relative group">BulkSearch <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#bulksearch" aria-label="Anchor">#</a></span></h3><p>Массовые запросы (например, <code>SearchMany(keys)</code>) могут разделять общий путь поиска и не начинать с головы каждый раз.</p>
-<p>// TODO реализовать SearchMany</p>
-<h3 id="shared-traversal" class="relative group">Shared Traversal <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#shared-traversal" aria-label="Anchor">#</a></span></h3><ol>
-<li>Для каждого <code>key</code> — продолжаем поиск с предыдущего найденного узла</li>
-<li>Так каждый элемент ищет в среднем <code>O(log(N/K))</code> вместо <code>O(log N)</code></li>
-</ol>
-<p>Достигается <strong>почти линейное время</strong> при отсортированных ключах.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">sl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">SkipList</span>) <span style="color:#a6e22e">BulkSearch</span>(<span style="color:#a6e22e">sortedKeys</span> []<span style="color:#66d9ef">int</span>) []<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">results</span> <span style="color:#f92672">:=</span> make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">Node</span>, len(<span style="color:#a6e22e">sortedKeys</span>))
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">curr</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">head</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">key</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">sortedKeys</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sl</span>.<span style="color:#a6e22e">level</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">level</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">--</span> {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">next</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Load</span>(); <span style="color:#a6e22e">next</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">next</span>.<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">key</span>; {
-</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">curr</span> = <span style="color:#a6e22e">next</span>
-</span></span><span style="display:flex;"><span>                <span style="color:#a6e22e">next</span> = <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">cand</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">forward</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">Load</span>()
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">cand</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">cand</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">key</span> <span style="color:#f92672">&amp;&amp;</span> !<span style="color:#a6e22e">cand</span>.<span style="color:#a6e22e">marked</span>.<span style="color:#a6e22e">Load</span>() {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">results</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">cand</span>
-</span></span><span style="display:flex;"><span>        }
+<p>Данная функция берет на вход массив предыдущих и последующих элементов на каждом уровне.</p>
+<p>Точно так же, как и в однопоточном поиске мы спускаемся из верхнего заполненого уровня до тех пор пока мы не найдем ключик больший или равный искомому или нулевой указатель.</p>
+<p>При получении следующего элемента мы не просто его получаем, но и удаляем элементы по которым мы ходим (обрываем ссылки на них).</p>
+<p>В случае, когда у нас не получается сделать CAS при очистки ссылок - начинаем все сначала с головы списка и с верхнего уровня.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// find locates preds and succs for key. Also helps unlink marked nodes.</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// returns true if key is found (and succs[0] has key == key and not marked)  </span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">csl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentSkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">preds</span>, <span style="color:#a6e22e">succs</span> []<span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#66d9ef">bool</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> (  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">pred</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">curr</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">succ</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">mark</span> <span style="color:#66d9ef">bool</span>  
+</span></span><span style="display:flex;"><span>    )  
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">retry</span>:  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pred</span> = <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">head</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">maxLevel</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">level</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">--</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">curr</span>, <span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">pred</span>, <span style="color:#a6e22e">level</span>)  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">curr</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>          }
+</span></span><span style="display:flex;"><span>          
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">//--------------------------------</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">// lookup next active node</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">// drop marked as deleted nodes until found active node</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">succ</span>, <span style="color:#a6e22e">mark</span> = <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">curr</span>, <span style="color:#a6e22e">level</span>)  
+</span></span><span style="display:flex;"><span>		  <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">mark</span> {  
+</span></span><span style="display:flex;"><span>			 <span style="color:#75715e">// attempt physical removal  </span>
+</span></span><span style="display:flex;"><span>			 <span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">casNext</span>(<span style="color:#a6e22e">pred</span>, int32(<span style="color:#a6e22e">level</span>), <span style="color:#a6e22e">curr</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">false</span>) {  
+</span></span><span style="display:flex;"><span>				<span style="color:#75715e">// failed - start over  </span>
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">goto</span> <span style="color:#a6e22e">retry</span>  
+</span></span><span style="display:flex;"><span>			 }  
+</span></span><span style="display:flex;"><span>			 <span style="color:#a6e22e">curr</span> = <span style="color:#a6e22e">succ</span>  
+</span></span><span style="display:flex;"><span>			 <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">curr</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>			 }  
+</span></span><span style="display:flex;"><span>			 <span style="color:#a6e22e">succ</span>, <span style="color:#a6e22e">mark</span> = <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">curr</span>, <span style="color:#a6e22e">level</span>)  
+</span></span><span style="display:flex;"><span>		  }
+</span></span><span style="display:flex;"><span>		  <span style="color:#75715e">//--------------------------------</span>
+</span></span><span style="display:flex;"><span>          
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">curr</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">key</span> &lt; <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">pred</span> = <span style="color:#a6e22e">curr</span>  
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">curr</span> = <span style="color:#a6e22e">succ</span>  
+</span></span><span style="display:flex;"><span>          } <span style="color:#66d9ef">else</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">preds</span>[<span style="color:#a6e22e">level</span>] = <span style="color:#a6e22e">pred</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">succs</span>[<span style="color:#a6e22e">level</span>] = <span style="color:#a6e22e">curr</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// check if found at level 0 and not marked  </span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">curr</span> <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nil</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">curr</span>.<span style="color:#a6e22e">key</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">key</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">mark</span> = <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">curr</span>, <span style="color:#ae81ff">0</span>)  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> !<span style="color:#a6e22e">mark</span>  
 </span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">results</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="simd--prefetch" class="relative group">SIMD / prefetch <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#simd--prefetch" aria-label="Anchor">#</a></span></h3><p>В CPU-ориентированных реализациях (например, Redis или ClickHouse) при поиске батчей ключей можно использовать <strong>prefetch</strong> инструкцию CPU, заранее подгружая cache line для следующего узла (особенно на уровне 0).</p>
-<p>// TODO Реализация SIMD / prefetch оптимизации
-// TODO Ссылку на Redis и ClickHouse реализации</p>
-<h3 id="композиционные-оптимизации" class="relative group">Композиционные оптимизации <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%ba%d0%be%d0%bc%d0%bf%d0%be%d0%b7%d0%b8%d1%86%d0%b8%d0%be%d0%bd%d0%bd%d1%8b%d0%b5-%d0%be%d0%bf%d1%82%d0%b8%d0%bc%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d0%b8" aria-label="Anchor">#</a></span></h3><ul>
-<li>
-<p><strong>Batch-friendly random level generator</strong> — использовать предсказуемые высоты для соседних ключей, чтобы структура оставалась статистически ровной при bulk вставке.</p>
-<p>// TODO Batch-friendly random level generator</p>
-</li>
-<li>
-<p><strong>Параллельные батчи</strong> — если ключи не пересекаются, можно делить диапазоны на потоки.</p>
-</li>
-<li>
-<p><strong>Immutable bulk merge</strong> — при массовом добавлении лучше построить новый skip list и потом атомарно заменить указатель на голову (copy-on-write подход).</p>
-</li>
-</ul>
-<h2 id="benchmarks" class="relative group">Benchmarks <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#benchmarks" aria-label="Anchor">#</a></span></h2><p>// TODO Benchmarks</p>
+</span></span></code></pre></div><p>Возвращает TRUE если ключ найден. Если ключ найден preds[0] -&gt; node(key) -&gt; succs[0].</p>
+<p>Вспомогательная функция loadNext берет указатель на следующий узел и распаковывает его:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">loadNext</span>[<span style="color:#a6e22e">K</span> <span style="color:#a6e22e">Key</span>, <span style="color:#a6e22e">V</span> <span style="color:#a6e22e">Value</span>](<span style="color:#a6e22e">n</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#a6e22e">level</span> <span style="color:#66d9ef">int</span>) (<span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>], <span style="color:#66d9ef">bool</span>) {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">level</span>].<span style="color:#a6e22e">Load</span>()  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">p</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">nil</span>, <span style="color:#66d9ef">false</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">unpackPointer</span>[<span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]](<span style="color:#a6e22e">unsafe</span>.<span style="color:#a6e22e">Pointer</span>(<span style="color:#a6e22e">p</span>))  
+</span></span><span style="display:flex;"><span>}  
+</span></span></code></pre></div><h3 id="вставка-1" class="relative group">Вставка <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%b2%d1%81%d1%82%d0%b0%d0%b2%d0%ba%d0%b0-1" aria-label="Anchor">#</a></span></h3><p>При вставке мы в первую очередь ищем элемент с запоминанием элементов (предыдущих - preds, следующих - succs), которые  на каждом уровне ведут к месту вставки. Если при этом мы нашли ключик, который собрались вставить, то выходим и возвращаем FALSE.</p>
+<p>На следующем шаге - формируем новый узел. Пишем ключик туда и заполняем массив next по уровням найденными следующими элементами.</p>
+<p>Затем, пытаемся заменить элемент preds[0].next[0] на новый узел, если он равен следующему элементу. Если то не так - какой-то из потоков уже поменял - повторяем попытку начиная с поиска. Если при повторной попытке мы выясним, что такой ключик уже есть (а это значит, что конкурентный код вставил тот же ключик) - выходим, иначе теперь мы имеем новое место для вставки описанное 2-мя массивами.</p>
+<p>Предположим, что мы смогли через CAS вставить новый узел на свое место. Теперь нам нужно для предущего узла (preds[0]) обновить массив next.</p>
+<p>Если на каком-то уровне мы не смогли вставить новый узел - обновляем массивы preds, succs.</p>
+<p>Если после вставки нового узла мы упали - ничего страшного - мы все равно можем найти новый элемент.</p>
+<p>На последнем шаге обновляем верхний уровень для всего списка значением уровня нового узла, если он больше текущего.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// Insert (returns true if inserted, false if key already present)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">csl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentSkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">Insert</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">value</span> <span style="color:#a6e22e">V</span>) <span style="color:#66d9ef">bool</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> int(<span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">levelGenerator</span>.<span style="color:#a6e22e">NextLevel</span>())  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">preds</span> = make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">succs</span> = make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">found</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">preds</span>, <span style="color:#a6e22e">succs</span>)  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">found</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">// already present  </span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>  
+</span></span><span style="display:flex;"><span>       }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">newNode</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">newNode</span>(<span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">value</span>, <span style="color:#a6e22e">level</span>)  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">level</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">newNode</span>.<span style="color:#a6e22e">next</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">Store</span>((<span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>])(<span style="color:#a6e22e">packPointer</span>(<span style="color:#a6e22e">succs</span>[<span style="color:#a6e22e">i</span>], <span style="color:#66d9ef">false</span>)))
+</span></span><span style="display:flex;"><span>       } 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// try link at level 0 first  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">pred</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">preds</span>[<span style="color:#ae81ff">0</span>]  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">succ</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">succs</span>[<span style="color:#ae81ff">0</span>]  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">casNext</span>(<span style="color:#a6e22e">pred</span>, <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">newNode</span>, <span style="color:#66d9ef">false</span>) {  
+</span></span><span style="display:flex;"><span>          <span style="color:#75715e">// failed, retry  </span>
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">continue</span>  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// link higher levels  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">level</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">pred</span> = <span style="color:#a6e22e">preds</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">succ</span> = <span style="color:#a6e22e">succs</span>[<span style="color:#a6e22e">i</span>]  
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">casNext</span>(<span style="color:#a6e22e">pred</span>, int32(<span style="color:#a6e22e">i</span>), <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">newNode</span>, <span style="color:#66d9ef">false</span>) {  
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>             }  
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">// if fail, recompute preds/succs  </span>
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">preds</span>, <span style="color:#a6e22e">succs</span>)  
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// Update list-level hint  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">currentLevel</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">level</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> int32(<span style="color:#a6e22e">level</span>) &gt; <span style="color:#a6e22e">currentLevel</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">atomic</span>.<span style="color:#a6e22e">CompareAndSwapInt32</span>(<span style="color:#f92672">&amp;</span><span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">level</span>, <span style="color:#a6e22e">currentLevel</span>, int32(<span style="color:#a6e22e">level</span>))  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="удаление-1" class="relative group">Удаление <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d1%83%d0%b4%d0%b0%d0%bb%d0%b5%d0%bd%d0%b8%d0%b5-1" aria-label="Anchor">#</a></span></h3><p>При удалении в первую очередь ищем узел, который следует удалить. При этом заполняем элементы preds, succs. Если узла по ускомому ключу не найдено - выходим из метода.</p>
+<p>Затем маркируем элементы preds[0].next[i] как удаленные на всех уровнях на исключением 0-го.</p>
+<p>Затем отдельно маркируем preds[0].next[0] как удаленный - если он уже был помечен как удаленный конкурентным кодом - завершаем выполнение.</p>
+<p>Затем удаляем ссылки на удаляемый узел вызывая метод find с ключиком удаляемого узла.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#75715e">// Delete (returns true if deleted)</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">csl</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">ConcurrentSkipList</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]) <span style="color:#a6e22e">Delete</span>(<span style="color:#a6e22e">key</span> <span style="color:#a6e22e">K</span>) <span style="color:#66d9ef">bool</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">node</span> = <span style="color:#a6e22e">ConcurrentNode</span>[<span style="color:#a6e22e">K</span>, <span style="color:#a6e22e">V</span>]  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">preds</span> = make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">succs</span> = make([]<span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">maxLevel</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">nodeToDelete</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">found</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">preds</span>, <span style="color:#a6e22e">succs</span>)  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">found</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">nodeToDelete</span> = <span style="color:#a6e22e">succs</span>[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// logically mark from top level down to 0</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">level</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">nodeToDelete</span>.<span style="color:#a6e22e">level</span>; <span style="color:#a6e22e">level</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">level</span><span style="color:#f92672">--</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">var</span> <span style="color:#a6e22e">succ</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#a6e22e">succ</span>, <span style="color:#a6e22e">_</span> = <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">nodeToDelete</span>, int(<span style="color:#a6e22e">level</span>))  
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">succ</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {  
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>             }  
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">// mark pointer at this level  </span>
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">casNext</span>(<span style="color:#a6e22e">nodeToDelete</span>, <span style="color:#a6e22e">level</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">true</span>) {  
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>             }  
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">// else retry  </span>
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// finally mark level 0  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">for</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">succ</span>, <span style="color:#a6e22e">marked</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">loadNext</span>(<span style="color:#a6e22e">nodeToDelete</span>, <span style="color:#ae81ff">0</span>)  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">marked</span> {  
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">// already marked by another remover  </span>
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>  
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>          <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">casNext</span>(<span style="color:#a6e22e">nodeToDelete</span>, <span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">false</span>, <span style="color:#a6e22e">succ</span>, <span style="color:#66d9ef">true</span>) {  
+</span></span><span style="display:flex;"><span>             <span style="color:#75715e">// successful logical deletion  </span>
+</span></span><span style="display:flex;"><span>             <span style="color:#66d9ef">break</span>  
+</span></span><span style="display:flex;"><span>          }  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>       <span style="color:#75715e">// try to physically remove by swinging preds&#39; pointers  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">csl</span>.<span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">key</span>, <span style="color:#a6e22e">preds</span>, <span style="color:#a6e22e">succs</span>) <span style="color:#75715e">// helps unlink  </span>
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="применение" class="relative group">Применение <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5" aria-label="Anchor">#</a></span></h2><p>skip-list используется во многих базах данных для предоставления быстрого доступа.</p>
+<p>В Redis skip-list используется для range запросы в типе данных <code>ZSET</code> (не описаны в статье). Причем, в этой же структуре данных данные описаны в виде hash map.</p>
+<p>В многих базах данных skip list используется для реализации <code>MemTable</code>, которая, в свою очередь является частью реализации <code>LMS Trees</code>:</p>
 <ol>
-<li>Сравнение конкурентной и неконкурентной версий</li>
-<li>Сравнение с оптимизациями для bulk операций</li>
-<li>Сравнение с RB-tree</li>
-<li>Сравнение с RB-tree (конкурентных версий)</li>
-</ol>
-<h3 id="сравнение-с-bst-avl-b-tree" class="relative group">Сравнение с BST (AVL, B-Tree) <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d1%81%d1%80%d0%b0%d0%b2%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-%d1%81-bst-avl-b-tree" aria-label="Anchor">#</a></span></h3><p>При вставке/удалении узла мы не меняем всю структуру данных как это происходит в BST или, например, в куче (при реализации приоритетной очереди), а меняем только лишь сам узел. Это позволяет эффективно испоьзовать конкурентный доступ для этой структуры и так же lock-free доступ.</p>
-<p>Возможность реализации параллельного доступа без блокировок дает, а так же большая локальность данных по сравнению с BST дает этой структуре преимущество в многопрессорной среде.</p>
-<p>В оригинальной статье [<a href="#references">2</a>], [<a href="#references">6</a>] есть сравнения с 2-3, avl,  splay деревьями, которые говорят в пользу скип листа. Но они выполнялись в 1990-м году на том железе и, кроме того, на одноядерном компьютере. Так же, там нет сравнения с B-Tree. Поэтому сделать бенчмарки было бы любопытно (наверняка их проводили, не нашел в сети).</p>
-<p>Идея пропуска шагов так же применима и на деревья поиска <a href="#references">3</a>.</p>
-<h2 id="применение" class="relative group">Применение <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5" aria-label="Anchor">#</a></span></h2><ol>
-<li>Redis <code>ZSET</code> - range запросы</li>
-<li>RocksDB’s <code>MemTable</code></li>
+<li>LevelsDB</li>
+<li>RocksDB</li>
 <li>ClickHouse</li>
-<li>Java <code>ConcurrentSkipListMap</code></li>
+<li>Apache Cassandra и другие</li>
 </ol>
-<p>Описанный в статье код доступен <a href="https://github.com/swvitaliy/goalgo/blob/main/skip_list" target="_blank" rel="noreferrer">на github</a>.</p>
+<p>Описанный в статье код доступен в репозитории <a href="https://github.com/swvitaliy/goalgo/blob/main/skip_list" target="_blank" rel="noreferrer">на github</a>.</p>
 <hr>
 <h2 id="references" class="relative group">References <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#references" aria-label="Anchor">#</a></span></h2><ol>
 <li><a href="https://www.math.umd.edu/~immortal/CMSC420/notes/skiplists.pdf" target="_blank" rel="noreferrer">https://www.math.umd.edu/~immortal/CMSC420/notes/skiplists.pdf</a></li>
@@ -681,15 +799,15 @@
         </span>
         <span>
           
-            <a class="group flex text-right" href="http://localhost:1313/posts/berkley_algorithm/">
+            <a class="group flex text-right" href="http://localhost:1313/posts/consistent_rendezvous_hashing/">
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Berkley Algorithm</span
+                  >Consistent and Rendezvous Hashing</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2025-06-21 21:00:00 &#43;0400 &#43;04">21 June 2025</time>
+                    <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time>
                   
                 </span>
               </span>
@@ -736,7 +854,7 @@
           <li class="group mb-1 text-end sm:mb-0 sm:me-7 sm:last:me-0">
             
               <a
-                href="https://old.swvit.com"
+                href="https://archive.swvit.dev"
                 title=""
                 
                 ><span
@@ -757,7 +875,7 @@
       
         <p class="text-sm text-neutral-500 dark:text-neutral-400">
             &copy;
-            2025
+            2026
             
         </p>
       

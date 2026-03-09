@@ -1,5 +1,5 @@
 develop: clean
-	hugo server -D
+	hugo server --disableFastRender -D
 
 build:
 	hugo --minify
