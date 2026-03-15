@@ -1,4 +1,4 @@
-baseURL = "http://swvit.local/"
+baseURL = "https://swvitaliy.github.io/"
 languageCode = "en-us"
 title = "swvit's blog"
 #theme = "rocinante"
