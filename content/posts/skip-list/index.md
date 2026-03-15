@@ -2,12 +2,9 @@
 title = 'Skip-list'
 date = 2024-01-14T08:07:07+04:00
 tags = [ "dsa", "skip-list", "go" ]
-
-draft = true
 +++
 
-Skip-list - это **вероятностная структура данных**, похожая по функционалу на сбалансированные деревья поиска, однако отличается от них тем, что не имеет явного этапа балансировки. Это позволяет реализовать конкурентную версию skip-list без глобальной блокировки всей структуры данных. Более того, возможна lock-free реализация вовсе без блокировок (см. [jiffy](https://arxiv.org/abs/2102.01044)).
-
+Skip-list - это **вероятностная структура данных**, похожая по функционалу на сбалансированные деревья поиска, однако отличается от них тем, что не имеет явного этапа балансировки. Это позволяет реализовать конкурентную версию skip-list без глобальной блокировки всей структуры данных. Более того, возможна эффективная и довольно простая lock-free реализация.
 ## Описание структуры данных
 
 Каждый узел представляет из себя узел связного списка. Вместо указателя `Next` на следующий элемент массив таких указателей. В данном массиве в элементе `Next[i]` содержится указатель на следующий элемент i-го уровня. Размер этого массива является вероятностной величиной, ограниченной некоторым значением.
@@ -532,20 +529,135 @@ func (csl *ConcurrentSkipList[K, V]) Delete(key K) bool {
 }
 ```
 
+Описанный в статье код доступен в репозитории [на github](https://github.com/swvitaliy/goalgo/blob/main/skip_list).
 ## Применение 
 
-skip-list используется во многих базах данных для предоставления быстрого доступа.
+В Redis skip-list используется для range запросы в типе данных `ZSET` (не описаны в статье). Причем, данные продублированы так же в hash table, для доступа по ключу.
 
-В Redis skip-list используется для range запросы в типе данных `ZSET` (не описаны в статье). Причем, в этой же структуре данных данные описаны в виде hash map.
+В LevelsDB/RocksDB skip list используется для реализации `MemTable`, которая, в свою очередь является частью реализации `LSM Trees`.
 
-В многих базах данных skip list используется для реализации `MemTable`, которая, в свою очередь является частью реализации `LMS Trees`:
+В Apache Kafka используется java ConcurrentSkipListMap для хранения offsets.
 
-1. LevelsDB
-2. RocksDB
-3. ClickHouse
-4. Apache Cassandra и другие
+### skip-list в redis
 
-Описанный в статье код доступен в репозитории [на github](https://github.com/swvitaliy/goalgo/blob/main/skip_list).
+Далее рассмотрим применение skip-list в redis. Поскольку выполнение команд в redis однопоточное, его код довольно просто читается.
+
+В redis, как уже было написано выше, skip-list используется для реализации [zset](https://github.com/redis/redis/blob/unstable/src/t_zset.c) операций по диапазону значений. Для этого для каждого узла хранится поле span - сколько элементов пропускает этот указатель.
+
+```c
+typedef struct zskiplistNode {
+    double score;
+    struct zskiplistNode *backward;
+    struct zskiplistLevel {
+        struct zskiplistNode *forward;
+        unsigned long span;
+    } level[];
+} zskiplistNode;
+
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length;
+    int level;
+    size_t alloc_size;
+} zskiplist;
+
+typedef struct zset {
+    dict *dict;
+    zskiplist *zsl;
+} zset;
+```
+
+Как видим тут используется карта ключей и skip-list вместе.
+
+```c
+static void zslInsertNode(zskiplist *zsl, zskiplistNode *node) {
+    zskiplistNode *update[ZSKIPLIST_MAXLEVEL];
+    unsigned long rank[ZSKIPLIST_MAXLEVEL];
+    zskiplistNode *x;
+    int i, level;
+    double score = node->score;
+    sds ele = zslGetNodeElement(node);
+    level = zslGetNodeInfo(node)->levels;
+    serverAssert(!isnan(score));
+
+    /* Find the position where this node should be inserted */
+    x = zsl->header;
+    for (i = zsl->level-1; i >= 0; i--) {
+        /* store rank that is crossed to reach the insert position */
+        rank[i] = i == (zsl->level-1) ? 0 : rank[i+1];
+        while (zslCompareWithNode(score, ele, x->level[i].forward) > 0) {
+            rank[i] += zslGetNodeSpanAtLevel(x, i);
+            x = x->level[i].forward;
+        }
+        update[i] = x;
+    }
+
+    /* Update skiplist level if needed */
+    if (level > zsl->level) {
+        for (i = zsl->level; i < level; i++) {
+            rank[i] = 0;
+            update[i] = zsl->header;
+            zslSetNodeSpanAtLevel(update[i], i, zsl->length);
+        }
+        zsl->level = level;
+        zslGetNodeInfo(zsl->header)->levels = level;
+    }
+
+    /* Insert the node at the found position */
+    for (i = 0; i < level; i++) {
+        node->level[i].forward = update[i]->level[i].forward;
+        update[i]->level[i].forward = node;
+
+        /* update span covered by update[i] as node is inserted here */
+        zslSetNodeSpanAtLevel(node, i, zslGetNodeSpanAtLevel(update[i], i) - (rank[0] - rank[i]));
+        zslSetNodeSpanAtLevel(update[i], i, (rank[0] - rank[i]) + 1);
+    }
+
+    /* increment span for untouched levels */
+    for (i = level; i < zsl->level; i++) {
+        zslIncrNodeSpanAtLevel(update[i], i, 1);
+    }
+
+    /* Update backward pointers */
+    node->backward = (update[0] == zsl->header) ? NULL : update[0];
+    if (node->level[0].forward)
+        node->level[0].forward->backward = node;
+    else
+        zsl->tail = node;
+
+    zsl->length++;
+}
+```
+Код на вставку довольно похож на тот, что описан выше однако есть и отличия. Это обновление полей span с помощью преподсчитанного массива rank. Он, как и массив updated меняется с конца в начало. Для получения каждого следующего элемента он берет предыдущий и увеличивает его на величину span ():
+
+```c
+static inline unsigned long zslGetNodeSpanAtLevel(zskiplistNode *x, int level) {
+    /* At level 0, span stores node level instead of distance, so return the actual span value:
+     * 1 for all nodes except the last node (which has span 0). */
+    if (level > 0) return x->level[level].span;
+    /* For level 0, if regular node, span is 1. If tail node, span is 0. */
+    return x->level[0].forward ? 1 : 0;
+}
+```
+`rank[i]` — сколько элементов мы прошли от header до позиции вставки на уровне i. После того, как мы нашли место для вставки, мы обновляем значение span для нового узла (`span` - сколько элементов пропускает этот указатель):
+
+```c
+/* update span covered by update[i] as node is inserted here */
+        zslSetNodeSpanAtLevel(node, i, zslGetNodeSpanAtLevel(update[i], i) - (rank[0] - rank[i]));
+        zslSetNodeSpanAtLevel(update[i], i, (rank[0] - rank[i]) + 1);
+``` 
+
+`rank[0] - rank[i]` - сколько элементов между вставленным элементом и `update[i]`. Span нужен для операций по диапазону значений (ZRANK, ZRANGE). Используя span мы можем сразу, находясь в узле, понять какой он имеет индекс. Таким образом, для команды `ZRANGE key 1000 2000` псевдокод будет выглядеть следующим образом (функция `zslGetElementByRankFromNode`):
+
+```
+traversed = 0
+level = start_level
+пока level >= 0
+  идем forward
+  traversed += node.span
+  if traversed == rank return node
+return NULL
+```
 
 ---
 ## References
