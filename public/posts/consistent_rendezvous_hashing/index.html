@@ -56,8 +56,7 @@
     name="description"
     content="
       
-        Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
-На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.
+        Consistent and Rendezvous Hashing #Одной из главных стратегий горизонтального масштабирования является шардирование - распределение данных по разным узлам. Это применяется в базах данных, в системах передачи сообщений (Apache Kafka), в системах кеширования данных и работы с ними (Redis). Чтобы выполнить равномерное распределение (или распределение с учетом весов) данных не достаточно произвольным образом по хешу отправить их на нужный узел, ведь в этом случае, при добавлении нового узла мы получим значительное перераспределение хешей. Чтобы минимизировать такое перераспределение тут рассматриваются 2 механизма - консистентное хеширование и рандеву хеш.
       
     "
   />
@@ -84,15 +83,15 @@
   <meta property="og:url" content="http://localhost:1313/posts/consistent_rendezvous_hashing/">
   <meta property="og:site_name" content="swvit&#39;s blog">
   <meta property="og:title" content="Consistent and Rendezvous Hashing">
-  <meta property="og:description" content="Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
-На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
+  <meta property="og:description" content="Consistent and Rendezvous Hashing #Одной из главных стратегий горизонтального масштабирования является шардирование - распределение данных по разным узлам. Это применяется в базах данных, в системах передачи сообщений (Apache Kafka), в системах кеширования данных и работы с ними (Redis). Чтобы выполнить равномерное распределение (или распределение с учетом весов) данных не достаточно произвольным образом по хешу отправить их на нужный узел, ведь в этом случае, при добавлении нового узла мы получим значительное перераспределение хешей. Чтобы минимизировать такое перераспределение тут рассматриваются 2 механизма - консистентное хеширование и рандеву хеш.">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2025-08-17T10:00:00+04:00">
     <meta property="article:modified_time" content="2025-08-17T10:00:00+04:00">
     <meta property="article:tag" content="Dsa">
-    <meta property="article:tag" content="Consistent">
+    <meta property="article:tag" content="Consistent Hashing">
+    <meta property="article:tag" content="Hash Ring">
     <meta property="article:tag" content="Rendezvous">
     <meta property="article:tag" content="Hashing">
     <meta property="article:tag" content="Go">
@@ -100,8 +99,7 @@
   
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Consistent and Rendezvous Hashing">
-  <meta name="twitter:description" content="Rendezvous hashing #Rendezvous hashing, Highest Random Weight hashing, HRW - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.
-На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм ставит в соответствие переданное число n в бакет под номером k, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.">
+  <meta name="twitter:description" content="Consistent and Rendezvous Hashing #Одной из главных стратегий горизонтального масштабирования является шардирование - распределение данных по разным узлам. Это применяется в базах данных, в системах передачи сообщений (Apache Kafka), в системах кеширования данных и работы с ними (Redis). Чтобы выполнить равномерное распределение (или распределение с учетом весов) данных не достаточно произвольным образом по хешу отправить их на нужный узел, ведь в этом случае, при добавлении нового узла мы получим значительное перераспределение хешей. Чтобы минимизировать такое перераспределение тут рассматриваются 2 механизма - консистентное хеширование и рандеву хеш.">
 
   
   <script type="application/ld+json">
@@ -112,7 +110,7 @@
     "name": "Consistent and Rendezvous Hashing",
     "headline": "Consistent and Rendezvous Hashing",
     
-    "abstract": "\u003ch2 id=\u0022rendezvous-hashing\u0022 class=\u0022relative group\u0022\u003eRendezvous hashing \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#rendezvous-hashing\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003e\u003cstrong\u003eRendezvous hashing, Highest Random Weight hashing, HRW\u003c\/strong\u003e - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении\/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.\u003c\/p\u003e\n\u003cp\u003eНа вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число \u003ccode\u003en\u003c\/code\u003e в бакет под номером \u003ccode\u003ek\u003c\/code\u003e, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.\u003c\/p\u003e",
+    "abstract": "\u003ch2 id=\u0022consistent-and-rendezvous-hashing\u0022 class=\u0022relative group\u0022\u003eConsistent and Rendezvous Hashing \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#consistent-and-rendezvous-hashing\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003eОдной из главных стратегий горизонтального масштабирования является шардирование - распределение данных по разным узлам. Это применяется в базах данных, в системах передачи сообщений (Apache Kafka), в системах кеширования данных и работы с ними (Redis). Чтобы выполнить равномерное распределение (или распределение с учетом весов) данных не достаточно произвольным образом по хешу отправить их на нужный узел, ведь в этом случае, при добавлении нового узла мы получим значительное перераспределение хешей. Чтобы минимизировать такое перераспределение тут рассматриваются 2 механизма - консистентное хеширование и рандеву хеш.\u003c\/p\u003e",
     "inLanguage": "en",
     "url" : "http:\/\/localhost:1313\/posts\/consistent_rendezvous_hashing\/",
     "author" : {
@@ -125,10 +123,10 @@
     
     "dateModified": "2025-08-17T10:00:00\u002b04:00",
     
-    "keywords": ["dsa","consistent","rendezvous","hashing","go"],
+    "keywords": ["dsa","consistent hashing","hash ring","rendezvous","hashing","go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "848"
+    "wordCount": "1373"
   }
   </script>
     
@@ -298,19 +296,10 @@
   <div class="flex flex-row flex-wrap items-center">
     
     
-      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">4 mins</span>
+      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">7 mins</span>
     
 
     
-    
-      <span class="ps-2"><span class="flex">
-  <span
-    class="ms-1 rounded-md border border-primary-400 px-1 py-[1px] text-xs font-normal text-primary-700 dark:border-primary-600 dark:text-primary-400"
-  >
-    Draft
-  </span>
-</span>
-</span>
     
   </div>
 
@@ -325,8 +314,8 @@
     <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
       
       <div class="min-h-0 min-w-0 max-w-prose grow">
-        <h2 id="rendezvous-hashing" class="relative group">Rendezvous hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p><strong>Rendezvous hashing, Highest Random Weight hashing, HRW</strong> - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.</p>
-<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+        <h2 id="consistent-and-rendezvous-hashing" class="relative group">Consistent and Rendezvous Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#consistent-and-rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p>Одной из главных стратегий горизонтального масштабирования является шардирование - распределение данных по разным узлам. Это применяется в базах данных, в системах передачи сообщений (Apache Kafka), в системах кеширования данных и работы с ними (Redis). Чтобы выполнить равномерное распределение (или распределение с учетом весов) данных не достаточно произвольным образом по хешу отправить их на нужный узел, ведь в этом случае, при добавлении нового узла мы получим значительное перераспределение хешей. Чтобы минимизировать такое перераспределение тут рассматриваются 2 механизма - консистентное хеширование и рандеву хеш.</p>
+<h2 id="consistent-hashing" class="relative group">Consistent Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#consistent-hashing" aria-label="Anchor">#</a></span></h2><p>При Consistent Hashing мы строим кольцо хешей (hash ring). Для этого мы сначала берем какое-то большое число N (как правило 2^32-1). При получении кеша мы его отображаем на интервал [0..2^32-1], то есть берем остаток от деления хеша на N. Для построения hash ring мы вычисляем хеши для каждого узла, сохраняем их в отсортированном виде в массив - строим кольцо ключей.</p>
 <p>
 
 
@@ -336,15 +325,10 @@
 
   
   
-<figure><img src="./randezvous.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
+<figure><img src="./hash_ring.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
 </figure>
 </p>
-<p>При использовании rendezvous hash примерно 1/N ключей будут перераспределены при добавлении/удалении ключа. В случае с consistent hash это примерно 10-15%.</p>
-<h2 id="consistent-hashing" class="relative group">Consistent Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#consistent-hashing" aria-label="Anchor">#</a></span></h2><p>// TODO нарисовать key ring</p>
-<p>// TODO нарисовать vnodes</p>
-<p>Для начала стоит рассмотреть консистентное кеширование, чтобы понять решаемую проблему.</p>
-<p>При Consistent Hashing для начала мы вычисляем хеши для каждого узла, сохраняем их в отсортированном виде в массив - строим кольцо ключей.</p>
-<p>Затем, когда нам нужно получить соответствие ключу его узла, просто ищем бинпоиском позицию большую или равную ключу узла.</p>
+<p>Затем, когда нам нужно получить соответствие ключу его узла, просто ищем бинпоиском позицию большую или равную ключу узла (ищут узел, которому принадлежит кеш по часовой стрелке в кольце ключей).</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">ringPoint</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hash</span> <span style="color:#66d9ef">int64</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">node</span> <span style="color:#66d9ef">string</span>
@@ -373,8 +357,37 @@
 </span></span><span style="display:flex;"><span>	}
 </span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ring</span>[<span style="color:#a6e22e">idx</span>].<span style="color:#a6e22e">node</span>
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>Основной недостаток такой прямолинейной реализации в том, что ключи узлов распределяются на кольце произвольным образом - не равномерно. Кроме того, например, при добавлении узла в кольцо ключей, он добавляется между 2-мя последовательными узлами, перераспределяя в себя некоторое количество последовательных хешей, что может быть не всегда удобно на практике.</p>
-<p>Чтобы избежать этого недостатка добавим понятие виртуальных ключей (vnodes). Для этого сделаем сопоставление 2-го подрядка - для каждого реального узла добавим несколько 100 виртуальных ключей. Количество vnodes для каждого реального узла одинаковое. Распределение хешей vnodes так же произвольное, но за счет того, что их много и интервалы между ними маленькие распределение теперь будет около равномерным.</p>
+</span></span></code></pre></div><p>Основной недостаток такой прямолинейной реализации в том, что ключи узлов распределяются на кольце произвольным образом. При добавлении нового узла, он добавляется между двумя существующими узлами и &ldquo;забирает&rdquo; часть хешей следующего по часовой стрелке узла на себя. Получаем, что часть хешей теперь распределяется неравномерно между новым узлом <code>x</code> и узлом <code>b</code>. Таким образом, мы имеем следующие недостатки:</p>
+<ol>
+<li>при количестве узлов K, количество перераспределенных кешей равно n/K (где n - количество уже вычисленных кешей на момент добавления нового узла)</li>
+<li>при добавлении нового узла, он добавляется в произвольную точку, беря на себя часть произвольную часть кешей от одного из узлов. Это может вызвать неравномерную нагрузку на узлы.</li>
+</ol>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./hash_ring1.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
+<p>Чтобы избежать этих недостатков (вернее минимизировать их) добавим понятие виртуальных ключей (vnodes). Для этого сделаем сопоставление 2-го порядка - для каждого реального узла добавим несколько, например, 100 виртуальных ключей. Количество vnodes для каждого реального узла одинаковое. Распределение хешей vnodes так же произвольное, но за счет того, что их много и интервалы между ними маленькие каждый раз добавляя новый виртуальный узел мы перераспределяем количество хешей не N/K (как в предыдущем случае), а N/(100*K), то есть в 100 раз меньше.</p>
+<p>При добавлении нового узла (то есть некоторого количества виртуальных узлов на hash ring) мы может &ldquo;размазать&rdquo; нагрузку на перераспределение кешей по времени, добавляя виртуальные узлы с некоторой задержкой. Это так же делает меньше блокировку узлов (fine-grained lock). Кроме того, теперь при добавлении нового узла, хеши на него распределяются из разных существующих узлов - это делает распределение хешей относительно равномерным по узлам.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./hash_ring2.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">HashRing</span> <span style="color:#66d9ef">struct</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">replicas</span> <span style="color:#66d9ef">int</span>                
 </span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">keys</span>     []<span style="color:#66d9ef">uint32</span>            
@@ -420,9 +433,24 @@
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">hashMap</span>[<span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">keys</span>[<span style="color:#a6e22e">idx</span>]]
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="wrh---weighted-rendezvous-hashing" class="relative group">WRH - Weighted Rendezvous Hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#wrh---weighted-rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p>В отличие от консистентного кеша рандеву не хранит кольцевой буфер. Вместо этого он миксует ключ, для которого ищется узел (бакет) и имя этого узла и для каждого из узлов находит значение хеша. Среди всех таких значений выбирается максимальное, которое и выбирается как значение бакета для ключика (его остаток от деления).</p>
+</span></span></code></pre></div><h2 id="rendezvous-hashing" class="relative group">Rendezvous hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#rendezvous-hashing" aria-label="Anchor">#</a></span></h2><p><strong>Rendezvous hashing, HRW (Highest Random Weight) hashing</strong> - это алгоритм взятия хеша, который стремится минимизировать изменение в распределении потребителей узлов (подписчиков, клиентов) при увеличении/уменьшении их числа. Подобно консистентному кешированию HRW ставит в соответствие набору входных данных некоторое всегда одинаковое число (при условии неизменных настроек), однако в отличие от него для этого использует константный объем памяти.</p>
+<p>На вход этому алгоритму поступает какое-то число (заранее взятый быстрый хеш, вроде murmur3, xxhash) и количество бакетов (узлов, шардов и так далее). Данный алгоритм  ставит в соответствие переданное число <code>n</code> в бакет под номером <code>k</code>, причем делает это таким образом, что при изменении числа бакетов соответствие переданного числа бакету стремиться не меняться. Данный алгоритм не использует ring key buffer, в отличие от консистентного хеша.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./randezvous.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
+<p>При использовании rendezvous hash примерно 1/N ключей будут перераспределены при добавлении/удалении ключа. В случае с consistent hash это примерно 10-15%.</p>
+<p>В отличие от консистентного кеша рандеву не хранит кольцевой буфер. Вместо этого он миксует ключ, для которого ищется узел (бакет) и имя этого узла и для каждого из узлов находит значение хеша. Среди всех таких значений выбирается максимальное, которое и выбирается как значение бакета для ключика (его остаток от деления).</p>
 <p>Пример простейшей реализации рандеву хеша:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">rendezvousHash</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">nodes</span> []<span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">FindNode</span>(<span style="color:#a6e22e">key</span> <span style="color:#66d9ef">string</span>, <span style="color:#a6e22e">nodes</span> []<span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> {
 </span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">maxHash</span> <span style="color:#66d9ef">int64</span>
 </span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">chosen</span> <span style="color:#66d9ef">string</span>
 </span></span><span style="display:flex;"><span>
@@ -439,24 +467,79 @@
 <p>Когда добавляется новый узел перераспределяются в него только те ключики, для которых хеш с этим узлом стал максимальным. То же самое происходит при удалении узла. Если перед удалением хеш ключика не был максимален с данным узлом, то этот ключик не будет перераспределен.</p>
 <p>При этом, в отличие от консистентного кеша, не нужно пересчитывать кольцо и не происходит массовых перестановок.</p>
 <p>Из-за равномерного распределения хешей мы имеем что и максимальное значение так же будет равномерно распределено.</p>
+<p>Если же у вас есть неравномерное распределение, то при добавлении нового узла оно стремится распределится  равномернее за счет того, что по сути некоторый произвольный существующий ключ переходит на новый узел. Если для какого-то из узлов мы имеем больше хешей, чем для остальных, то мы можем ожидать, что и большее количество таких хешей перейдет на новый узел. То есть при таком подходе, система сама стремится выровнить распределение.</p>
+<p>Например, на картинке ниже мы имеем больше &ldquo;зеленых&rdquo; хешей, чем остальных. При добавлении нового &ldquo;желтого&rdquo; узла, мы вероятнее &ldquo;перекрасим&rdquo; больше зеленых узлов, просто потому, что их больше, а мат. ожидание выбора равномерное.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./randezvous1.excalidraw.svg" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
 <p>Главный недостаток randezvous по сравнению с consistent hashing заключается в необходимости вычисления хеша по каждому узлу при вычислении бакета для ключа. В consistent hashing нам достаточно 1 раз вычислить хеш ключика + предварительно вычислить hash nodes/vnodes. Для большого количества узлов мы будем иметь линейное увеличение нагрузки для вычисления каждого бакета по ключу.</p>
-<p>Так же поиск в кольце хешей выполняется через бинпоиск, тогда как в рандеву поиск линеен, что так же может сыграть свою роль при увеличении количества узлов.</p>
-<p>В consistent hashing вы можете распределить vnodes неравномерно так, чтобы на некоторые узлы нагручка приходила больге, чем на остальные (горячие ключи). В randezvous так сделать нельзя.</p>
-<h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
+<p>Чтобы уменьшить количество вычислений в отличие от прямолинейной функции, представленной выше использовать операцию <code>побитового или</code> для хешей. Тогда можно вычислить хеш ключа 1 раз и не аллоцировать память на канкатенацию строк. Кроме того, можно вычислять хеш узла так же один раз при его добавлении.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">HRW</span>) <span style="color:#a6e22e">FindNode</span>(<span style="color:#a6e22e">key</span> []<span style="color:#66d9ef">byte</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">HRWNode</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> (
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">resNode</span>  <span style="color:#f92672">*</span><span style="color:#a6e22e">HRWNode</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">maxScore</span> <span style="color:#66d9ef">uint64</span>
+</span></span><span style="display:flex;"><span>	)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">hKey</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">xxhash</span>.<span style="color:#a6e22e">Sum64</span>(<span style="color:#a6e22e">key</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">nodes</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">score</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">hash</span> ^ <span style="color:#a6e22e">hKey</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">score</span> &gt; <span style="color:#a6e22e">maxScore</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">maxScore</span> = <span style="color:#a6e22e">score</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">resNode</span> = <span style="color:#a6e22e">node</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">resNode</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Так же поиск в кольце хешей выполняется через бинпоиск, тогда как в рандеву поиск линеен, что так же может сыграть свою роль при увеличении количества узлов.</p>
+<p>В consistent hashing вы можете распределить vnodes неравномерно так, чтобы на некоторые узлы нагрузка приходила больше, чем на остальные (горячие ключи). В randezvous так сделать нельзя.</p>
+<p>Если, при этом, мы сопоставим каждому узлу его вес и будем распределять хеши в соответствии с этим весом, то такая версия алгоритма называется <strong>WRH (Weighted Rendezvous Hashing)</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">score</span>(<span style="color:#a6e22e">hash</span> <span style="color:#66d9ef">uint64</span>, <span style="color:#a6e22e">weight</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">u</span> <span style="color:#f92672">:=</span> float64(<span style="color:#a6e22e">hash</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">MaxUint64</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Log</span>(<span style="color:#a6e22e">u</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">weight</span>  
+</span></span><span style="display:flex;"><span>}  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">WHR</span>) <span style="color:#a6e22e">FindNode</span>(<span style="color:#a6e22e">key</span> []<span style="color:#66d9ef">byte</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">WHRNode</span> {  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> (  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">resNode</span>  <span style="color:#f92672">*</span><span style="color:#a6e22e">WHRNode</span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">maxScore</span> <span style="color:#66d9ef">float64</span>  
+</span></span><span style="display:flex;"><span>    )  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">hKey</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">xxhash</span>.<span style="color:#a6e22e">Sum64</span>(<span style="color:#a6e22e">key</span>)  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">node</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">h</span>.<span style="color:#a6e22e">nodes</span> {  
+</span></span><span style="display:flex;"><span>       <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">score</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">hash</span> ^ <span style="color:#a6e22e">hKey</span>, <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">weight</span>)  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>       <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">s</span> &gt; <span style="color:#a6e22e">maxScore</span> {  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">maxScore</span> = <span style="color:#a6e22e">s</span>  
+</span></span><span style="display:flex;"><span>          <span style="color:#a6e22e">resNode</span> = <span style="color:#a6e22e">node</span>  
+</span></span><span style="display:flex;"><span>       }  
+</span></span><span style="display:flex;"><span>    }  
+</span></span><span style="display:flex;"><span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">resNode</span>  
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
 <p>// TODO scenarios</p>
 <ol>
 <li>redis-go для выбора узла в shardedClient</li>
 <li>nginx (where?)</li>
 <li></li>
 </ol>
-<h2 id="применение-consistent-hashing" class="relative group">Применение consistent hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-consistent-hashing" aria-label="Anchor">#</a></span></h2><p>// TODO scenarios</p>
-<ol>
+<h2 id="применение-consistent-hashing" class="relative group">Применение consistent hashing <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-consistent-hashing" aria-label="Anchor">#</a></span></h2><ol>
 <li>Apache Kafka</li>
 <li>Apache Cassandra</li>
-<li>Raik</li>
 </ol>
 <hr>
-<h2 id="referencies" class="relative group">Referencies <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#referencies" aria-label="Anchor">#</a></span></h2><ol>
+<h2 id="references" class="relative group">References <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#references" aria-label="Anchor">#</a></span></h2><ol>
 <li><a href="https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740" target="_blank" rel="noreferrer">https://medium.com/my-games-company/comparing-consistent-vs-rendezvous-hashing-for-hashing-server-data-9e90dfe51740</a></li>
 <li><a href="https://habr.com/ru/companies/mygames/articles/669390/" target="_blank" rel="noreferrer">https://habr.com/ru/companies/mygames/articles/669390/</a></li>
 <li><a href="https://randorithms.com/2020/12/26/rendezvous-hashing.html" target="_blank" rel="noreferrer">https://randorithms.com/2020/12/26/rendezvous-hashing.html</a></li>
@@ -494,7 +577,7 @@
       <div class="flex justify-between pt-3">
         <span>
           
-            <a class="group flex" href="http://localhost:1313/posts/skip-list/">
+            <a class="group flex" href="http://localhost:1313/posts/kafka_rebalance_benchmark/">
               <span
                 class="me-2 text-neutral-700 transition-transform group-hover:-translate-x-[2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
                 ><span class="ltr:inline rtl:hidden">&larr;</span
@@ -503,11 +586,11 @@
               <span class="flex flex-col">
                 <span
                   class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Skip-list</span
+                  >Apache Kafka Rebalancing Benchmark</span
                 >
                 <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
                   
-                    <time datetime="2024-01-14 08:07:07 &#43;0400 &#43;04">14 January 2024</time>
+                    <time datetime="2024-07-25 10:00:00 &#43;0400 &#43;04">25 July 2024</time>
                   
                 </span>
               </span>

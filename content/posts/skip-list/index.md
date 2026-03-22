@@ -654,8 +654,8 @@ static inline unsigned long zslGetNodeSpanAtLevel(zskiplistNode *x, int level) {
 ```
 traversed = 0
 level = start_level
-пока level >= 0
-  идем forward
+while level >= 0
+  go forward
   traversed += node.span
   if traversed == rank return node
 return NULL

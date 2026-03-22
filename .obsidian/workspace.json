@@ -22,17 +22,31 @@
             }
           },
           {
-            "id": "1d66871334aabf4a",
+            "id": "124b18aeaa53f7fb",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "content/posts/raft/index.md",
+                "file": "content/posts/consistent_rendezvous_hashing/index.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
               "title": "index"
+            }
+          },
+          {
+            "id": "1d66871334aabf4a",
+            "type": "leaf",
+            "state": {
+              "type": "split-diff-view",
+              "state": {
+                "aFile": "themes/rocinante",
+                "bFile": "themes/rocinante",
+                "aRef": ""
+              },
+              "icon": "diff",
+              "title": "Diff: rocinante"
             }
           }
         ],
@@ -207,26 +221,40 @@
       "remotely-save:Remotely Save": false
     }
   },
-  "active": "1d66871334aabf4a",
+  "active": "7930aa6d9fbba6a4",
   "lastOpenFiles": [
+    "content/posts/skip-list/index.md",
     "content/posts/kafka_rebalance_benchmark/index.md",
+    "content/posts/consistent_rendezvous_hashing/index.md",
+    "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
+    "content/posts/consistent_rendezvous_hashing/randezvous1.excalidraw.svg",
+    "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
+    "public/tags/consensus/index.xml",
+    "public/tags/consensus/page/1/index.html",
+    "public/tags/consensus/page/1",
+    "public/tags/consensus/page",
+    "public/tags/consensus/index.html",
+    "public/tags/consensus",
+    "public/tags/dsa/index.xml",
+    "public/index.xml",
+    "public/tags/go/index.xml",
+    "public/posts/index.xml",
+    "public/posts/skip-list/sl_search.svg",
+    "public/posts/skip-list/sl_levels.svg",
+    "public/posts/bwt/images/sorting.png",
+    "public/posts/bwt/images/cyclic_rotation.png",
+    "public/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
+    "public/posts/consistent_rendezvous_hashing/hash_ring2.excalidraw.svg",
+    "public/posts/consistent_rendezvous_hashing/hash_ring1.excalidraw.svg",
+    "public/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.svg",
+    "content/posts/consistent_rendezvous_hashing/rendezvous.excalidraw.md",
     "content/posts/raft/index.md",
     "content/posts/simple_dns/index.md",
     "drafts/posts/lsm-tree/index.md",
     "drafts/posts/simple_markov_chains/index.md",
     "drafts/posts/skip-list_benchmarks/index.md",
     "drafts/posts/skip-list-bulk-opearations/index.md",
-    "content/posts/consistent_rendezvous_hashing/index.md",
-    "content/posts/Untitled",
-    "content/posts/raft",
-    "drafts/posts/Untitled",
-    "content/posts/consistent_rendezvous_hashing/hash_ring2.excalidraw.svg",
     "content/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.md",
-    "content/posts/consistent_rendezvous_hashing/hash_ring1.excalidraw.svg",
-    "content/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.svg",
-    "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
-    "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
-    "test",
     "drafts/posts/lsm-tree_ss-table/index.md",
     "drafts/posts/consistent_collection_ordering/index.md",
     "drafts/posts/berkley_algorithm/index.md",
@@ -241,20 +269,6 @@
     "drafts/posts/2025-12-13_combinatory/index.md",
     "drafts/posts/2025-01-05_run_stable_diffusion_in_aws/2025-01-05_run_stable_diffusion_in_aws.md",
     "drafts/posts/2025-12-13_CMS/index.md",
-    "content/posts/skip-list/index.md",
-    "content/posts/bwt/index.md",
-    "content/posts/skip-list/sl_levels.svg",
-    "public/tags/index.xml",
-    "public/tags/consistent/index.xml",
-    "public/index.xml",
-    "public/tags/strings/index.xml",
-    "public/tags/rendezvous/index.xml",
-    "public/tags/hashing/index.xml",
-    "public/posts/bwt/images/sorting.png",
-    "public/posts/bwt/images/cyclic_rotation.png",
-    "public/posts/skip-list/sl_search.svg",
-    "public/posts/skip-list/sl_levels.svg",
-    "public/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
     "content/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/Untitled.canvas"
