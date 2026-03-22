@@ -221,10 +221,12 @@
       "remotely-save:Remotely Save": false
     }
   },
-  "active": "7930aa6d9fbba6a4",
+  "active": "124b18aeaa53f7fb",
   "lastOpenFiles": [
-    "content/posts/skip-list/index.md",
     "content/posts/kafka_rebalance_benchmark/index.md",
+    "content/posts/raft/index.md",
+    "content/posts/simple_dns/index.md",
+    "content/posts/skip-list/index.md",
     "content/posts/consistent_rendezvous_hashing/index.md",
     "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
     "content/posts/consistent_rendezvous_hashing/randezvous1.excalidraw.svg",
@@ -248,8 +250,6 @@
     "public/posts/consistent_rendezvous_hashing/hash_ring1.excalidraw.svg",
     "public/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.svg",
     "content/posts/consistent_rendezvous_hashing/rendezvous.excalidraw.md",
-    "content/posts/raft/index.md",
-    "content/posts/simple_dns/index.md",
     "drafts/posts/lsm-tree/index.md",
     "drafts/posts/simple_markov_chains/index.md",
     "drafts/posts/skip-list_benchmarks/index.md",

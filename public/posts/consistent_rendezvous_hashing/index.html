@@ -126,7 +126,7 @@
     "keywords": ["dsa","consistent hashing","hash ring","rendezvous","hashing","go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1373"
+    "wordCount": "1498"
   }
   </script>
     
@@ -296,7 +296,7 @@
   <div class="flex flex-row flex-wrap items-center">
     
     
-      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">7 mins</span>
+      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">8 mins</span>
     
 
     
@@ -502,11 +502,10 @@
 </span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">resNode</span>
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><p>Так же поиск в кольце хешей выполняется через бинпоиск, тогда как в рандеву поиск линеен, что так же может сыграть свою роль при увеличении количества узлов.</p>
-<p>В consistent hashing вы можете распределить vnodes неравномерно так, чтобы на некоторые узлы нагрузка приходила больше, чем на остальные (горячие ключи). В randezvous так сделать нельзя.</p>
 <p>Если, при этом, мы сопоставим каждому узлу его вес и будем распределять хеши в соответствии с этим весом, то такая версия алгоритма называется <strong>WRH (Weighted Rendezvous Hashing)</strong></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">score</span>(<span style="color:#a6e22e">hash</span> <span style="color:#66d9ef">uint64</span>, <span style="color:#a6e22e">weight</span> <span style="color:#66d9ef">float64</span>) <span style="color:#66d9ef">float64</span> {  
 </span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">u</span> <span style="color:#f92672">:=</span> float64(<span style="color:#a6e22e">hash</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> float64(<span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">MaxUint64</span>)  
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Log</span>(<span style="color:#a6e22e">u</span>) <span style="color:#f92672">/</span> <span style="color:#a6e22e">weight</span>  
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">Log</span>(<span style="color:#a6e22e">u</span>) <span style="color:#f92672">*</span> <span style="color:#a6e22e">weight</span>  
 </span></span><span style="display:flex;"><span>}  
 </span></span><span style="display:flex;"><span>  
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> (<span style="color:#a6e22e">h</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">WHR</span>) <span style="color:#a6e22e">FindNode</span>(<span style="color:#a6e22e">key</span> []<span style="color:#66d9ef">byte</span>) <span style="color:#f92672">*</span><span style="color:#a6e22e">WHRNode</span> {  
@@ -527,7 +526,15 @@
 </span></span><span style="display:flex;"><span>  
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">resNode</span>  
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
+</span></span></code></pre></div><h2 id="benchmarks" class="relative group">Benchmarks <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#benchmarks" aria-label="Anchor">#</a></span></h2><p>Тест бенчмарка - выполнить поиск узла для 10 миллионов ключей. Для каждого бенча меняется количество узлов: 3, 5, 10, 20, 50, 100.</p>
+<p><a href="https://github.com/swvitaliy/goalgo/blob/main/hashes/hashes_test.go" target="_blank" rel="noreferrer">исходный код бенчмарков</a></p>
+<p><a href="https://github.com/swvitaliy/goalgo/blob/main/hashes/bench_results_10M.txt" target="_blank" rel="noreferrer">результаты выполнения на гитхаб</a></p>
+<p>// TODO график</p>
+<p>Использование алгоритма распределения <strong>рандеву по взвешенным узлам</strong> дает честный линейный рост времени поиска узла от количества этих узлов. Использование</p>
+<p>Использование алгоритма распределения <strong>рандеву (не взвешенный)</strong> дает примерно 3-х кратный рост времени поиска узла при увеличении количества узлов от 3 до 100. Это довольно существенный прирост.</p>
+<p>При использовании <strong>консистентного хеша</strong> время поиска увеличилось незначительно при увеличении количества узлов от 3 до 100 - от 1 сек. до 1.3 сек.</p>
+<p>Интересно так же, что при использовании консистентного хеша в тестах на равномерность распределения пришлось поставить Eps=0.1, тогда как обе рандеву реализации имеют в аналогичных тестах Eps=0.01. Это указывает на то, что даже при использовании vnodes в hash ring равномерность распределения ключей хуже чем для рандеву и прилично отличается от равномерной.</p>
+<h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
 <p>// TODO scenarios</p>
 <ol>
 <li>redis-go для выбора узла в shardedClient</li>
