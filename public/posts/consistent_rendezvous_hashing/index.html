@@ -126,7 +126,7 @@
     "keywords": ["dsa","consistent hashing","hash ring","rendezvous","hashing","go"],
     
     "mainEntityOfPage": "true",
-    "wordCount": "1498"
+    "wordCount": "1517"
   }
   </script>
     
@@ -529,10 +529,45 @@
 </span></span></code></pre></div><h2 id="benchmarks" class="relative group">Benchmarks <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#benchmarks" aria-label="Anchor">#</a></span></h2><p>Тест бенчмарка - выполнить поиск узла для 10 миллионов ключей. Для каждого бенча меняется количество узлов: 3, 5, 10, 20, 50, 100.</p>
 <p><a href="https://github.com/swvitaliy/goalgo/blob/main/hashes/hashes_test.go" target="_blank" rel="noreferrer">исходный код бенчмарков</a></p>
 <p><a href="https://github.com/swvitaliy/goalgo/blob/main/hashes/bench_results_10M.txt" target="_blank" rel="noreferrer">результаты выполнения на гитхаб</a></p>
-<p>// TODO график</p>
-<p>Использование алгоритма распределения <strong>рандеву по взвешенным узлам</strong> дает честный линейный рост времени поиска узла от количества этих узлов. Использование</p>
-<p>Использование алгоритма распределения <strong>рандеву (не взвешенный)</strong> дает примерно 3-х кратный рост времени поиска узла при увеличении количества узлов от 3 до 100. Это довольно существенный прирост.</p>
+<p>Использование алгоритма распределения <strong>рандеву по взвешенным узлам</strong> дает честный линейный рост времени поиска узла от количества этих узлов.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./wrh_plot.png" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
+<p>Использование алгоритма распределения <strong>рандеву (не взвешенный)</strong> дает примерно 3-х кратный рост времени поиска узла при увеличении количества узлов от 3 до 100. Это довольно существенный прирост, однако заметно меньший по сравнению со взвешенной версией. Вероятно, на производительность WRH повлияло наличие операций деления чисел с плавающей точкой и взятие логарифма.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./hrw_plot.png" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
 <p>При использовании <strong>консистентного хеша</strong> время поиска увеличилось незначительно при увеличении количества узлов от 3 до 100 - от 1 сек. до 1.3 сек.</p>
+<p>
+
+
+
+
+
+
+  
+  
+<figure><img src="./consistent_plot.png" alt="" class="mx-auto my-0 rounded-md" />
+</figure>
+</p>
 <p>Интересно так же, что при использовании консистентного хеша в тестах на равномерность распределения пришлось поставить Eps=0.1, тогда как обе рандеву реализации имеют в аналогичных тестах Eps=0.01. Это указывает на то, что даже при использовании vnodes в hash ring равномерность распределения ключей хуже чем для рандеву и прилично отличается от равномерной.</p>
 <h2 id="применение-randezvous" class="relative group">Применение randezvous <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bf%d1%80%d0%b8%d0%bc%d0%b5%d0%bd%d0%b5%d0%bd%d0%b8%d0%b5-randezvous" aria-label="Anchor">#</a></span></h2><p>// TODO more examples</p>
 <p>// TODO scenarios</p>
