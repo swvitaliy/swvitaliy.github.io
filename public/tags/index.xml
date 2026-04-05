@@ -16,10 +16,38 @@
       <description></description>
     </item>
     <item>
+      <title>Priority Queue</title>
+      <link>http://localhost:1313/tags/priority-queue/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/priority-queue/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Raft</title>
       <link>http://localhost:1313/tags/raft/</link>
       <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/raft/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis</title>
+      <link>http://localhost:1313/tags/redis/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/redis/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis Streams</title>
+      <link>http://localhost:1313/tags/redis-streams/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/redis-streams/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Task Queue</title>
+      <link>http://localhost:1313/tags/task-queue/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/task-queue/</guid>
       <description></description>
     </item>
     <item>
@@ -72,6 +100,13 @@
       <description></description>
     </item>
     <item>
+      <title>Consiste</title>
+      <link>http://localhost:1313/tags/consiste/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/consiste/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Consistent Hashing</title>
       <link>http://localhost:1313/tags/consistent-hashing/</link>
       <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
@@ -86,6 +121,13 @@
       <description></description>
     </item>
     <item>
+      <title>Envoy</title>
+      <link>http://localhost:1313/tags/envoy/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/envoy/</guid>
+      <description></description>
+    </item>
+    <item>
       <title>Hash Ring</title>
       <link>http://localhost:1313/tags/hash-ring/</link>
       <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
@@ -97,6 +139,13 @@
       <link>http://localhost:1313/tags/hashing/</link>
       <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
       <guid>http://localhost:1313/tags/hashing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Nginx</title>
+      <link>http://localhost:1313/tags/nginx/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/nginx/</guid>
       <description></description>
     </item>
     <item>
@@ -132,6 +181,62 @@
       <link>http://localhost:1313/tags/skip-list/</link>
       <pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate>
       <guid>http://localhost:1313/tags/skip-list/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ngin</title>
+      <link>http://localhost:1313/tags/ngin/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/ngin/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Prio</title>
+      <link>http://localhost:1313/tags/prio/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/prio/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Priority Queu</title>
+      <link>http://localhost:1313/tags/priority-queu/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/priority-queu/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis S</title>
+      <link>http://localhost:1313/tags/redis-s/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/redis-s/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis Stream</title>
+      <link>http://localhost:1313/tags/redis-stream/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/redis-stream/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redissss</title>
+      <link>http://localhost:1313/tags/redissss/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/redissss/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Task Queu</title>
+      <link>http://localhost:1313/tags/task-queu/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/task-queu/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Тпштч</title>
+      <link>http://localhost:1313/tags/%D1%82%D0%BF%D1%88%D1%82%D1%87/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/%D1%82%D0%BF%D1%88%D1%82%D1%87/</guid>
       <description></description>
     </item>
   </channel>

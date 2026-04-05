@@ -11,46 +11,17 @@
             "id": "b5807d1841567101",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "content/posts/consistent_rendezvous_hashing/index.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "index"
-            }
-          },
-          {
-            "id": "124b18aeaa53f7fb",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "content/posts/consistent_rendezvous_hashing/index.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "index"
-            }
-          },
-          {
-            "id": "1d66871334aabf4a",
-            "type": "leaf",
-            "state": {
               "type": "split-diff-view",
               "state": {
-                "aFile": "themes/rocinante",
-                "bFile": "themes/rocinante",
+                "aFile": "content/posts/consistent_rendezvous_hashing/index.md",
+                "bFile": "content/posts/consistent_rendezvous_hashing/index.md",
                 "aRef": ""
               },
               "icon": "diff",
-              "title": "Diff: rocinante"
+              "title": "Diff: index"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -169,13 +140,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "content/posts/consistent_rendezvous_hashing/index.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of index"
+              "title": "Outline"
             }
           },
           {
@@ -221,29 +191,38 @@
       "remotely-save:Remotely Save": false
     }
   },
-  "active": "124b18aeaa53f7fb",
+  "active": "b5807d1841567101",
   "lastOpenFiles": [
-    "content/posts/consistent_rendezvous_hashing/hrw_plot.png",
+    "content/posts/nginx_envoy_hash/index.md",
     "content/posts/consistent_rendezvous_hashing/index.md",
+    "public/tags/consiste/index.xml",
+    "public/tags/consiste/page/1/index.html",
+    "public/tags/consiste/page/1",
+    "public/tags/consiste/page",
+    "public/tags/consiste/index.html",
+    "public/tags/consiste",
+    "public/tags/envoy/index.xml",
+    "public/tags/envoy/page/1/index.html",
+    "public/tags/envoy/page/1",
+    "public/tags/envoy/page",
+    "drafts/posts/2026-03-28_tx_in_outbox/index.md",
+    "drafts/posts/2026-03-28-bulk-mailing/index.md",
+    "drafts/posts/2025-12-13_CMS/index.md",
+    "drafts/posts/2025-12-13_combinatory/index.md",
+    "drafts/posts/2025-01-05_redis_based_task_queue/2025-01-05_redis_based_task_queue.md",
+    "drafts/posts/2026-03-28_exactly-once-delivery/index.md",
+    "content/posts/simple_dns/index.md",
+    "drafts/posts/2025-01-05_kafka_exactly_once/2025-01-05_kafka_exactly_once.md",
+    "content/posts/redis_prior_task_queue/index.md",
+    "content/posts/raft/index.md",
+    "content/posts/consistent_rendezvous_hashing/hrw_plot.png",
     "content/posts/consistent_rendezvous_hashing/wrh_plot.png",
     "content/posts/consistent_rendezvous_hashing/consistent_plot.png",
     "content/posts/kafka_rebalance_benchmark/index.md",
-    "content/posts/raft/index.md",
-    "content/posts/simple_dns/index.md",
     "content/posts/skip-list/index.md",
     "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
     "content/posts/consistent_rendezvous_hashing/randezvous1.excalidraw.svg",
     "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
-    "public/tags/consensus/index.xml",
-    "public/tags/consensus/page/1/index.html",
-    "public/tags/consensus/page/1",
-    "public/tags/consensus/page",
-    "public/tags/consensus/index.html",
-    "public/tags/consensus",
-    "public/tags/dsa/index.xml",
-    "public/index.xml",
-    "public/tags/go/index.xml",
-    "public/posts/index.xml",
     "public/posts/skip-list/sl_search.svg",
     "public/posts/skip-list/sl_levels.svg",
     "public/posts/bwt/images/sorting.png",
@@ -259,15 +238,6 @@
     "drafts/posts/consistent_collection_ordering/index.md",
     "drafts/posts/berkley_algorithm/index.md",
     "drafts/projects/nginx_json_rpc/index.md",
-    "drafts/projects/knowledgebase_normalization/index.md",
-    "drafts/projects/spaced_repetition/index.md",
-    "drafts/posts/2025-01-05_concurrency_patterns_in_go/2025-01-05_concurrency_patterns_in_go.md",
-    "drafts/posts/2025-01-05_kafka_exactly_once/2025-01-05_kafka_exactly_once.md",
-    "drafts/posts/2025-01-05_lampart_clocks/2025-01-05_lampart_clocks.md",
-    "drafts/posts/2025-01-05_linux_shed/2025-01-05_linux_shed.md",
-    "drafts/posts/2025-01-05_redis_based_task_queue/2025-01-05_redis_based_task_queue.md",
-    "drafts/posts/2025-12-13_combinatory/index.md",
-    "drafts/posts/2025-01-05_run_stable_diffusion_in_aws/2025-01-05_run_stable_diffusion_in_aws.md",
     "content/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/Untitled.canvas"
