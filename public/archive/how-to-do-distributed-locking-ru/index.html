@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Как сделать распределенную блокировку</title>
+    <link rel="stylesheet" href="../assets/built/screen.css%3Fv=d83250423b.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:400,400i,700,700i,800">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+
+    <script>
+        if (localStorage.getItem('alto_dark') == 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+
+    <link rel="icon" href="../favicon.png" type="image/png" />
+    <link rel="canonical" href="index.html" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="amp/index.html" />
+    
+    <meta property="og:site_name" content="swvitaliy&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Как сделать распределенную блокировку" />
+    <meta property="og:description" content="Как часть исследования для моей книги, я встретил алгоритм Redlock на сайте Redis. Алгоритм утверждает, что он реализует отказоустойчивые распределенные блокировки (точнее сказать, аренды) основываясь на Redis. Этот алгоритм вызывает тревожный звоночек в моем разуме" />
+    <meta property="og:url" content="https://swvitaliy.site/how-to-do-distributed-locking-ru/" />
+    <meta property="og:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta property="article:published_time" content="2022-01-22T10:25:06.000Z" />
+    <meta property="article:modified_time" content="2022-01-22T10:33:54.000Z" />
+    <meta property="article:tag" content="translation" />
+    
+    <meta property="article:publisher" content="https://www.facebook.com/sw.vitaliy" />
+    <meta property="article:author" content="https://www.facebook.com/swvitaly" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Как сделать распределенную блокировку" />
+    <meta name="twitter:description" content="Как часть исследования для моей книги, я встретил алгоритм Redlock на сайте Redis. Алгоритм утверждает, что он реализует отказоустойчивые распределенные блокировки (точнее сказать, аренды) основываясь на Redis. Этот алгоритм вызывает тревожный звоночек в моем разуме" />
+    <meta name="twitter:url" content="https://swvitaliy.site/how-to-do-distributed-locking-ru/" />
+    <meta name="twitter:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="swvitaliy" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="translation" />
+    <meta name="twitter:site" content="@swvitaliy" />
+    <meta name="twitter:creator" content="@swvitaly" />
+    <meta property="og:image:width" content="2709" />
+    <meta property="og:image:height" content="938" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "swvitaliy&#x27;s blog",
+        "url": "https://swvitaliy.site/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "swvitaliy",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "https://swvitaliy.site/author/swvitaly/",
+        "sameAs": [
+            "https://www.facebook.com/swvitaly",
+            "https://twitter.com/swvitaly"
+        ]
+    },
+    "headline": "Как сделать распределенную блокировку",
+    "url": "https://swvitaliy.site/how-to-do-distributed-locking-ru/",
+    "datePublished": "2022-01-22T10:25:06.000Z",
+    "dateModified": "2022-01-22T10:33:54.000Z",
+    "keywords": "translation",
+    "description": "Как часть исследования для моей книги, я встретил алгоритм Redlock на сайте Redis. Алгоритм утверждает, что он реализует отказоустойчивые распределенные блокировки (точнее сказать, аренды) основываясь на Redis. Этот алгоритм вызывает тревожный звоночек в моем разуме",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://swvitaliy.site/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 4.1" />
+    <link rel="alternate" type="application/rss+xml" title="swvitaliy&#x27;s blog" href="../rss/index.html" />
+    <script defer src="https://unpkg.com/@tryghost/portal@~1.0.0/umd/portal.min.js" data-ghost="https://swvitaliy.site/"></script><style> .gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <!-- link tag -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" /> -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/a11y-light.min.css">
+<link href="https://unpkg.com/octomments/build/ocs-ui.min.css" rel="stylesheet">
+
+<!--
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+	<style>
+      body {
+          font-family: 'Source Sans 3', sans-serif;
+          font-size: 18px;
+      }
+        .post-footer, section.author, .site-footer>.copyright, .site-footer>.logo {
+            display: none;
+        }
+        .dark-mode .logo-image:not(.white) {
+            opacity: 1;
+        }
+        /*.comment-container {
+        	background-color: white;
+        }*/
+        .O_comments, .O_comments>.O_summary,.O_comment_left,.O_comment_right,.O_comment_heading,
+        .O_comment_body,.O_new-comment,.O_comment,.O__textarea,.O_new-comment textarea,.O__submit_comment,.O_new-comment button {
+         	font-size:1em;   
+        }
+        .u-text-format ol>li:before {
+        	border-radius: unset;
+            color: inherit;
+        }
+        .u-text-format ol li:before, .u-text-format ul li:before {
+    		background-color: inherit;
+        }
+        
+        /* for block of code */
+        /*.hljs-ln td.hljs-ln-code {
+            padding-left: 10px;
+        }*/
+        .hljs-ln tr td.hljs-ln-numbers {
+          padding-right: 10px;
+        }
+        .post-feed>.post .post-excerpt {
+        	font-size: 16px;
+        }
+        .single-post .post-content {
+          font-size: 16px;
+        }
+    </style>
+<!-- <script defer data-domain="swvitaliy.site" src="https://plausible.io/js/plausible.js"></script> -->
+<script data-goatcounter="https://swvitaliy.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+
+<style>:root {--ghost-accent-color: #15171A;}</style>
+</head>
+
+<body class="post-template tag-translation">
+    <div class="site">
+        <header class="site-header container">
+    <div class="navbar">
+        <div class="navbar-left">
+            <div class="burger hidden-lg hidden-xl"></div>
+            <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>            <div class="sep hidden-xs hidden-sm hidden-sm"></div>
+                <nav class="main-menu hidden-xs hidden-sm hidden-md">
+                    <ul class="nav-list u-plain-list">
+        <li class="menu-item menu-item-zamietki"><a class="menu-item-link"
+                href="../index.html">Заметки</a></li>
+        <li class="menu-item menu-item-obo-mnie"><a class="menu-item-link"
+                href="../about/index.html">Обо мне</a></li>
+        <li class="menu-item menu-item-github"><a class="menu-item-link"
+                href="https://github.com/swvitaliy">Github</a></li>
+</ul>
+                </nav>
+        </div>
+        <div class="navbar-right">
+            <div class="toggle-track">
+                <div class="toggle-moon"><i class="icon icon-brightness-2"></i></div>
+                <div class="toggle-sun"><i class="icon icon-white-balance-sunny"></i></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+    </div>
+</header>        <div class="site-content">
+            
+<div class="content-area">
+    <main class="site-main">
+            <article class="post tag-translation no-image no-image single-post" postid="612ca4783f692249e5366382">
+                <header class="post-header big-title container medium">
+        <h1 class="post-title">Как сделать распределенную блокировку</h1>
+                <div class="post-meta">
+            <span class="post-meta-item post-meta-date">
+                <time datetime="2022-01-22">
+                        22 янв. 2022 г.
+                </time>
+            </span>
+            <!-- <span class="post-meta-item post-meta-length">
+                11 min read
+            </span> -->
+                <span class="post-meta-item post-meta-tags">
+                    <a href="../tag/translation/index.html" title="translation">translation</a>
+                </span>
+        </div>
+</header>
+                                <!-- <div class="post-content kg-canvas u-text-format"> -->
+                <div class="post-content container medium u-text-format">
+                    <p>Перевод статьи Мартина Клипмана. Оригинал по <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">ссылке</a>.</p><p>Как часть исследования для моей книги, я встретил алгоритм Redlock на сайте Redis. Алгоритм утверждает, что он реализует отказоустойчивые распределенные блокировки (точнее сказать, аренды) основываясь на Redis. Этот алгоритм вызывает тревожный звоночек в моем разуме, так что я потратил немного времени, раздумывая о нем и написал эту заметку.</p><p>С тех пор есть более 10 независимых реализаций алгоритма Redlock и мы не знаем кто уже полагается на этот алгоритм. Я подумал, что будет полезно опубликовать эту статью. Я не буду тщательно рассматривать другие аспекты Редиса, некоторые из которых я уже критиковал в другой статье.</p><p>Перед тем, как я углублюсь в детали редлока, давайте я скажу, что мне вполне нравится Редис и я с успехом испоьзовал его в продакшене в прошлом. Я думаю он хорош, когда вам нужно расшарить какие-то скоротечные, приблизительные, быстроменяющиеся данные между серверами и не будет большой проблемы если вы изредка потеряете эти данные по какой бы то ни было причине. Например, хороший пример использования — счетчик запроосов по IP (для ограничения запросов) и установка IP адреса для UserID (для обнаружения).</p><p>Однако, Редис постепенно уходит в сторону управления данными, в котором есть ожидание [от системы] строгой консистентности и долгожевучести данных, что волнует меня, поскольку это не то, для чего создан Редис. Вероятно, распределенная блокировка одна из таких областей. Давайте рассмотрим ее более детальнее.</p><h2 id="%D0%B4%D0%BB%D1%8F-%D1%87%D0%B5%D0%B3%D0%BE-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D0%B5%D1%82%D1%81%D1%8F-%D1%82%D0%B0%D0%BA%D0%B0%D1%8F-%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B0">Для чего используется такая блокировка?</h2><p>Задача блокировки гарантировать, что среди нескольких узлов, которые могут делать один и тот же кусок работы, только один в действительности делает его (в один момент времени). Эта работа может писать какие-то данные в общую систему хранения, выполнять какие-то вычисления, вызывать какие-то внешние API или что-то подобное. На высоком уравне, есть 2 причины, почему вы можете захотеть блокировку в распределенном приложении: для эффективнсти или корректности. Чтобы различать эти случаи, вы можете задать вопрос "что бы случилось, если бы блокировка была нарушена":</p><ul><li>Эффективность: взятие лока предотвращает от ненужного выполнения одной и той же работы дважды (например, каких-то сложных вычислений). Если блокировка нарушена и 2 узла закончили делать одну и ту же работу, в результате получим незначительное увеличение в стоимости (к конечном счете вы заплатите на 5 центов больше) или незначительное неудобство (например, юзер получит задвоенный емаил).</li><li>Корректность: взятие лока предотвращает конкурентные процессы от наступания друг другу на пятки и путанице в состоянии системы. Если лок нарушен и есть 2 узла с конкурентными раобтами на одном и том же куске данных, в резутьтате будет поврежденный файл, потерянные данные, постоянная неконсистентность, неправильная доза лекарства, выписанного пациенту и другие серьезные проблемы.</li></ul><p>Это оба 2 правильных случая для использования лока, но вам нужно четко понимать с каким из них вы имеете дело.</p><p>Я буду спорить, если вы используете локи просто для целей эффективности – не нужно для этого использовать редис, запускать 5 серверов и проверять большинство для взятия вашего лока. Вам лучше использовать 1 инстанс редис, возможно, с асинхронной репликацией на secondary инстанс для случая, когда первичный упадет.</p><p>Если вы исопльзуете одиночный инстанс редис, конечно вы будете ронять некоторые локи если внезапно редис узел обесточат или что-то пойдет не так. Но если вы используете локи только для оптимизации эффективности и краши не возникают часто, то это не принципиально. Такого рода компромисы – это сценарии, где редис действительно хорош. По крайней мере, если вы полагаетесь на один экземпляр Redis, всем, кто смотрит на систему, ясно, что блокировки являются приблизительными и должны использоваться только для некритических целей.</p><p>С другой стороны, Redlock алгоритм с 5 репликами и большинством при голосовании, выглядит на первый взгляд как подходящий для ситуации, в которой ваш лок критически важен для коректности. Я буду приводить доводы против этого – он не применим для этого случая. В этой статье мы допустим, что ваши блокировки важны для корректности и что это серьезный баг, когда 2 разных узла одновременно верят, что они держат один и тот же лок.</p><h2 id="%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D0%B0-%D1%80%D0%B5%D1%81%D1%83%D1%80%D1%81%D0%B0-%D1%81-%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E-%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D0%B8">Защита ресурса с помощью блокировки</h2><p>Давайте на минуту забудем о Редлоке и поговорим, как распределенный лок используется в общем (в не зависимости от частных алгоритмов блокировки). Важно помнить, что блокировка в распределенной системе это не мьютекс в многопоточном приложении. Это более сложный зверь, из-за того, что разные узлы и сети могут выходить из строя независимо друг от друга и разными способами.</p><p>Например, скажем у вас есть приложение, в котором клиенту нужно обновить файл в общем хранилище (HDFS или S3). Клиент сначала забирает блокировку, затем читает файл, вносит какие-то изменения, пишет эти изменения назад, и, наконец, освобождает блокировку. Блокировка предотвращает, чтобы 2 клиента не выполняли этот цикл чтения-изменения-записи одновременно, что бы привело к потере обновления. Код модет быть что-от вреоде этого:</p><pre><code class="language-js">// THIS CODE IS BROKEN
+function writeData(filename, data) {
+    var lock = lockService.acquireLock(filename);
+    if (!lock) {
+        throw 'Failed to acquire lock';
+    }
+
+    try {
+        var file = storage.readFile(filename);
+        var updated = updateContents(file, data);
+        storage.writeFile(filename, updated);
+    } finally {
+        lock.release();
+    }
+}</code></pre><p>К сожалению, даже если вы имеете безупречный сервис локов, код, приведенный выше сломан. Следующая диаграмма показывает, как вы можете остаться с поврежденными данными:</p><figure class="kg-card kg-image-card"><img src="../content/images/2022/01/unsafe-lock.png" class="kg-image" alt loading="lazy" width="1100" height="400" srcset="../content/images/size/w600/2022/01/unsafe-lock.png 600w, ../content/images/size/w1000/2022/01/unsafe-lock.png 1000w, ../content/images/2022/01/unsafe-lock.png 1100w" sizes="(min-width: 720px) 720px"></figure><p>В этом примере клиент, захвативший лок приостановлен на длительный период времени пока держит лок – например, потому что garbage collector умер. Лок имеет timeout, который является всегда хорошей идеей (в противном случае, краш клиента может оставить лок навсегда поднятым и никогда не освободить). Однако, если GC проснется после истечения таймаута и клиент не понимает, что лок протух, то он может сделать небезопасные изменения.</p><p>Этот баг не теоретический:  HBase имел эту проблему. Обычно GC  имеет очень маленький период, но эти остановка мира известно, что могут длится до нескольких минут – достаточно долго, чтобы лок протух. Даже так называемые "параллельные" GC такие как HotSpot JVM’s CMS не могут полностью работать с кодом приложения – даже они останавливают мир время от времени.</p><p>Вы не сможете решить эту проблему вставкой проверки на то, что лок истек перед записью назад в хранилище. Помните, что GC может остановить мир в любой точке, включая точку, максимально для вас неудобную (между последней проверкой и записью).</p><p>И если вы чувствуете высокомерие, потому что runtime вашего языка программирования не имеет долгих GC пауз, есть много других причин почему процесс может приостанавливать свою работу. Возможно, ваш процесс пытается прочитать адрес, который еще не загружен в память, поэтому он получает page fault и он приостановится до тех пор, пока адрес не загрузится из диска. Возможно, ваш диск в действительности – это EBS и такое чтение невольно преобразится в сетевой запрос в сеть Amazon. Возможно, есть есть куча других прочессов, конкурирующих за CPU и вы попали в черную дыру в вашем дереве планировщика. Возможно кто-то случайно отправил SIGSTOP процессу. Так или иначе, ваши процессы будут приостановлены.</p><p>Если вы все еще не верите мне насчет пауз в процессе, тогда считайте, что запрос на запись в файл может быть отложен перед достижением хранилища. Пакетные сети, такие как Ethernet или IP могут задерживать пакеты как угодно и они это делают: в известом инциденте с гитхабом, пакеты были в сети на приблизительно 90 секунд. Это значит, что процесс приложения может отправить запрос на запись, а он достигнет хранилища через минуту, когда лок уже протух.</p><p>Даже в хорошо управляемых сетях такого рода вещи случаются. Вы просто не можете делать предположения о таймингах, вот почему приведенный выше код в корне небезопасен, независимо от того, какой службой блокировки вы пользуетесь.</p><h2 id="%D0%B7%D0%B0%D1%89%D0%B8%D1%82%D0%B0-%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BE%D0%BA-%D1%81-%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E-%D0%B1%D0%B0%D1%80%D1%8C%D0%B5%D1%80%D0%BE%D0%B2">Защита блокировок с помощью барьеров</h2><p>Исправление этой проблемы действительно очень простое – вам нужно вставить fencing token в каждый запрос к хранилищу. В этом контексте, fencing token это просто число, которое увеличивается (увеличивается с помощью службы блокировки) каждый раз, когда клиент забирает лок. Это проилюстрировано на следующей диаграмме:</p><figure class="kg-card kg-image-card"><img src="https://martin.kleppmann.com/2016/02/fencing-tokens.png" class="kg-image" alt="Using fencing tokens to make resource access safe" loading="lazy"></figure><p>Клиент 1 забирает лок и получает токен 33. Затем, он уходит надолго в паузу и лок протухает. Клиент 2 забирает лок и получает токен 34 (числа всегда увеличиваются) и затем пишет его в хранилище. Затем, клиент 1 просыпается и отправляет запрос на запись в хранилище с токеном 33. Однако, хранилище уже запомнило, что уже обработало запись с большим токеном (34) и поэтому оно отклоняет этот запрос с токеном 33.</p><p>Примечательно то, что требуется активная роль хранилища в проверке токенов – отклонение любого запроса на запись, в котором токен пошел назад. Но это не особенно сложно, если вы знаете этот трюк. И при условии, что служба блокировки генерирует строго монотонно инкрементальные токены, это делает блокировки безопасными. Например, если вы используете ZooKeeper как службу блокировки, вы можете использовать zxid или номер версии znode как fencing token.</p><p>Как бы то ни было, это подводит нас к первой проблеме редлока – он не имеет какого бы то ни было механизма для генерации fencing токенов. Алгоритм не производит какого-то числа, которое бы гарантированно увеличивалось каждый раз при взятии лока. Это значит, что даже если бы алгоритм был бы в остальном совершенен, его бы все равно нельзя безопасно использовать, потому что вы не можете предотвратить состояние гонки между клиентами, когда один из клиентов приостановил работу или его пакеты задержаны.</p><p>И совершенно для меня не очевидно, как изменить редлок, чтобы начать генерировать fencing token. Юникальные рандомные значения, которые он использует не обеспечивают монотонности. Простого сохранения счетчика на одном узле Redis будет недостаточно, поскольку этот узел может выйти из строя. Сохранение счетчиков на нескольких узлах означало бы, что они могут быть не синхронизированы. Вполне вероятно, что вам понадобится алгоритм консенсуса только для генерации токенов ограждения. (Если бы только увеличение счетчика было простым).</p><h2 id="%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B2%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%B8-%D0%B4%D0%BB%D1%8F-%D0%B4%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BA%D0%BE%D0%BD%D1%81%D0%B5%D0%BD%D1%81%D1%83%D1%81%D0%B0">Использование времени для достижения консенсуса</h2><p>Тот факт, что Redlock не генерирует токены ограждения, уже должен быть достаточной причиной, чтобы не использовать его в ситуациях, когда корректность зависит от блокировки. Но есть еще некоторые проблемы, которые стоит обсудить.</p><p>В академической литературе наиболее практичная модель системы для такого рода алгоритмов – это асинхронная модель с ненадежной фиксацией ошибок. На простом английском это значит, что алгоритм не делает предположений о таймингах – процессы могут приостановить свою работу на произвольный промежуток времени, пакеты могут произвольно долго задержаться в сети и часы могут произвольно врать – и тем не менее ожидается, что алгоритм будет делать правильные вещи. Учитывая то, что мы обсуждали выше, это очень разумные предположения.</p><p>Единственная цель, для которой алгоритмы могут использовать часы – это генерировать таймауты, чтобы избежать вечного ожидания, если учел не работает. Но таймауты не должны быть точными просто потому что есть таймауты запросов, которые не означают, что другие узлы точно упали – с таким же успехом может быть, что в сети наблюдается большая задержка или что ваши локальные часы врут. Когда вы используете в качестве детектора сбоев таймауты, они могут предположительно сказать вам, что что-то пошло не так. (Если бы распределенные алгоритмы полностью обходились бы без часов, то консенсус стал бы невозможным. Взятие лока подобно compare-and-set операции для которой нужен консенсус.)</p><p>Заметьте, что редис использует gettimeofday, не монотонные часы, для определения истечения времени жизни ключа. man page для gettimeofday недвусмыссленно сообщает нам, что время, которое он возвращает, подвержено прерывистым скачкам в системном времени– то есть он может внезапно прыгнуть вперед на несколько минут или даже прыгнуть назад во времени (другими словами, если часы ускоряются NTP, потому что они слишком сильно отличаются от сервера NTP или часы вручную установил администратор). Таким образом, если системные часы делают странные вещи, легко может случиться так, что срок действия ключа в Redis истекает намного быстрее или намного медленнее, чем ожидалось.</p><p>Для алгоритмов в асинхронной модели это не является большой проблемой – эти алгоритмы, как правило, гарантируют, что их свойства безопасности всегда сохраняются, без каких-либо предположений о времени. Только свойства живучести зависят от таймаутов или какого-либо другого детектора сбоев. На простом языке, это значит, что даже, если тайминги в системе все пошли вразобой (процессы приостанавливаются, есть задержки в сети, часы скачат вперед-назад), производительность алгоритма может пойти ко всем чертям, но алгоритм никогда не сделает некорректное решение.</p><p>Однако, редлок не такой. Его безопасность зависит от множества допущений о таймингах – он полагает, что все узлы редис держат ключи одинаковое время перед тем, как они истекут, что сетевые задержки малы по сравнению со сроком годности и что процессы приостанавливают свою работу на значительно меньшее время, чем срок годности.</p><h2 id="%D0%B2%D0%B7%D0%BB%D0%BE%D0%BC-%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%BA%D0%B0-%D1%81-%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E-%D0%BF%D0%BB%D0%BE%D1%85%D0%B8%D1%85-%D1%82%D0%B0%D0%B9%D0%BC%D0%B8%D0%BD%D0%B3%D0%BE%D0%B2">Взлом редлока, с помощью плохих таймингов</h2><p>Давайте взглянем на некоторые примеры для демонстрации зависимости редлока от предположений о таймингах. Скажем, система имеет 5 редис узлов (A, B, C, D, E) и 2 клиента (1 и 2). Что случится, если часы на одном из редис узлов прыгнут вперед?</p><ol><li>Клиент 1 возьмет лок на узлах A, B, C. Из-за проблем с сетью D, E недоступны.</li><li>Часы на узле C прыгают вперед, поэтому лок там протухает.</li><li>Клиент 2 берет лок на узлах C, D, E. Из-за проблем с сетью A, B недоступны.</li><li>Клиенты 1 и 2 оба верят, что получили лок.</li></ol><p>Похожая ситуация может произойти, если C упадет перед записью лока на диск, и немедленно перезагрузится. По этой причине в редлок документации рекомендована задержка при перезагрузке упавшего узла длительностью по крайней мере, равной времени жизни самого долгоживущего лока. Но эта задержка полагается на достаточно точное измерение времени, и это приведет к ошибке, если часы будут прыгать.</p><p>Хорошо, может быть вы думаете, что прыжки часов – это нереалистично, потому что вы уверены в том, что правильно настроили NTP только для того, чтобы замедлять время. В таком случае давайте рассмотрим пример того, как пауза процесса может привести к сбою алгоритма:</p><ol><li>Клиент 1 запрашивает лок на узлах A, B, C, D, E.</li><li>Пока ответ прилетает к клиенту 1 у него приостанавливается процесс (GC).</li><li>Лок истекает на всех узлах редис.</li><li>Клиент 2 берет лок на узлах A, B, C, D, E.</li><li>Клиент 1 просыпается и получает ответы от редис узлов, что он успешно взял лок (они хранились в сетевых буферах ядра клиента 1, пока процесс был приостановлен)</li><li>Клиенты 1 и 2 оба верят, что получили лок.</li></ol><p>Обратите внимание, что, хотя Redis написан на C, и, следовательно, не имеет GC, это не помогает нам здесь – любая система, в которой клиенты могут испытывать GC паузы имеет эту проблему. Вы можете сделать это безопасным, только запретив клиенту 1 выполнять какие-либо операции под блокировкой после того, как клиент 2 получил блокировку, например, используя описанный выше подход к ограждению.</p><p>Длительная задержка в сети может привести к тому же эффекту, что и пауза процесса. Возможно, это зависит от вашего таймаута пользователя TCP – если вы сделаете тайм-аут значительно короче, чем TTL Redis, возможно, задержанные сетевые пакеты будут проигнорированы, но нам придется подробно изучить реализацию TCP, чтобы быть уверенными в этом. Кроме того, с таймаутами мы снова возвращаемся к точности измерения времени!</p><h2 id="%D0%BF%D1%80%D0%B5%D0%B4%D0%BF%D0%BE%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D1%81%D0%B8%D0%BD%D1%85%D1%80%D0%BE%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D1%80%D0%B5%D0%B4%D0%BB%D0%BE%D0%BA%D0%B0">Предположения о синхронности Редлока</h2><p>Эти примеры показывают, что редлок работает корректно, только если вы предполагаете синхронную модель, что означает систему со следующими свойствами:</p><ul><li>ограниченная задержка сети (вы можете гарантировать, что пакеты всегда прибывают с некоторой гарантированной максимальной задержкой)</li><li>ограниченные паузы процессов (другими словами, жесткие ограничения в реальном времени, которые обычно встречаются только в автомобильных системах подушек безопасности и тому подобном)</li><li>ограниченная ошибка синхронизации времени (скрестите пальцы, чтобы потерять ваше время плохого NTP сервера)</li></ul><p>Замечу, что синхронная модель не значит именно синхронизированные часы: это значит, что вы полагаете, что знаете верхнюю временную границу задержек сети, пауз и смещений часов. Редлок предполагает, что задержки, паузы и смещения мало зависят от времени лока; если проблема тайминга станет настолько большим как время жизни лока, алгоритм провалится.</p><p>В достаточно хорошо функционирующей среде датацентра, предположения о сроках будут выполняться большую часть времени – это известно как частично синхронная система. Но достаточно ли этого? Как только эти временные допущения будут нарушены редлок может нарушить эти свойства безопасности, например, предоставление аренды одному клиенту до истечения срока действия другого. Если вы полагаетесь на правильность своей блокировки, "большая часть времени" не достаточна – вам нужна правильность всегда.</p><p>Есть множество доказательств, что небезопасно предполагать синхронную модель системы для большинства практических системных сред. Вспомните об инциденте на GitHub с 90 секундными пакетными задержками. Маловероятно, что Редлок выдержит <a href="https://jepsen.io/">тест Джепсена</a> (<a href="https://aphyr.com/tags/jepsen">примеры тестов</a>).</p><p>С другой стороны, алгоритм консенсуса, разработанный для частично синронных систем (или асинхронная модель с детектором отказов) действительно имеют шанс на работу. Raft, Viewstamped Replication, Zab and Paxos – все попадают в эту категорию. Такой алгоритм должен отказаться от всех временных допущений. Это трудно – так заманчиво предположить, что сети, процессы и часы более надежны, чем они есть на самом деле. Но в запутанной реальности распределенных систем вы должны быть очень осторожны со своими предположениями.</p><h2 id="%D0%B7%D0%B0%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5">Заключение</h2><p>Я думаю алгоритм redlock это слабый выбор, "ни рыба ни мясо". Он неоправданно тяжеловесен и дорог для оптимизированного на эффективности лока, но недостаточно безопасен для ситуаций, в которых правильность зависит от блокировки.</p><p>В частности, алгоритм делает опасные предположения о таймингах и системных часах (по сути, предполагается синхронная система с ограниченной задержкой в сети и ограниченным временем выполнения операций), и это он нарушает свойства безопасности, если эти предположения не выполняются. Более того, в нем отсутствует средство для генерации токенов ограждения (которые защищают систему от длительных задержек в сети или приостановленных процессов).</p><p>Если вам нужны локи только на основе лучших усилий (как оптимизация производительности, не корректность) я бы рекомендовал остановиться на прямом одноузловом лок алгоритме для редис (условный set-if-not-exists для получения лока, атомарный delete-if-value-matches для освобождения лока) и документирование очень четко в вашем коде, что лок только приблизительный и может быть нарушен. Не утруждайте себя созданием кластера из пяти узлов Redis.</p><p>С другой стороны, если вам нужен лок для корректности, пожалуйста, не используйте redlock. Вместо него, используйте правильные системы консенсуса, такие как ZooKeeper, возможно, с одним из "<a href="https://curator.apache.org/curator-recipes/index.html">Рецептов куратора</a>" (<a href="https://curator.apache.org/curator-recipes/index.html">Curator recipes</a>), которые реализуют лок.</p><p>Как я упомянул вначале, редис превосходный инструмент, если вы используете его корректно. Ничто из вышеперечисленного не умаляет полезности Redis для его целей. <a href="http://antirez.com/">Сальвадор</a> очень предан своему проекту долгие годы и его успех вполне заслужен. Но у каждого инструмента есть ограничения, и важно знать их и планировать соответствующим образом.</p><p>Если вы хотите узнать больше, я объясняю эту тему в мельчайших деталях в <a href="https://dataintensive.net/">8 и 9 главах моей книги</a> (Приведенные выше диаграммы взяты из моей книги). Для изучения как использовать ZooKeeper я рекомендую книгу <a href="http://shop.oreilly.com/product/0636920028901.do">Junqueira and Reed’s</a>. В качестве хорошего введения в теорию распределенных систем, я рекомендую <a href="http://www.distributedprogramming.net/">руководство Christian Cachin, Rachid Guerraoui, Luís </a>Rodrigues.</p><p>Спасибо <em><em><a href="https://aphyr.com/">Kyle Kingsbury</a>, <a href="https://twitter.com/skamille">Camille Fournier</a>, <a href="https://twitter.com/fpjunqueira">Flavio Junqueira</a>, and <a href="http://antirez.com/">Salvatore Sanfilippo</a></em> за ревью черновика этой статьи. </em>Любые ошибки, конечно, мои.</p><p><strong>Обновление 9 фев. 2016</strong>: Сальватор, первоначальный автор редлока, опубликовал опровержение этой статьи. Он делает несколько хороших замечаний, но я остаюсь при своих выводах. Я могу подробнее рассказать об этом в следующем посте, если у меня будет время, но, пожалуйста, сформулируйте свое собственное мнение – и пожалуйста, ознакомьтесь с приведенными ниже ссылками, многие из которых прошли тщательную академическую рецензию (в отличие от любой из наших постов).</p><p>З.ы. в оригинальной статье содержится много важных ссылок в тексте, а так же есть список литературы, который я не перенес сюда.</p><p></p>
+                </div>
+                <div class="container medium">
+                    <div class="share u-hover-wrapper">
+    <a class="share-item share-facebook u-hover-item"
+        href="https://www.facebook.com/sharer.php?u=https://swvitaliy.site/how-to-do-distributed-locking-ru/" target="_blank" rel="noopener"><i
+            class="icon icon-facebook"></i></a>
+    <a class="share-item share-twitter u-hover-item"
+        href="https://twitter.com/intent/tweet?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&text=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83" target="_blank" rel="noopener"><i
+            class="icon icon-twitter"></i></a>
+    <a class="share-item share-pinterest u-hover-item"
+        href="https://pinterest.com/pin/create/button/?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&media=&description=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83"
+        target="_blank" rel="noopener" data-pin-do="none"><i class="icon icon-pinterest"></i></a>
+    <a class="share-item share-linkedin u-hover-item"
+        href="https://www.linkedin.com/shareArticle?mini=true&url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&title=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83"
+        target="_blank" rel="noopener"><i class="icon icon-linkedin"></i></a>
+    <a class="share-item share-reddit u-hover-item"
+        href="https://reddit.com/submit?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&title=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83" target="_blank" rel="noopener"><i
+            class="icon icon-reddit"></i></a>
+    <a class="share-item share-tumblr u-hover-item"
+        href="https://www.tumblr.com/widgets/share/tool?canonicalUrl=https://swvitaliy.site/how-to-do-distributed-locking-ru/&title=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83"
+        target="_blank" rel="noopener"><i class="icon icon-tumblr"></i></a>
+    <a class="share-item share-vk u-hover-item"
+        href="http://vk.com/share.php?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&title=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83" target="_blank" rel="noopener"><i
+            class="icon icon-vk"></i></a>
+    <a class="share-item share-pocket u-hover-item" href="https://getpocket.com/edit?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/"
+        target="_blank" rel="noopener"><i class="icon icon-pocket"></i></a>
+    <a class="share-item share-telegram u-hover-item"
+        href="https://t.me/share/url?url=https://swvitaliy.site/how-to-do-distributed-locking-ru/&text=%D0%9A%D0%B0%D0%BA%20%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C%20%D1%80%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%83%D1%8E%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B8%D1%80%D0%BE%D0%B2%D0%BA%D1%83" target="_blank" rel="noopener"><i
+            class="icon icon-telegram"></i></a>
+</div>                        <section class="author">
+        <div class="author-image-placeholder u-placeholder">
+            <img class="author-image lazyload u-object-fit"
+                data-srcset="//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x"
+                src="https://www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&amp;d=mm&amp;r=x"
+                srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                alt="swvitaliy">
+        </div>
+        <div class="author-wrapper">
+            <header class="author-header">
+                <div class="author-header-wrapper">
+                    <h4 class="author-name">swvitaliy</h4>
+                    <div class="author-social">
+                            <a class="author-social-item author-facebook"
+                                href="https://www.facebook.com/swvitaly"
+                                target="_blank" rel="noopener">Facebook</a>
+                            <a class="author-social-item author-twitter"
+                                href="https://twitter.com/@swvitaly"
+                                target="_blank" rel="noopener">Twitter</a>
+                        <a class="author-social-item author-more"
+                            href="../author/swvitaly/index.html">More posts</a>
+                    </div>
+                </div>
+            </header>
+            <div class="author-bio"></div>
+        </div>
+    </section>
+                </div>
+            </article>
+            <div class="navigation container medium">
+        <div class="navigation-item navigation-previous">
+            <a class="navigation-item-link button-arrow button-arrow-left" href="../csharp-pros-cons/index.html">
+                <i class="button-arrow-icon icon icon-arrow-left"></i> Previous Post
+            </a>
+        </div>
+
+        <div class="navigation-item navigation-next">
+            <a class="navigation-item-link button-arrow button-arrow-right" href="../circular-buffer-by-key/index.html">
+                Next Post <i class="button-arrow-icon icon icon-arrow-right"></i>
+            </a>
+        </div>
+</div>                    <section class="related-posts container medium">
+            <h3 class="related-title"><span class="text">You might also like...</span></h3>
+            <div class="row">
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../concurrency-in-go-shared-memory/index.html">Конкурентность в Go: общая память</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../in-defense-of-linked-lists/index.html">В защиту связных списков</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../pierievod-20-vieshchiei-kotoryie-ia-ponial-za-20-liet/index.html">20 вещей, которые я понял за 20 лет, будучи программным инженером</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+            </div>
+        </section>
+            <div class="comment-container">
+    <div class="comment container medium">
+        <div id="comments"></div>
+
+    </div>
+</div>
+    </main>
+</div>
+
+        </div>
+        <footer class="site-footer container large">
+    <div class="copyright">
+        Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+    </div>
+
+        <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>
+    <div class="footer-social">
+            <a class="footer-social-item footer-social-item-facebook" href="https://www.facebook.com/sw.vitaliy"
+                target="_blank" rel="noopener" aria-label="Facebook">
+                <i class="icon icon-facebook"></i>
+            </a>
+            <a class="footer-social-item footer-social-item-twitter" href="https://twitter.com/swvitaliy"
+                target="_blank" rel="noopener" aria-label="Twitter">
+                <i class="icon icon-twitter"></i>
+            </a>
+        <a class="footer-social-item footer-social-item-rss"
+            href="https://feedly.com/i/subscription/feed/https://swvitaliy.site/rss/" target="_blank" rel="noopener"
+            aria-label="RSS">
+            <i class="icon icon-rss"></i>
+        </a>
+    </div>
+</footer>    </div>
+
+    <div class="dimmer"></div>
+
+    <div class="off-canvas">
+        <div class="canvas-close">
+            <i class="canvas-icon icon icon-window-close"></i>
+        </div>
+        <div class="mobile-menu"></div>
+    </div>
+
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous">
+    </script>
+    <script src="../assets/built/main.min.js%3Fv=d83250423b"></script>
+
+    
+
+    <!-- script tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+
+<script>
+    hljs.highlightAll();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+<script src="https://unpkg.com/octomments/build/ocs.min.js"></script>
+<script>
+    
+  var PostIdToIssuesMap = {
+  	  "60cca8ec3f692249e53661c6": 1,
+      "61c128843f692249e5366f19": 2,
+      "61b8f1ad3f692249e5366e40": 3, 
+      "6141b7023f692249e53663f3": 4,
+      "616b2f043f692249e536665d": 5,
+      "6141c62f3f692249e53664be": 6,
+      "612d14c93f692249e53663b2": 7,
+      "6065a7d53f692249e53660a3": 8,
+      "6141ce5c3f692249e53664ed": 9,
+      "61b5c96e3f692249e5366e12": 10, 
+      "61ebdf693f692249e5367744": 11,
+      "624000583f692249e53678a6": 12,
+      "612ca4783f692249e5366382": 13,
+      "61746abd3f692249e536667c": 14,
+      "612ca5f33f692249e53663a2": 15,
+      "612ca6253f692249e53663a8": 16,
+      "624213e53f692249e53679cf": 17,
+      "626472fb3f692249e5367a71": 18,
+      "6240cf053f692249e53679ba": 19
+  };
+    
+  var post = document.getElementsByTagName('article')[0];
+  var postId = post?.getAttribute('postId') || 'undef_key';
+  if (PostIdToIssuesMap[postId])
+      Octomments({
+        github: {
+          owner: 'swvitaliy',
+          repo: 'blog',
+        },
+        issueNumber: PostIdToIssuesMap[postId],
+        renderer: [OctommentsRenderer, '#comments']
+      }).init();
+    else {
+      var comments = document.getElementsByClassName('comment-container')[0];
+      if (comments) comments.style.display = 'none';
+    }
+</script>
+</body>
+
+</html>

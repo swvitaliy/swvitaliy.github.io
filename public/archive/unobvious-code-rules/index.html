@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Неочевидные правила кода</title>
+    <link rel="stylesheet" href="../assets/built/screen.css%3Fv=d83250423b.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:400,400i,700,700i,800">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+
+    <script>
+        if (localStorage.getItem('alto_dark') == 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+
+    <link rel="icon" href="../favicon.png" type="image/png" />
+    <link rel="canonical" href="index.html" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="amp/index.html" />
+    
+    <meta property="og:site_name" content="swvitaliy&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Неочевидные правила кода" />
+    <meta property="og:description" content="Тут написал правила кодирования, организации работы, взгляды на какие-то вещи – все вместе. Не знаю, как это разделить – думаю, что и не нужно это разделять." />
+    <meta property="og:url" content="https://swvitaliy.site/unobvious-code-rules/" />
+    <meta property="og:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta property="article:published_time" content="2023-08-17T20:31:00.000Z" />
+    <meta property="article:modified_time" content="2023-09-02T16:19:34.000Z" />
+    <meta property="article:publisher" content="https://www.facebook.com/sw.vitaliy" />
+    <meta property="article:author" content="https://www.facebook.com/swvitaly" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Неочевидные правила кода" />
+    <meta name="twitter:description" content="Тут написал правила кодирования, организации работы, взгляды на какие-то вещи – все вместе. Не знаю, как это разделить – думаю, что и не нужно это разделять." />
+    <meta name="twitter:url" content="https://swvitaliy.site/unobvious-code-rules/" />
+    <meta name="twitter:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="swvitaliy" />
+    <meta name="twitter:site" content="@swvitaliy" />
+    <meta name="twitter:creator" content="@swvitaly" />
+    <meta property="og:image:width" content="2709" />
+    <meta property="og:image:height" content="938" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "swvitaliy&#x27;s blog",
+        "url": "https://swvitaliy.site/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "swvitaliy",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "https://swvitaliy.site/author/swvitaly/",
+        "sameAs": [
+            "https://www.facebook.com/swvitaly",
+            "https://twitter.com/swvitaly"
+        ]
+    },
+    "headline": "Неочевидные правила кода",
+    "url": "https://swvitaliy.site/unobvious-code-rules/",
+    "datePublished": "2023-08-17T20:31:00.000Z",
+    "dateModified": "2023-09-02T16:19:34.000Z",
+    "description": "Тут написал правила кодирования, организации работы, взгляды на какие-то вещи – все вместе. Не знаю, как это разделить – думаю, что и не нужно это разделять.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://swvitaliy.site/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 4.1" />
+    <link rel="alternate" type="application/rss+xml" title="swvitaliy&#x27;s blog" href="../rss/index.html" />
+    <script defer src="https://unpkg.com/@tryghost/portal@~1.0.0/umd/portal.min.js" data-ghost="https://swvitaliy.site/"></script><style> .gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <!-- link tag -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" /> -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/a11y-light.min.css">
+<link href="https://unpkg.com/octomments/build/ocs-ui.min.css" rel="stylesheet">
+
+<!--
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+	<style>
+      body {
+          font-family: 'Source Sans 3', sans-serif;
+          font-size: 18px;
+      }
+        .post-footer, section.author, .site-footer>.copyright, .site-footer>.logo {
+            display: none;
+        }
+        .dark-mode .logo-image:not(.white) {
+            opacity: 1;
+        }
+        /*.comment-container {
+        	background-color: white;
+        }*/
+        .O_comments, .O_comments>.O_summary,.O_comment_left,.O_comment_right,.O_comment_heading,
+        .O_comment_body,.O_new-comment,.O_comment,.O__textarea,.O_new-comment textarea,.O__submit_comment,.O_new-comment button {
+         	font-size:1em;   
+        }
+        .u-text-format ol>li:before {
+        	border-radius: unset;
+            color: inherit;
+        }
+        .u-text-format ol li:before, .u-text-format ul li:before {
+    		background-color: inherit;
+        }
+        
+        /* for block of code */
+        /*.hljs-ln td.hljs-ln-code {
+            padding-left: 10px;
+        }*/
+        .hljs-ln tr td.hljs-ln-numbers {
+          padding-right: 10px;
+        }
+        .post-feed>.post .post-excerpt {
+        	font-size: 16px;
+        }
+        .single-post .post-content {
+          font-size: 16px;
+        }
+    </style>
+<!-- <script defer data-domain="swvitaliy.site" src="https://plausible.io/js/plausible.js"></script> -->
+<script data-goatcounter="https://swvitaliy.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+
+<style>:root {--ghost-accent-color: #15171A;}</style>
+</head>
+
+<body class="post-template">
+    <div class="site">
+        <header class="site-header container">
+    <div class="navbar">
+        <div class="navbar-left">
+            <div class="burger hidden-lg hidden-xl"></div>
+            <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>            <div class="sep hidden-xs hidden-sm hidden-sm"></div>
+                <nav class="main-menu hidden-xs hidden-sm hidden-md">
+                    <ul class="nav-list u-plain-list">
+        <li class="menu-item menu-item-zamietki"><a class="menu-item-link"
+                href="../index.html">Заметки</a></li>
+        <li class="menu-item menu-item-obo-mnie"><a class="menu-item-link"
+                href="../about/index.html">Обо мне</a></li>
+        <li class="menu-item menu-item-github"><a class="menu-item-link"
+                href="https://github.com/swvitaliy">Github</a></li>
+</ul>
+                </nav>
+        </div>
+        <div class="navbar-right">
+            <div class="toggle-track">
+                <div class="toggle-moon"><i class="icon icon-brightness-2"></i></div>
+                <div class="toggle-sun"><i class="icon icon-white-balance-sunny"></i></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+    </div>
+</header>        <div class="site-content">
+            
+<div class="content-area">
+    <main class="site-main">
+            <article class="post no-image no-image single-post" postid="64ca2ed31956d006d1beaeb0">
+                <header class="post-header big-title container medium">
+        <h1 class="post-title">Неочевидные правила кода</h1>
+                <div class="post-meta">
+            <span class="post-meta-item post-meta-date">
+                <time datetime="2023-08-17">
+                        17 авг. 2023 г.
+                </time>
+            </span>
+            <!-- <span class="post-meta-item post-meta-length">
+                7 min read
+            </span> -->
+        </div>
+</header>
+                                <!-- <div class="post-content kg-canvas u-text-format"> -->
+                <div class="post-content container medium u-text-format">
+                    <p>Тут написал правила кодирования, организации работы, взгляды на какие-то вещи – все вместе. Не знаю, как это разделить – думаю, что и не нужно это разделять.</p><p>Идеи не претендуют на оригинальность. "Алан Голуб. Веревка ...", "Совершенный код", "Программист прагматик" и другое прочитаны давно, возможно, что-то оттуда продублировано (надо еще раз пролистать, освежить память).</p><p>Этот список не претендует на полноту. </p><p>Порядок идей в списке хаотичный.</p><p>Я не пытаюсь этим кого-то чему-то научить, а, написал это для себя. Впрочем, возможно, вы посчитаете какую-то из этих идей интересной, нет ничего плохого в том, чтобы подчетпнуть ее для себя – я буду этому рад. </p><h2 id="%D1%81%D1%82%D0%B0%D1%80%D0%B0%D0%B9%D1%82%D0%B5%D1%81%D1%8C-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-%D0%BF%D0%BE%D0%BD%D1%8F%D1%82%D0%BD%D1%8B%D0%B5-%D0%B8%D0%BC%D0%B5%D0%BD%D0%B0-%D0%BF%D0%B5%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D1%85">Старайтесь использовать понятные имена переменных</h2><ol><li>Достаточно уникальные</li><li>Достаточно длинные и понятные</li><li>Имена переменных ссылок – это будет неплохо, если они будут содержать уникатьные слова из изначальных термов</li></ol><p>Конечно, тут речь идет о переменных, общих для большого объема кода. Если код вмещается в один или пусть даже несколько экранов, то конечно можно называть проще переменные. Вот несколько примеров</p><ul><li>в локальной области видимости<code>conn</code>, <code>connection</code>; в глобальной – <code>bookingDbConnection</code>, <code>mainDbConn</code>, <code>mainMongoDbConn</code></li><li>в локальной области видимости <code>options</code>, <code>opts</code>, <code>config</code>; в глобальной – <code>socks5ProxyOptions</code>, <code>redisLocksConfig</code></li></ul><h2 id="%D0%B8%D0%B7%D0%B1%D0%B5%D0%B3%D0%B0%D0%B9%D1%82%D0%B5-%D0%BD%D0%B5%D0%BE%D0%B1%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B6%D0%B5%D0%BB%D0%B0%D0%BD%D0%B8%D1%8F-%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D1%82%D1%8C-%D0%BA%D1%80%D0%B0%D1%81%D0%B8%D0%B2%D0%BE">Избегайте необоснованного желания сделать красиво </h2><p><code>for await</code> – вы долго будете искать в 12 часов ночи какого черта у вас дублируются запросы, а потом долго будете материть того человека, который все это написал, и вообще, того, кто придумал async/await.</p><h2 id="%D1%81%D0%B4%D0%B5%D0%BB%D0%B0%D0%B9%D1%82%D0%B5-%D1%8D%D1%82%D0%BE-%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B4%D0%B0%D0%B6%D0%B5-%D0%B5%D1%81%D0%BB%D0%B8-%D1%8D%D1%82%D0%BE-%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D1%8B%D0%B9-%D0%B2%D1%8B%D0%B1%D0%BE%D1%80">Сделайте это решение, даже если это сложный выбор</h2><p>Просто, блин, сделайте это и все. Если у вас появляются мысли как это сделать и вы самостоятельно не можете на них ответить (в результате внутреннего диалога не можете выбрать один из нескольких вариантов), то лучше сначала спросить у кого-то аргументы в пользу того или иного варианта. Если нет такого человека поблизости, выберите самый простой для понимания вариант и вариант наименее воздействующий на окружающий код без вреда функционалу. </p><h2 id="%D0%BE%D0%B1%D1%8F%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE-%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D1%8C%D1%82%D0%B5-%D0%BA%D0%BE%D0%BC%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%80%D0%B8%D0%B9-%D0%B2-%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D1%8B%D1%85-%D1%81%D0%B8%D1%82%D1%83%D0%B0%D1%86%D0%B8%D1%8F%D1%85">Обязательно оставьте комментарий в сложных ситуациях</h2><p>В сложных ситуациях, например, когда вы до конца не уверены, как данный код заафектит все вокруг, вы просто обязаны, я считаю, рассказать о вашем выборе в коментариях к этому коду, поскольку этот код может быть неочевиден и даже противоречить другому коду в проекте (все мы не идеальны). Таким образом:</p><ol><li>Вы сами будете помнить, что и зачем вы написали – вы просто не будете себе и другим казаться сумасшедшим чуваком, который все ломает вокруг</li><li>Когда вы сами или кто-то другой придёт и скажет, что этот код сломал ту фичу, то по комментариям можно будет понять зачем этот код нужен и принять правильное решение – или поменять этот код или поменять код в "той фиче" или что-то третье</li><li>Если проект большой, это поможет не ходить по кругу исправляя одно и ломая другое</li></ol><h2 id="%D0%BD%D0%B5-%D1%82%D0%BE%D1%80%D0%BE%D0%BF%D0%B8%D1%82%D0%B5%D1%81%D1%8C">Не торопитесь</h2><p>Когда вы начинаете торопиться, ваш мозг переходит в состояние цейтнота  и начитает работать довольно специфически (бей или беги). При этом это частая ошибка (по крайней мере и я был этому привержен когда-то давно и у других замечал). Видимо, это связано с невысказанной атмосферой соревновательности, которая присутствует в компаниях, а так же с чувством профессионального достоинства, когда программист думает, что чем быстрее он это сделает, тем лучше. На практике получается код "на отъебись" – крайне неоптимальный, без какой-то идеи, с кучей багов и неточностей – почти всегда его проще переписать (что, впрочем, редко удается убедить сделать). И он потом выливается или в многочасовые диалоги или в баги в продакшене. Лучше не стесняйтесь, возьмите лишние 3 часа если не уверены или лишний рабочий день и сделайте спокойно.</p><h2 id="%D0%B1%D0%B5%D1%80%D0%B8%D1%82%D0%B5-%D0%B2%D1%80%D0%B5%D0%BC%D1%8F-%D0%BD%D0%B0-%D0%B8%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8%D0%BF%D1%80%D0%BE%D0%B1%D0%BB%D0%B5%D0%BC%D1%8B">Берите время на исследование задачи/проблемы</h2><p>Если вы ни разу не настраивали nginx, не писали mongodb запросов, не настраивали rabbitmq очередь, то не стесняйтесь выделить время на исследование того, как это работает, какие есть подводные камни. Попробуйте сделать тестовый проект и поиграться с этой технологией, сделайте ее своей. При этом явно скажите об этом окружающим, так всем будет все понятно и это честно.</p><h2 id="%D0%BF%D0%BE%D1%81%D0%BF%D0%B8%D1%82%D0%B5-%D0%BF%D0%B5%D1%80%D0%B5%D0%B4-%D1%82%D0%B5%D0%BC-%D0%BA%D0%B0%D0%BA-%D0%B3%D0%BE%D1%80%D0%BE%D0%B4%D0%B8%D1%82%D1%8C-%D1%81%D0%BE%D0%BC%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D0%BA%D0%BE%D0%B4">Поспите, перед тем, как городить сомнительный код</h2><p>Часто, когда вы не понимаете как писать, на самом деле, вы не понимаете, что именно вам нужно сделать и естественное желание начинающих программистов огорадить себя от этой проблемы милионами слоев абстракций (ведь не зря же вы все это читали?). Я не буду говорить очевидного совета, что не нужно так делать и все такое. Я бы посоветовал сделать самое правильное на мой взгляд в такой ситуации – пойти поспать.</p><p>На самом деле, это поможет вам по 2-м причинам:</p><ol><li>Когда вы устали, вам сложно принимать решения, кроме того, ваш взгляд на вещи зашорен вашим текущим опытом, поэтому вам сложно отказаться от текущей идеи-фикс</li><li>Во время засыпания и сна (фазы быстрого сна) ваш мозг вырабатывает решения. Он (мозг) уже не находится в состоянии цейтнота (если конечно во сне за вами не гонится кто-то кровожадный) поэтому с высокой долей вероятности вы несколько разочаруетесь в том, что вы делали 10 минут назад. Вместе с этим вы увидите другие варианты, посмотрите на картину под другим ракурсом.</li></ol><h2 id="%D0%B3%D0%BE%D1%80%D0%B4%D0%B8%D1%81%D1%8C-%D1%82%D0%B5%D0%BC-%D1%87%D1%82%D0%BE-%D0%B4%D0%B5%D0%BB%D0%B0%D0%B5%D1%88%D1%8C">Гордись тем, что делаешь</h2><p>Не знаю, что тут еще добавить... не скажу, что это самая важная мотивация, но, я считаю, что необходимо испытывать гордость за то, что делаешь. Это делает тебя значимым в своих же глазах как специалиста, побуждает не опускать уровень качества своего кода и своей работы, зачастую, несмотря на внешние обстоятельства, дает тебе спокойствие и внутреннюю уверенность, делает тебя сильнее как личность, позволяя развиваться дальше.</p><h2 id="%D0%BD%D0%B5-%D1%81%D1%82%D0%B0%D1%80%D0%B0%D0%B9%D1%81%D1%8F-%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%D1%81%D1%8F-%D1%83%D0%BC%D0%BD%D1%8B%D0%BC">Не старайся казаться умным</h2><p>Не пишите, так, как будто вы хотите кого-то запутать. Не думайте, что ваш код будет кто-то досконально изучать – его прочтут по диагонали быстренько поняв, что тут происходит (точно так же, как и вы поспупаете). Поэтому, лучше использовать стандартные языковые конструкции. Ситуация, когда одна какая-то загогулина меняет все поведение программы, крайне неприятна, тк. человек, который будет читать ваш код может просто не увидеть ее и это будет причиной многочасовой отладки и когнитивного диссонанса для него. Впрочем, это можно исправить, написав комментарий рядом, о том как работает этот кусок кода (и будет вообще прекрасно, если вы "подсветите" в комментарии ту неочевидную загогулину). В общем, сконцентрируйтесь на решении задачи, а не на том, как красиво этот код выглядит – всем правда плевать.</p><h2 id="%D0%BD%D0%B5-%D0%B4%D0%B0%D0%B2%D0%B0%D0%B9%D1%82%D0%B5-%D0%BE%D0%B1%D1%89%D0%B8%D1%85-%D1%81%D0%BE%D0%B2%D0%B5%D1%82%D0%BE%D0%B2">Не давайте общих советов</h2><p>Или по другому можно сформулировать – не учите других, как им нужно работать.</p><p>Во-первых, это бессмысленно. На что вы рассчитываете, когда даете общие советы? Если вывести людей из себя, то это тоже не самый лучший способ, тк. как правило человек, которому вы их даете уже много раз их слышал и он просто по другому со временем к вам начнет относиться.</p><p>Во-вторых, это бесит.</p><p>В-третьих, смотрите кому вы даете совет. Не ставьте себя в идиотское положение.</p><p>Если человек у вас спрашивает совет, то или скажите, что не знаете или скажите, что он может справится сам или таки напишите ясно, четко и по делу. Не нужно при общении с другими цитировать книги о хорошем программировании.</p><h2 id="%D0%BF%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%BD%D0%BE-%D0%B8%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D1%83%D0%B9%D1%82%D0%B5-%D0%B3%D0%BE%D1%82%D0%BE%D0%B2%D1%8B%D0%B5-%D1%80%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%B8-%D0%BF%D1%80%D0%B8%D0%BC%D0%B5%D0%BD%D1%8F%D0%B9%D1%82%D0%B5-%D0%B8%D1%85">Постоянно исследуйте готовые решения и применяйте их</h2><p>Я думаю, что это одно из отличий прикладного специалиста – знание инструментов, лучших практик, готовых решений. Это нужно по вполне понятной причине – не писать все с нуля каждый раз и выбирать именно то, что нужно в данном случае. Есть множество различных источников информации  – подкасты, <a href="https://swvitaliy.site/unobvious-code-rules/news.ycombinator.com">hackernews</a>, различные публичные специалисты в twitter (mastodon, telegram), онлайн курсы, github с различными рейтингами репозиториев. Да просто интересно все это читать.</p><h2 id="%D0%BD%D0%B5-%D0%B1%D0%BE%D0%B9%D1%82%D0%B5%D1%81%D1%8C-%D0%B8%D0%B7%D0%BE%D0%B1%D1%80%D0%B5%D1%82%D0%B0%D1%82%D1%8C-%D0%B2%D0%B5%D0%BB%D0%BE%D1%81%D0%B8%D0%BF%D0%B5%D0%B4">Не бойтесь изобретать велосипед</h2><p>Велосипеды полезны – они позволяют быстро и с комфортом добраться на небольшие расстояния, в пределах 5-10 км. Если бы они не были изобретены, это бы стоило сделать. Кроме того, их есть огромное множество конструкций и модификаций под разные нужды. Поэтому не стесняйтесь изобретать велосипеды – новые или необычные способы решить существующую задачу. Но при этом вы должны четко понимать, что и зачем вы делаете.</p><p>На первый взгляд кажется, что этот пункт противоречит предыдущему, однако на самом деле если вы хорошо знаете существующие технические решения в предметной области, это даст вам понимание в нужности (или ненужности) того, что вы делаете.</p><h2 id="%D1%81%D1%82%D0%B0%D1%80%D0%B0%D0%B9%D1%82%D0%B5%D1%81%D1%8C-%D0%BC%D0%B8%D0%BD%D0%B8%D0%BC%D0%B8%D0%B7%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-%D0%B4%D0%B8%D1%84%D1%84%D1%8B-%D0%B2-%D0%BC%D1%80">Старайтесь минимизировать диффы в мр</h2><p>Если вы увидели в коде неправильное выравнивание строк или неправильное форматирование, если вы увидели неточность, даже если вы увидели явный баг – не трогайте его прямо сейчас. Особенно это касается форматирования строк – возникает желание исправить это форматирование и все тут и в мр появляется куча лишних строк, что сильно ухудшает читаемость.</p><p>Если у вас стоит проблема неконсистентного форматирования кода, то она решается с помощью линтеров, которые 1. внедрены в IDE, 2. валидируются на этапе коммита 3. валидируется на удаленном сервере на этапе пуша и мержа в мастер.</p><p>Если вы увидели, что что-то нужно исправить напишите об этом в отдельный R&amp;D чат или члену команды, который понимает этот код – задайте вопрос нужно ли это исправлять и как другие видят способы исправить это, какие есть преимущества, недостатки у разных способов исправления. Затем, вы можете описать к чему приводит наличие этого бага, который вы нашли и высказать мнение относительно срочности его исправления.</p><h2 id="%D0%B4%D0%B5%D0%BB%D0%B0%D0%B9%D1%82%D0%B5-%D1%81%D1%80%D0%B0%D0%B7%D1%83-%D0%B8-%D0%BF%D1%80%D0%BE%D1%81%D1%82%D0%BE">Делайте сразу и просто</h2><p>Ты не можешь остановить время, чтобы переделать или оставить на потом. За тебя никто не допишет этот код. Всем плевать, насколько мудрено и "как в книжке" ты можешь написать. Старайся минимализировать усилия, направленные на написание и поддержку кода (пиши меньше кода, короче). </p><p>Часто нужно просто приложить над собой усилие, чтобы завершить работу. Часто нужно приложить над собой усилие, чтобы остановиться и еще раз подумать, возможно, есть способ сделать проще. Если вы не уверены как именно сделать ту или иную фичу, то проведите исследование перед тем, как делать. Не бойтесь, что вас поругает злой начальник за то, что вы не пишите код – это плохая мотивация. Попробуйте в этом случае сформулировать вашу исследовательскую деятельность. Если это не получается, то возможно, вы находитесь в расфокусе и вы не до конца понимаете, что именно вам нужно сделать. Поговорите с кем-то, кто понимает предметную область. Если ситуация не стала проще, возможно, стоит перенести задачу или ничтоже сумявшись переназначить на другого человека с комментариями конечно, какие именно проблемы мешают ее сделать. </p><h2 id="dont-repeat-yourself">Don't repeat* yourself</h2><p>Тут я бы подумал, что такое repeat. Это неочевидно, что тот код, который вы физически скопировали, является его логической копией. Иначе все конфигурации nginx, форки на гитхабе, все вызовы функций и методов, у которых совпадают передаваемые пераметры, противоречили бы этому принципу.</p><p>В целом, с практической точки зрения, я бы этот принцип немного перефразировал: если вы видите, что некоторые куски кода делают примерно одно и то же, то вероятно, их стоит вынести в отдельную функцию/метод/класс/библиотеку, чтобы упростить поддержку этого кода в случае изменения (не нужно будет менять в нескольких местах, достаточно будет поменять в одном месте). Впрочем, и обратное тоже верно – если вы видите, что у вас появилась куча настроек в общем куске кода, то можно рассмотреть рефакторинг этого кода на несколько методов или вынести  этот код в некоторых случаях использования наверх. </p><p>Я бы применял этот принцип и на уровне продукта – если появляется много настроек, которые друг с другом находятся в суперпозиции (влияют друг на друга), то имеет смысл редуцировать эти настройки до некоторого множества, которое было бы непротиворечиво и умещалось бы в голове, составляло единое целое.  Так же, можно попробовать выделить несколько основных сценариев использования этих настроек и сделать режимы/суперсеты настроек (wrapping, скрытие сложности суперпозиции). </p><h2 id="ps">P.S.</h2><p>Тут можно, если подумать, вспомнить еще много чего. Думаю, что этого будет достаточно, иначе будет слишком душно (скорее всего уже душно).</p><p>Часть правил нацелена на то, чтобы избежать ловушки выбора (когда вы не можете выбрать один из нескольких вариантов). Некоторые правила не относятся к коду вообще, но сильно влияют на него. Некоторые правила вполне конкретны, некоторые довольно абстрактны. Так или иначе, они являются сублимацией моего опыта. У каждого он свой, поэтому вполне нормально, если вы не согласитесь с тем или иным пунктом. </p>
+                </div>
+                <div class="container medium">
+                    <div class="share u-hover-wrapper">
+    <a class="share-item share-facebook u-hover-item"
+        href="https://www.facebook.com/sharer.php?u=https://swvitaliy.site/unobvious-code-rules/" target="_blank" rel="noopener"><i
+            class="icon icon-facebook"></i></a>
+    <a class="share-item share-twitter u-hover-item"
+        href="https://twitter.com/intent/tweet?url=https://swvitaliy.site/unobvious-code-rules/&text=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0" target="_blank" rel="noopener"><i
+            class="icon icon-twitter"></i></a>
+    <a class="share-item share-pinterest u-hover-item"
+        href="https://pinterest.com/pin/create/button/?url=https://swvitaliy.site/unobvious-code-rules/&media=&description=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0"
+        target="_blank" rel="noopener" data-pin-do="none"><i class="icon icon-pinterest"></i></a>
+    <a class="share-item share-linkedin u-hover-item"
+        href="https://www.linkedin.com/shareArticle?mini=true&url=https://swvitaliy.site/unobvious-code-rules/&title=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0"
+        target="_blank" rel="noopener"><i class="icon icon-linkedin"></i></a>
+    <a class="share-item share-reddit u-hover-item"
+        href="https://reddit.com/submit?url=https://swvitaliy.site/unobvious-code-rules/&title=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0" target="_blank" rel="noopener"><i
+            class="icon icon-reddit"></i></a>
+    <a class="share-item share-tumblr u-hover-item"
+        href="https://www.tumblr.com/widgets/share/tool?canonicalUrl=https://swvitaliy.site/unobvious-code-rules/&title=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0"
+        target="_blank" rel="noopener"><i class="icon icon-tumblr"></i></a>
+    <a class="share-item share-vk u-hover-item"
+        href="http://vk.com/share.php?url=https://swvitaliy.site/unobvious-code-rules/&title=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0" target="_blank" rel="noopener"><i
+            class="icon icon-vk"></i></a>
+    <a class="share-item share-pocket u-hover-item" href="https://getpocket.com/edit?url=https://swvitaliy.site/unobvious-code-rules/"
+        target="_blank" rel="noopener"><i class="icon icon-pocket"></i></a>
+    <a class="share-item share-telegram u-hover-item"
+        href="https://t.me/share/url?url=https://swvitaliy.site/unobvious-code-rules/&text=%D0%9D%D0%B5%D0%BE%D1%87%D0%B5%D0%B2%D0%B8%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BA%D0%BE%D0%B4%D0%B0" target="_blank" rel="noopener"><i
+            class="icon icon-telegram"></i></a>
+</div>                        <section class="author">
+        <div class="author-image-placeholder u-placeholder">
+            <img class="author-image lazyload u-object-fit"
+                data-srcset="//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x"
+                src="https://www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&amp;d=mm&amp;r=x"
+                srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                alt="swvitaliy">
+        </div>
+        <div class="author-wrapper">
+            <header class="author-header">
+                <div class="author-header-wrapper">
+                    <h4 class="author-name">swvitaliy</h4>
+                    <div class="author-social">
+                            <a class="author-social-item author-facebook"
+                                href="https://www.facebook.com/swvitaly"
+                                target="_blank" rel="noopener">Facebook</a>
+                            <a class="author-social-item author-twitter"
+                                href="https://twitter.com/@swvitaly"
+                                target="_blank" rel="noopener">Twitter</a>
+                        <a class="author-social-item author-more"
+                            href="../author/swvitaly/index.html">More posts</a>
+                    </div>
+                </div>
+            </header>
+            <div class="author-bio"></div>
+        </div>
+    </section>
+                </div>
+            </article>
+            <div class="navigation container medium">
+        <div class="navigation-item navigation-previous">
+            <a class="navigation-item-link button-arrow button-arrow-left" href="../cgroups/index.html">
+                <i class="button-arrow-icon icon icon-arrow-left"></i> Previous Post
+            </a>
+        </div>
+
+        <div class="navigation-item navigation-next">
+            <a class="navigation-item-link button-arrow button-arrow-right" href="../concurrency-in-go-shared-memory/index.html">
+                Next Post <i class="button-arrow-icon icon icon-arrow-right"></i>
+            </a>
+        </div>
+</div>                        <div class="comment-container">
+    <div class="comment container medium">
+        <div id="comments"></div>
+
+    </div>
+</div>
+    </main>
+</div>
+
+        </div>
+        <footer class="site-footer container large">
+    <div class="copyright">
+        Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+    </div>
+
+        <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>
+    <div class="footer-social">
+            <a class="footer-social-item footer-social-item-facebook" href="https://www.facebook.com/sw.vitaliy"
+                target="_blank" rel="noopener" aria-label="Facebook">
+                <i class="icon icon-facebook"></i>
+            </a>
+            <a class="footer-social-item footer-social-item-twitter" href="https://twitter.com/swvitaliy"
+                target="_blank" rel="noopener" aria-label="Twitter">
+                <i class="icon icon-twitter"></i>
+            </a>
+        <a class="footer-social-item footer-social-item-rss"
+            href="https://feedly.com/i/subscription/feed/https://swvitaliy.site/rss/" target="_blank" rel="noopener"
+            aria-label="RSS">
+            <i class="icon icon-rss"></i>
+        </a>
+    </div>
+</footer>    </div>
+
+    <div class="dimmer"></div>
+
+    <div class="off-canvas">
+        <div class="canvas-close">
+            <i class="canvas-icon icon icon-window-close"></i>
+        </div>
+        <div class="mobile-menu"></div>
+    </div>
+
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous">
+    </script>
+    <script src="../assets/built/main.min.js%3Fv=d83250423b"></script>
+
+    
+
+    <!-- script tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+
+<script>
+    hljs.highlightAll();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+<script src="https://unpkg.com/octomments/build/ocs.min.js"></script>
+<script>
+    
+  var PostIdToIssuesMap = {
+  	  "60cca8ec3f692249e53661c6": 1,
+      "61c128843f692249e5366f19": 2,
+      "61b8f1ad3f692249e5366e40": 3, 
+      "6141b7023f692249e53663f3": 4,
+      "616b2f043f692249e536665d": 5,
+      "6141c62f3f692249e53664be": 6,
+      "612d14c93f692249e53663b2": 7,
+      "6065a7d53f692249e53660a3": 8,
+      "6141ce5c3f692249e53664ed": 9,
+      "61b5c96e3f692249e5366e12": 10, 
+      "61ebdf693f692249e5367744": 11,
+      "624000583f692249e53678a6": 12,
+      "612ca4783f692249e5366382": 13,
+      "61746abd3f692249e536667c": 14,
+      "612ca5f33f692249e53663a2": 15,
+      "612ca6253f692249e53663a8": 16,
+      "624213e53f692249e53679cf": 17,
+      "626472fb3f692249e5367a71": 18,
+      "6240cf053f692249e53679ba": 19
+  };
+    
+  var post = document.getElementsByTagName('article')[0];
+  var postId = post?.getAttribute('postId') || 'undef_key';
+  if (PostIdToIssuesMap[postId])
+      Octomments({
+        github: {
+          owner: 'swvitaliy',
+          repo: 'blog',
+        },
+        issueNumber: PostIdToIssuesMap[postId],
+        renderer: [OctommentsRenderer, '#comments']
+      }).init();
+    else {
+      var comments = document.getElementsByClassName('comment-container')[0];
+      if (comments) comments.style.display = 'none';
+    }
+</script>
+</body>
+
+</html>
