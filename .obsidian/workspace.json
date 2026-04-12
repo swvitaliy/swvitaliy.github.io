@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "e03f6984aeda4103",
+        "id": "b33cd8a8d02bb51b",
         "type": "tabs",
         "children": [
           {
-            "id": "b5807d1841567101",
+            "id": "d39ed71df989a395",
             "type": "leaf",
             "state": {
               "type": "split-diff-view",
               "state": {
-                "aFile": "content/posts/consistent_rendezvous_hashing/index.md",
-                "bFile": "content/posts/consistent_rendezvous_hashing/index.md",
+                "aFile": "copilot/copilot-custom-prompts/Make longer.md",
+                "bFile": "copilot/copilot-custom-prompts/Make longer.md",
                 "aRef": ""
               },
               "icon": "diff",
-              "title": "Diff: index"
+              "title": "Diff: Make longer"
             }
           }
         ]
@@ -167,13 +167,33 @@
               "icon": "git-pull-request",
               "title": "Source Control"
             }
+          },
+          {
+            "id": "22fe2d38083dc657",
+            "type": "leaf",
+            "state": {
+              "type": "copilot-chat-view",
+              "state": {},
+              "icon": "message-square",
+              "title": "Copilot"
+            }
+          },
+          {
+            "id": "0bc7858f52303f56",
+            "type": "leaf",
+            "state": {
+              "type": "smart-connections-view",
+              "state": {},
+              "icon": "smart-connections",
+              "title": "Connections"
+            }
           }
         ],
         "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 435.5
+    "width": 496.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -188,39 +208,53 @@
       "templater-obsidian:Templater": false,
       "obsidian-git:Open Git source control": false,
       "table-editor-obsidian:Advanced Tables Toolbar": false,
-      "remotely-save:Remotely Save": false
+      "remotely-save:Remotely Save": false,
+      "copilot:Open Copilot Chat": false,
+      "smart-connections:Smart Connections: Open connections view": false,
+      "smart-connections:Smart Connections: Open random connection": false,
+      "smart-connections:Smart Lookup: Open lookup view": false
     }
   },
-  "active": "b5807d1841567101",
+  "active": "d39ed71df989a395",
   "lastOpenFiles": [
-    "content/posts/nginx_envoy_hash/index.md",
     "content/posts/consistent_rendezvous_hashing/index.md",
+    "copilot/copilot-custom-prompts/Make longer.md",
+    "copilot/copilot-custom-prompts/Make shorter.md",
+    "copilot/copilot-custom-prompts/Remove URLs.md",
+    "copilot/copilot-custom-prompts/Rewrite as tweet.md",
+    "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
+    "copilot/copilot-custom-prompts/Translate to Chinese.md",
+    "copilot/copilot-custom-prompts/Summarize.md",
+    "content/posts/consistent_rendezvous_hashing/index.md.tmp.1505606.1775995692309",
+    "content/posts/consistent_rendezvous_hashing/review_1.md",
+    "content/posts/consistent_rendezvous_hashing/index.md.tmp.1505606.1775993926367",
+    "copilot/copilot-custom-prompts/Explain like I am 5.md",
+    "copilot/copilot-custom-prompts/Emojify.md",
+    "copilot/copilot-custom-prompts/Clip YouTube Transcript.md",
+    "copilot/copilot-custom-prompts/Clip Web Page.md",
+    "content/posts/consistent_rendezvous_hashing/review.md",
+    "content/posts/consistent_rendezvous_hashing/hrw_plot.png",
+    "content/posts/consistent_rendezvous_hashing/consistent_plot.png",
+    "content/posts/nginx_envoy_hash/index.md",
+    "content/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.md",
+    "copilot/copilot-custom-prompts/Generate glossary.md",
+    "copilot/copilot-custom-prompts/Generate table of contents.md",
+    "copilot/copilot-custom-prompts/Simplify.md",
+    "copilot/copilot-custom-prompts/Fix grammar and spelling.md",
+    "copilot/copilot-custom-prompts",
+    "copilot",
+    "Untitled.md",
     "public/tags/consiste/index.xml",
     "public/tags/consiste/page/1/index.html",
     "public/tags/consiste/page/1",
     "public/tags/consiste/page",
     "public/tags/consiste/index.html",
     "public/tags/consiste",
-    "public/tags/envoy/index.xml",
-    "public/tags/envoy/page/1/index.html",
-    "public/tags/envoy/page/1",
-    "public/tags/envoy/page",
     "drafts/posts/2026-03-28_tx_in_outbox/index.md",
     "drafts/posts/2026-03-28-bulk-mailing/index.md",
     "drafts/posts/2025-12-13_CMS/index.md",
     "drafts/posts/2025-12-13_combinatory/index.md",
-    "drafts/posts/2025-01-05_redis_based_task_queue/2025-01-05_redis_based_task_queue.md",
-    "drafts/posts/2026-03-28_exactly-once-delivery/index.md",
-    "content/posts/simple_dns/index.md",
-    "drafts/posts/2025-01-05_kafka_exactly_once/2025-01-05_kafka_exactly_once.md",
-    "content/posts/redis_prior_task_queue/index.md",
-    "content/posts/raft/index.md",
-    "content/posts/consistent_rendezvous_hashing/hrw_plot.png",
     "content/posts/consistent_rendezvous_hashing/wrh_plot.png",
-    "content/posts/consistent_rendezvous_hashing/consistent_plot.png",
-    "content/posts/kafka_rebalance_benchmark/index.md",
-    "content/posts/skip-list/index.md",
-    "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.md",
     "content/posts/consistent_rendezvous_hashing/randezvous1.excalidraw.svg",
     "content/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
     "public/posts/skip-list/sl_search.svg",
@@ -228,16 +262,6 @@
     "public/posts/bwt/images/sorting.png",
     "public/posts/bwt/images/cyclic_rotation.png",
     "public/posts/consistent_rendezvous_hashing/randezvous.excalidraw.svg",
-    "content/posts/consistent_rendezvous_hashing/rendezvous.excalidraw.md",
-    "drafts/posts/lsm-tree/index.md",
-    "drafts/posts/simple_markov_chains/index.md",
-    "drafts/posts/skip-list_benchmarks/index.md",
-    "drafts/posts/skip-list-bulk-opearations/index.md",
-    "content/posts/consistent_rendezvous_hashing/hash_ring.excalidraw.md",
-    "drafts/posts/lsm-tree_ss-table/index.md",
-    "drafts/posts/consistent_collection_ordering/index.md",
-    "drafts/posts/berkley_algorithm/index.md",
-    "drafts/projects/nginx_json_rpc/index.md",
     "content/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/rendezvous.canvas",
     "public/posts/consistent_rendezvous_hashing/Untitled.canvas"

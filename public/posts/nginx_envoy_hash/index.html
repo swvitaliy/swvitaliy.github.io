@@ -1,123 +1,68 @@
-
-
-
-
-
-
-
-<!doctype html>
-<html
-  lang="en"
-  dir="ltr"
-  class="scroll-smooth"
-  data-default-appearance="light"
-  data-auto-appearance="true"
-><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#FFFFFF" />
-  
-  <title>nginx vs envoy hash algorithms &middot; swvit&#39;s blog</title>
-    <meta name="title" content="nginx vs envoy hash algorithms &middot; swvit&#39;s blog" />
-  
-  
-  
-  
-  
-  <script
-    type="text/javascript"
-    src="http://localhost:1313/js/appearance.min.8a082f81b27f3cb2ee528df0b0bdc39787034cf2cc34d4669fbc9977c929023c.js"
-    integrity="sha256-iggvgbJ/PLLuUo3wsL3Dl4cDTPLMNNRmn7yZd8kpAjw="
-  ></script>
-  
-  
-  
-  
-  
-  
-  
-    
-  
-  
-  <link
-    type="text/css"
-    rel="stylesheet"
-    href="http://localhost:1313/css/main.bundle.min.071fe94b19e90e329a8823ebbdfba57afcb8992a4739df9796aa1ebf04ecc076.css"
-    integrity="sha256-Bx/pSxnpDjKaiCPrvfulevy4mSpHOd&#43;XlqoevwTswHY="
-  />
-  
-  
-  
-  
-  
-  
-  
-  <meta
-    name="description"
-    content="
+<!doctype html><html lang=en dir=ltr class=scroll-smooth data-default-appearance=light data-auto-appearance=true><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=theme-color content="#FFFFFF"><title>nginx vs envoy hash algorithms &#183; swvit's blog</title>
+<meta name=title content="nginx vs envoy hash algorithms &#183; swvit's blog"><script type=text/javascript src=https://swvitaliy.github.io/js/appearance.min.8a082f81b27f3cb2ee528df0b0bdc39787034cf2cc34d4669fbc9977c929023c.js integrity="sha256-iggvgbJ/PLLuUo3wsL3Dl4cDTPLMNNRmn7yZd8kpAjw="></script><link type=text/css rel=stylesheet href=https://swvitaliy.github.io/css/main.bundle.min.071fe94b19e90e329a8823ebbdfba57afcb8992a4739df9796aa1ebf04ecc076.css integrity="sha256-Bx/pSxnpDjKaiCPrvfulevy4mSpHOd+XlqoevwTswHY="><meta name=description content='
       
         nginx hash #Рассмотрим реализацию команды hash $something; в nginx.
-Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin &#43; retries &#43; fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
+Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin + retries + fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
  for ( ;; ) {
 
         /*
          * Hash expression is compatible with Cache::Memcached:
-         * ((crc32([REHASH] KEY) &gt;&gt; 16) &amp; 0x7fff) &#43; PREV_HASH
+         * ((crc32([REHASH] KEY) >> 16) & 0x7fff) + PREV_HASH
          * with REHASH omitted at the first iteration.
          */
 
         ngx_crc32_init(hash);
 
-        if (hp-&gt;rehash &gt; 0) {
-            size = ngx_sprintf(buf, &#34;%ui&#34;, hp-&gt;rehash) - buf;
+        if (hp->rehash > 0) {
+            size = ngx_sprintf(buf, "%ui", hp->rehash) - buf;
             ngx_crc32_update(&amp;hash, buf, size);
         }
 
-        ngx_crc32_update(&amp;hash, hp-&gt;key.data, hp-&gt;key.len);
+        ngx_crc32_update(&amp;hash, hp->key.data, hp->key.len);
         ngx_crc32_final(hash);
 
-        hash = (hash &gt;&gt; 16) &amp; 0x7fff;
+        hash = (hash >> 16) & 0x7fff;
 
-        hp-&gt;hash &#43;= hash;
-        hp-&gt;rehash&#43;&#43;;
+        hp->hash += hash;
+        hp->rehash++;
 
-        w = hp-&gt;hash % hp-&gt;rrp.peers-&gt;total_weight;
-        peer = hp-&gt;rrp.peers-&gt;peer;
+        w = hp->hash % hp->rrp.peers->total_weight;
+        peer = hp->rrp.peers->peer;
         p = 0;
 
-        while (w &gt;= peer-&gt;weight) {
-            w -= peer-&gt;weight;
-            peer = peer-&gt;next;
-            p&#43;&#43;;
+        while (w >= peer->weight) {
+            w -= peer->weight;
+            peer = peer->next;
+            p++;
         }
 
         n = p / (8 * sizeof(uintptr_t));
-        m = (uintptr_t) 1 &lt;&lt; p % (8 * sizeof(uintptr_t));
+        m = (uintptr_t) 1 << p % (8 * sizeof(uintptr_t));
 
-        if (hp-&gt;rrp.tried[n] &amp; m) {
+        if (hp->rrp.tried[n] & m) {
             goto next;
         }
 
-        ngx_http_upstream_rr_peer_lock(hp-&gt;rrp.peers, peer);
+        ngx_http_upstream_rr_peer_lock(hp->rrp.peers, peer);
 
-        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc-&gt;log, 0,
-                       &#34;get hash peer, value:%uD, peer:%ui&#34;, hp-&gt;hash, p);
+        ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc->log, 0,
+                       "get hash peer, value:%uD, peer:%ui", hp->hash, p);
 
-        if (peer-&gt;down) {
-            ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer);
+        if (peer->down) {
+            ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer);
             goto next;
         }
 
-        if (peer-&gt;max_fails
-            &amp;&amp; peer-&gt;fails &gt;= peer-&gt;max_fails
-            &amp;&amp; now - peer-&gt;checked &lt;= peer-&gt;fail_timeout)
+        if (peer->max_fails
+            && peer->fails >= peer->max_fails
+            && now - peer->checked <= peer->fail_timeout)
         {
-            ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer);
+            ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer);
             goto next;
         }
 
-        if (peer-&gt;max_conns &amp;&amp; peer-&gt;conns &gt;= peer-&gt;max_conns) {
-            ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer);
+        if (peer->max_conns && peer->conns >= peer->max_conns) {
+            ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer);
             goto next;
         }
 
@@ -125,562 +70,142 @@
 
     next:
 
-        if (&#43;&#43;hp-&gt;tries &gt; 20) {
-            ngx_http_upstream_rr_peers_unlock(hp-&gt;rrp.peers);
-            return hp-&gt;get_rr_peer(pc, &amp;hp-&gt;rrp);
+        if (++hp->tries > 20) {
+            ngx_http_upstream_rr_peers_unlock(hp->rrp.peers);
+            return hp->get_rr_peer(pc, &amp;hp->rrp);
         }
     }
 В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.
       
-    "
-  />
-  
-  
-  
-  
-    <link rel="canonical" href="http://localhost:1313/posts/nginx_envoy_hash/" />
-  
-  
-  
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-  
-  
-  
-  
-  
-  
-  
-  
-  <meta property="og:url" content="http://localhost:1313/posts/nginx_envoy_hash/">
-  <meta property="og:site_name" content="swvit&#39;s blog">
-  <meta property="og:title" content="nginx vs envoy hash algorithms">
-  <meta property="og:description" content="nginx hash #Рассмотрим реализацию команды hash $something; в nginx.
-Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin &#43; retries &#43; fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
-for ( ;; ) { /* * Hash expression is compatible with Cache::Memcached: * ((crc32([REHASH] KEY) &gt;&gt; 16) &amp; 0x7fff) &#43; PREV_HASH * with REHASH omitted at the first iteration. */ ngx_crc32_init(hash); if (hp-&gt;rehash &gt; 0) { size = ngx_sprintf(buf, &#34;%ui&#34;, hp-&gt;rehash) - buf; ngx_crc32_update(&amp;hash, buf, size); } ngx_crc32_update(&amp;hash, hp-&gt;key.data, hp-&gt;key.len); ngx_crc32_final(hash); hash = (hash &gt;&gt; 16) &amp; 0x7fff; hp-&gt;hash &#43;= hash; hp-&gt;rehash&#43;&#43;; w = hp-&gt;hash % hp-&gt;rrp.peers-&gt;total_weight; peer = hp-&gt;rrp.peers-&gt;peer; p = 0; while (w &gt;= peer-&gt;weight) { w -= peer-&gt;weight; peer = peer-&gt;next; p&#43;&#43;; } n = p / (8 * sizeof(uintptr_t)); m = (uintptr_t) 1 &lt;&lt; p % (8 * sizeof(uintptr_t)); if (hp-&gt;rrp.tried[n] &amp; m) { goto next; } ngx_http_upstream_rr_peer_lock(hp-&gt;rrp.peers, peer); ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc-&gt;log, 0, &#34;get hash peer, value:%uD, peer:%ui&#34;, hp-&gt;hash, p); if (peer-&gt;down) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } if (peer-&gt;max_fails &amp;&amp; peer-&gt;fails &gt;= peer-&gt;max_fails &amp;&amp; now - peer-&gt;checked &lt;= peer-&gt;fail_timeout) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } if (peer-&gt;max_conns &amp;&amp; peer-&gt;conns &gt;= peer-&gt;max_conns) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } break; next: if (&#43;&#43;hp-&gt;tries &gt; 20) { ngx_http_upstream_rr_peers_unlock(hp-&gt;rrp.peers); return hp-&gt;get_rr_peer(pc, &amp;hp-&gt;rrp); } } В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.">
-  <meta property="og:locale" content="en">
-  <meta property="og:type" content="article">
-    <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2025-08-17T10:00:00+04:00">
-    <meta property="article:modified_time" content="2025-08-17T10:00:00+04:00">
-    <meta property="article:tag" content="Nginx">
-    <meta property="article:tag" content="Envoy">
-    <meta property="article:tag" content="Consistent Hashing">
-
-  
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="nginx vs envoy hash algorithms">
-  <meta name="twitter:description" content="nginx hash #Рассмотрим реализацию команды hash $something; в nginx.
-Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin &#43; retries &#43; fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
-for ( ;; ) { /* * Hash expression is compatible with Cache::Memcached: * ((crc32([REHASH] KEY) &gt;&gt; 16) &amp; 0x7fff) &#43; PREV_HASH * with REHASH omitted at the first iteration. */ ngx_crc32_init(hash); if (hp-&gt;rehash &gt; 0) { size = ngx_sprintf(buf, &#34;%ui&#34;, hp-&gt;rehash) - buf; ngx_crc32_update(&amp;hash, buf, size); } ngx_crc32_update(&amp;hash, hp-&gt;key.data, hp-&gt;key.len); ngx_crc32_final(hash); hash = (hash &gt;&gt; 16) &amp; 0x7fff; hp-&gt;hash &#43;= hash; hp-&gt;rehash&#43;&#43;; w = hp-&gt;hash % hp-&gt;rrp.peers-&gt;total_weight; peer = hp-&gt;rrp.peers-&gt;peer; p = 0; while (w &gt;= peer-&gt;weight) { w -= peer-&gt;weight; peer = peer-&gt;next; p&#43;&#43;; } n = p / (8 * sizeof(uintptr_t)); m = (uintptr_t) 1 &lt;&lt; p % (8 * sizeof(uintptr_t)); if (hp-&gt;rrp.tried[n] &amp; m) { goto next; } ngx_http_upstream_rr_peer_lock(hp-&gt;rrp.peers, peer); ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc-&gt;log, 0, &#34;get hash peer, value:%uD, peer:%ui&#34;, hp-&gt;hash, p); if (peer-&gt;down) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } if (peer-&gt;max_fails &amp;&amp; peer-&gt;fails &gt;= peer-&gt;max_fails &amp;&amp; now - peer-&gt;checked &lt;= peer-&gt;fail_timeout) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } if (peer-&gt;max_conns &amp;&amp; peer-&gt;conns &gt;= peer-&gt;max_conns) { ngx_http_upstream_rr_peer_unlock(hp-&gt;rrp.peers, peer); goto next; } break; next: if (&#43;&#43;hp-&gt;tries &gt; 20) { ngx_http_upstream_rr_peers_unlock(hp-&gt;rrp.peers); return hp-&gt;get_rr_peer(pc, &amp;hp-&gt;rrp); } } В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.">
-
-  
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "articleSection": "Posts",
-    "name": "nginx vs envoy hash algorithms",
-    "headline": "nginx vs envoy hash algorithms",
-    
-    "abstract": "\u003ch2 id=\u0022nginx-hash\u0022 class=\u0022relative group\u0022\u003enginx hash \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#nginx-hash\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003eРассмотрим реализацию команды \u003ccode\u003ehash $something;\u003c\/code\u003e в nginx.\u003c\/p\u003e\n\u003cp\u003eРеализация команды hash находится в модуле \u003ca href=\u0022https:\/\/github.com\/nginx\/nginx\/blob\/master\/src\/http\/modules\/ngx_http_upstream_hash_module.c\u0022 target=\u0022_blank\u0022 rel=\u0022noreferrer\u0022\u003engx_http_upstream_hash_module\u003c\/a\u003e. Ключевая функция получения сервера (peer) \u003ccode\u003engx_http_upstream_get_hash_peer\u003c\/code\u003e. В данной функции реализованы алгоритмы weighted round robin \u002b retries \u002b fallback to round robin w\\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.\u003c\/p\u003e\n\u003cdiv class=\u0022highlight\u0022\u003e\u003cpre tabindex=\u00220\u0022 style=\u0022color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\u0022\u003e\u003ccode class=\u0022language-c\u0022 data-lang=\u0022c\u0022\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003efor\u003c\/span\u003e ( ;; ) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#75715e\u0022\u003e\/*\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * Hash expression is compatible with Cache::Memcached:\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * ((crc32([REHASH] KEY) \u0026gt;\u0026gt; 16) \u0026amp; 0x7fff) \u002b PREV_HASH\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * with REHASH omitted at the first iteration.\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         *\/\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_init\u003c\/span\u003e(hash);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            size \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_sprintf\u003c\/span\u003e(buf, \u003cspan style=\u0022color:#e6db74\u0022\u003e\u0026#34;%ui\u0026#34;\u003c\/span\u003e, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash) \u003cspan style=\u0022color:#f92672\u0022\u003e-\u003c\/span\u003e buf;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_update\u003c\/span\u003e(\u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehash, buf, size);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_update\u003c\/span\u003e(\u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehash, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ekey.data, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ekey.len);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_final\u003c\/span\u003e(hash);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hash \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e (hash \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e16\u003c\/span\u003e) \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0x7fff\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash \u003cspan style=\u0022color:#f92672\u0022\u003e\u002b=\u003c\/span\u003e hash;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        w \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash \u003cspan style=\u0022color:#f92672\u0022\u003e%\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003etotal_weight;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        peer \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003epeer;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        p \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003ewhile\u003c\/span\u003e (w \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003eweight) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            w \u003cspan style=\u0022color:#f92672\u0022\u003e-=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003eweight;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            peer \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003enext;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            p\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        n \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e p \u003cspan style=\u0022color:#f92672\u0022\u003e\/\u003c\/span\u003e (\u003cspan style=\u0022color:#ae81ff\u0022\u003e8\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003esizeof\u003c\/span\u003e(\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e));\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        m \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e (\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e) \u003cspan style=\u0022color:#ae81ff\u0022\u003e1\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026lt;\u0026lt;\u003c\/span\u003e p \u003cspan style=\u0022color:#f92672\u0022\u003e%\u003c\/span\u003e (\u003cspan style=\u0022color:#ae81ff\u0022\u003e8\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003esizeof\u003c\/span\u003e(\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e));\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.tried[n] \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e m) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_lock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_log_debug2\u003c\/span\u003e(NGX_LOG_DEBUG_HTTP, pc\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003elog, \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e,\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e                       \u003cspan style=\u0022color:#e6db74\u0022\u003e\u0026#34;get hash peer, value:%uD, peer:%ui\u0026#34;\u003c\/span\u003e, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash, p);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003edown) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_fails\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003efails \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_fails\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e now \u003cspan style=\u0022color:#f92672\u0022\u003e-\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003echecked \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026lt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003efail_timeout)\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_conns \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003econns \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_conns) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003ebreak\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    next:\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003ehp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003etries \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e20\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peers_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003ereturn\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eget_rr_peer\u003c\/span\u003e(pc, \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    }\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/code\u003e\u003c\/pre\u003e\u003c\/div\u003e\u003cp\u003eВ данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.\u003c\/p\u003e",
-    "inLanguage": "en",
-    "url" : "http:\/\/localhost:1313\/posts\/nginx_envoy_hash\/",
-    "author" : {
-      "@type": "Person",
-      "name": ""
-    },
-    "copyrightYear": "2025",
-    "dateCreated": "2025-08-17T10:00:00\u002b04:00",
-    "datePublished": "2025-08-17T10:00:00\u002b04:00",
-    
-    "dateModified": "2025-08-17T10:00:00\u002b04:00",
-    
-    "keywords": ["nginx","envoy","consistent hashing"],
-    
-    "mainEntityOfPage": "true",
-    "wordCount": "863"
-  }
-  </script>
-    
-    <script type="application/ld+json">
-    {
-   "@context": "https://schema.org",
-   "@type": "BreadcrumbList",
-   "itemListElement": [
-     {
-       "@type": "ListItem",
-       "item": "http://localhost:1313/",
-       "name": "Swvit's Blog",
-       "position": 1
-     },
-     {
-       "@type": "ListItem",
-       "item": "http://localhost:1313/posts/",
-       "name": "Posts",
-       "position": 2
-     },
-     {
-       "@type": "ListItem",
-       "name": "Nginx vs Envoy Hash Algorithms",
-       "position": 3
-     }
-   ]
- }
-  </script>
-
-  
-  
-  
-  
-  
-
-
-
-
-
-
-
-  
-  
-
-  
-  
-</head>
-<body
-    class="m-auto flex h-screen max-w-7xl flex-col bg-neutral px-6 text-lg leading-7 text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32"
-  >
-    <div id="the-top" class="absolute flex self-center">
-      <a
-        class="-translate-y-8 rounded-b-lg bg-primary-200 px-3 py-1 text-sm focus:translate-y-0 dark:bg-neutral-600"
-        href="#main-content"
-        ><span class="pe-2 font-bold text-primary-600 dark:text-primary-400">&darr;</span
-        >Skip to main content</a
-      >
-    </div>
-    
-    
-      <header class="py-6 font-semibold text-neutral-900 dark:text-neutral sm:py-10 print:hidden">
-  <nav class="flex items-start justify-between sm:items-center">
-    
-    <div class="flex flex-row items-center">
-      
-  <a
-    class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2"
-    rel="me"
-    href="/"
-    >swvit&rsquo;s blog</a
-  >
-
-    </div>
-    
-    
-      <ul class="flex list-none flex-col text-end sm:flex-row">
-        
-          
-            
-            <li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5">
-              
-                <a
-                  href="/posts/"
-                  title="Posts"
-                  
-                  ><span
-                      class="decoration-primary-500 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2"
-                      >Posts</span
-                    >
-                  </a
-                >
-              
-            </li>
-          
-            
-            <li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5">
-              
-                <a
-                  href="https://github.com/swvitaliy"
-                  title=""
-                  target="_blank"
-                  >
-                    <span
-                      class="group-dark:hover:text-primary-400 transition-colors group-hover:text-primary-600"
-                    ><span class="icon relative inline-block px-1 align-text-bottom"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
-</span></span></a
-                >
-              
-            </li>
-          
-            
-            <li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5">
-              
-                
-                
-              
-            </li>
-          
-          
-        
-      </ul>
-    
-  </nav>
-</header>
-
-    
-    <div class="relative flex grow flex-col">
-      <main id="main-content" class="grow">
-        
-  <article>
-    <header class="max-w-prose">
-      
-      <h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">
-        nginx vs envoy hash algorithms
-      </h1>
-      
-        <div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden">
-          
-
-
-
-
-
-  
-  
-
-
-
-  
-
-  
-  
-    
-  
-
-  
-
-  
-
-  
-    
-  
-
-  
-
-
-  <div class="flex flex-row flex-wrap items-center">
-    
-    
-      <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time><span class="px-2 text-primary-500">&middot;</span><span title="Reading time">5 mins</span>
-    
-
-    
-    
-  </div>
-
-  
-  
-
-
-        </div>
-      
-      
-    </header>
-    <section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row">
-      
-      <div class="min-h-0 min-w-0 max-w-prose grow">
-        <h2 id="nginx-hash" class="relative group">nginx hash <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#nginx-hash" aria-label="Anchor">#</a></span></h2><p>Рассмотрим реализацию команды <code>hash $something;</code> в nginx.</p>
-<p>Реализация команды hash находится в модуле <a href="https://github.com/nginx/nginx/blob/master/src/http/modules/ngx_http_upstream_hash_module.c" target="_blank" rel="noreferrer">ngx_http_upstream_hash_module</a>. Ключевая функция получения сервера (peer) <code>ngx_http_upstream_get_hash_peer</code>. В данной функции реализованы алгоритмы weighted round robin + retries + fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span> <span style="color:#66d9ef">for</span> ( ;; ) {
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/*
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * Hash expression is compatible with Cache::Memcached:
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * ((crc32([REHASH] KEY) &gt;&gt; 16) &amp; 0x7fff) + PREV_HASH
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         * with REHASH omitted at the first iteration.
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e">         */</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_crc32_init</span>(hash);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (hp<span style="color:#f92672">-&gt;</span>rehash <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) {
-</span></span><span style="display:flex;"><span>            size <span style="color:#f92672">=</span> <span style="color:#a6e22e">ngx_sprintf</span>(buf, <span style="color:#e6db74">&#34;%ui&#34;</span>, hp<span style="color:#f92672">-&gt;</span>rehash) <span style="color:#f92672">-</span> buf;
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ngx_crc32_update</span>(<span style="color:#f92672">&amp;</span>hash, buf, size);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_crc32_update</span>(<span style="color:#f92672">&amp;</span>hash, hp<span style="color:#f92672">-&gt;</span>key.data, hp<span style="color:#f92672">-&gt;</span>key.len);
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_crc32_final</span>(hash);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        hash <span style="color:#f92672">=</span> (hash <span style="color:#f92672">&gt;&gt;</span> <span style="color:#ae81ff">16</span>) <span style="color:#f92672">&amp;</span> <span style="color:#ae81ff">0x7fff</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        hp<span style="color:#f92672">-&gt;</span>hash <span style="color:#f92672">+=</span> hash;
-</span></span><span style="display:flex;"><span>        hp<span style="color:#f92672">-&gt;</span>rehash<span style="color:#f92672">++</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        w <span style="color:#f92672">=</span> hp<span style="color:#f92672">-&gt;</span>hash <span style="color:#f92672">%</span> hp<span style="color:#f92672">-&gt;</span>rrp.peers<span style="color:#f92672">-&gt;</span>total_weight;
-</span></span><span style="display:flex;"><span>        peer <span style="color:#f92672">=</span> hp<span style="color:#f92672">-&gt;</span>rrp.peers<span style="color:#f92672">-&gt;</span>peer;
-</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (w <span style="color:#f92672">&gt;=</span> peer<span style="color:#f92672">-&gt;</span>weight) {
-</span></span><span style="display:flex;"><span>            w <span style="color:#f92672">-=</span> peer<span style="color:#f92672">-&gt;</span>weight;
-</span></span><span style="display:flex;"><span>            peer <span style="color:#f92672">=</span> peer<span style="color:#f92672">-&gt;</span>next;
-</span></span><span style="display:flex;"><span>            p<span style="color:#f92672">++</span>;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        n <span style="color:#f92672">=</span> p <span style="color:#f92672">/</span> (<span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">uintptr_t</span>));
-</span></span><span style="display:flex;"><span>        m <span style="color:#f92672">=</span> (<span style="color:#66d9ef">uintptr_t</span>) <span style="color:#ae81ff">1</span> <span style="color:#f92672">&lt;&lt;</span> p <span style="color:#f92672">%</span> (<span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">uintptr_t</span>));
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (hp<span style="color:#f92672">-&gt;</span>rrp.tried[n] <span style="color:#f92672">&amp;</span> m) {
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">goto</span> next;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_http_upstream_rr_peer_lock</span>(hp<span style="color:#f92672">-&gt;</span>rrp.peers, peer);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_log_debug2</span>(NGX_LOG_DEBUG_HTTP, pc<span style="color:#f92672">-&gt;</span>log, <span style="color:#ae81ff">0</span>,
-</span></span><span style="display:flex;"><span>                       <span style="color:#e6db74">&#34;get hash peer, value:%uD, peer:%ui&#34;</span>, hp<span style="color:#f92672">-&gt;</span>hash, p);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (peer<span style="color:#f92672">-&gt;</span>down) {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ngx_http_upstream_rr_peer_unlock</span>(hp<span style="color:#f92672">-&gt;</span>rrp.peers, peer);
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">goto</span> next;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (peer<span style="color:#f92672">-&gt;</span>max_fails
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> peer<span style="color:#f92672">-&gt;</span>fails <span style="color:#f92672">&gt;=</span> peer<span style="color:#f92672">-&gt;</span>max_fails
-</span></span><span style="display:flex;"><span>            <span style="color:#f92672">&amp;&amp;</span> now <span style="color:#f92672">-</span> peer<span style="color:#f92672">-&gt;</span>checked <span style="color:#f92672">&lt;=</span> peer<span style="color:#f92672">-&gt;</span>fail_timeout)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ngx_http_upstream_rr_peer_unlock</span>(hp<span style="color:#f92672">-&gt;</span>rrp.peers, peer);
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">goto</span> next;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (peer<span style="color:#f92672">-&gt;</span>max_conns <span style="color:#f92672">&amp;&amp;</span> peer<span style="color:#f92672">-&gt;</span>conns <span style="color:#f92672">&gt;=</span> peer<span style="color:#f92672">-&gt;</span>max_conns) {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ngx_http_upstream_rr_peer_unlock</span>(hp<span style="color:#f92672">-&gt;</span>rrp.peers, peer);
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">goto</span> next;
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    next:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#f92672">++</span>hp<span style="color:#f92672">-&gt;</span>tries <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">20</span>) {
-</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ngx_http_upstream_rr_peers_unlock</span>(hp<span style="color:#f92672">-&gt;</span>rrp.peers);
-</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> hp<span style="color:#f92672">-&gt;</span><span style="color:#a6e22e">get_rr_peer</span>(pc, <span style="color:#f92672">&amp;</span>hp<span style="color:#f92672">-&gt;</span>rrp);
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div><p>В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.</p>
-<p>В первых строках происходит вычисление хеша через crc32. Для каждой попытки к хешируемым данным добавляется индекс попытки (hp-&gt;rehash) за исключением первой.</p>
-<p>После вычисления хеша текущей попытки он добавляется к общему хешу. Это, насколько я понимаю, делает выбор более равномерным.</p>
-<p>Берем модуль хеша от суммарного веса всех узлов и получаем случайную точку w от 0 до total_weight-1:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>w <span style="color:#f92672">=</span> hp<span style="color:#f92672">-&gt;</span>hash <span style="color:#f92672">%</span> hp<span style="color:#f92672">-&gt;</span>rrp.peers<span style="color:#f92672">-&gt;</span>total_weight;
-</span></span></code></pre></div><p>Далее выполняется weighted round robin:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>        peer <span style="color:#f92672">=</span> hp<span style="color:#f92672">-&gt;</span>rrp.peers<span style="color:#f92672">-&gt;</span>peer;
-</span></span><span style="display:flex;"><span>        p <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (w <span style="color:#f92672">&gt;=</span> peer<span style="color:#f92672">-&gt;</span>weight) {
-</span></span><span style="display:flex;"><span>            w <span style="color:#f92672">-=</span> peer<span style="color:#f92672">-&gt;</span>weight;
-</span></span><span style="display:flex;"><span>            peer <span style="color:#f92672">=</span> peer<span style="color:#f92672">-&gt;</span>next;
-</span></span><span style="display:flex;"><span>            p<span style="color:#f92672">++</span>;
-</span></span><span style="display:flex;"><span>        }
-</span></span></code></pre></div><p>В данном коде мы последовательно обходим peers в связном списке и проверяем каждый на</p>
-<p>// TODO тут он ходит последовательно по связному списку - как обеспечивается равные шансы на получение узла, если у всех веса одинаковые</p>
-<p>Затем, мы смотрим, если мы этот сервер уже пробовали, чтобы не ходить к него снова (битовая магия):</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>	n <span style="color:#f92672">=</span> p <span style="color:#f92672">/</span> (<span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">uintptr_t</span>));  
-</span></span><span style="display:flex;"><span>	m <span style="color:#f92672">=</span> (<span style="color:#66d9ef">uintptr_t</span>) <span style="color:#ae81ff">1</span> <span style="color:#f92672">&lt;&lt;</span> p <span style="color:#f92672">%</span> (<span style="color:#ae81ff">8</span> <span style="color:#f92672">*</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">uintptr_t</span>));  
-</span></span><span style="display:flex;"><span>	  
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (hp<span style="color:#f92672">-&gt;</span>rrp.tried[n] <span style="color:#f92672">&amp;</span> m) {  
-</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">goto</span> next;  
-</span></span><span style="display:flex;"><span>	}
-</span></span></code></pre></div><p>В следующих строках происходит несколько проверок</p>
-<p>// TODO описание магии битовой карты tried</p>
-<p>Использование randezvous алгоритма при выборе узла, на мой взгляд, при реализации директивы <code>hash consistent</code> в nginx оправдано, поскольку мы редактируем список узлов руками, из-за этого он не можем быть очень большим и применение hash ring в данном случае привело бы к необходимости хранить его и усложнило бы процесс выбора. Однако, есть несколько нюансов реализации, которые могут ограничить область применения данной команды и о которых, на мой взгляд, было бы полезно знать.</p>
-<h2 id="нюансы-реализации-команды-nginx-hash" class="relative group">Нюансы реализации команды nginx hash <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#%d0%bd%d1%8e%d0%b0%d0%bd%d1%81%d1%8b-%d1%80%d0%b5%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d0%b8-%d0%ba%d0%be%d0%bc%d0%b0%d0%bd%d0%b4%d1%8b-nginx-hash" aria-label="Anchor">#</a></span></h2><p>Есть несколько интересных моментов реализации детерминированного хеширования в модуле <code>ngx_http_upstream_hash_module</code>.</p>
-<p>Во-первых, при использовании директивы hash, если количество попыток взять сервер по hash превышает 20, то мы выбираем сервер по round robin. Вероятно, этот fallback сделан для обеспечения доступности в угоду правильности работы алгоритма. При этом нет никакой ручки, чтобы понять, что он выбрал не ту ноду. Такой trade-off, на мой взгляд, не позволяет применять данный модуль для систем, для которых нужна строгая гарантия отправки запроса на нужный узел. Например, для систем, которые хранят часть своего состояния относящегося к клиенту на узлах. Так же, кажется, не получится сделать какой-то самостоятельный механизм поиска нужного узла, поскольку данный модуль (а возможно и nginx в целом) не предполагает, что вы можете отправить обратный запрос. Это ограничивает применение данной команды для случая использования кешей на backend серверах, когда переход не в тот узел не приведет к нарушению работы системы.</p>
-<p>Не менее важный момент не относится непосредственно реализации алгоритма рандеву, но затрагивает его. Если мы используем директиву <code>server any... resolve</code>, в которой содержится dns адрес, возвращающий несколько ip, то при изменении списка узлов, например, при изменении его порядка (dns не гарантирует порядок), мы получим другое распределение. При указании resolve периодически выполняется <code>ngx_http_upstream_resolve_handler</code>, описанный в файле <a href="https://github.com/nginx/nginx/blob/master/src/http/ngx_http_upstream.c#L1222" target="_blank" rel="noreferrer">ngx_http_upstream.c</a> . Туда уже передается список адресов, после чего вызывается функция <code>ngx_http_upstream_create_round_robin_peer</code> - по этому списку происходит обход в цикле, в котором инициализируется массив <code>peer</code>:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>    <span style="color:#66d9ef">ngx_http_upstream_resolved_t</span>  <span style="color:#f92672">*</span>ur
-</span></span><span style="display:flex;"><span>    ...
-</span></span><span style="display:flex;"><span>    ur<span style="color:#f92672">-&gt;</span>naddrs <span style="color:#f92672">=</span> ctx<span style="color:#f92672">-&gt;</span>naddrs;
-</span></span><span style="display:flex;"><span>    ur<span style="color:#f92672">-&gt;</span>addrs <span style="color:#f92672">=</span> ctx<span style="color:#f92672">-&gt;</span>addrs;
-</span></span><span style="display:flex;"><span>	...
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">ngx_http_upstream_create_round_robin_peer</span>(r, ur) <span style="color:#f92672">!=</span> NGX_OK) {
-</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">ngx_http_upstream_finalize_request</span>(r, u,
-</span></span><span style="display:flex;"><span>                                           NGX_HTTP_INTERNAL_SERVER_ERROR);
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">goto</span> failed;
-</span></span><span style="display:flex;"><span>    }
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> ur<span style="color:#f92672">-&gt;</span>naddrs; i<span style="color:#f92672">++</span>) {
-</span></span><span style="display:flex;"><span>...
-</span></span><span style="display:flex;"><span>	peer[i].sockaddr <span style="color:#f92672">=</span> sockaddr;
-</span></span><span style="display:flex;"><span>	peer[i].socklen <span style="color:#f92672">=</span> socklen;
-</span></span><span style="display:flex;"><span>	peer[i].name.len <span style="color:#f92672">=</span> len;
-</span></span><span style="display:flex;"><span>	peer[i].name.data <span style="color:#f92672">=</span> p;
-</span></span><span style="display:flex;"><span>	peer[i].weight <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>	peer[i].effective_weight <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>	peer[i].current_weight <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>	peer[i].max_conns <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
-</span></span><span style="display:flex;"><span>	peer[i].max_fails <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
-</span></span><span style="display:flex;"><span>	peer[i].fail_timeout <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><p>ctx-&gt;naddrs в ngx_http_upstream_resolve_handler берется из функции <code>ngx_resolver_process_a</code> в файле <code>src/core/ngx_resolver.c</code> (для AAA записей есть аналогичная функция), в которой так же сохраняется тот порядок адресов, который был передан от dns сервера:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span>  
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ngx_resolver_process_a</span>(<span style="color:#66d9ef">ngx_resolver_t</span> <span style="color:#f92672">*</span>r, <span style="color:#66d9ef">ngx_resolver_ctx_t</span> <span style="color:#f92672">*</span>ctx, ...)  
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>	ctx<span style="color:#f92672">-&gt;</span>addrs <span style="color:#f92672">=</span> <span style="color:#a6e22e">ngx_resolver_alloc</span>(r, naddrs <span style="color:#f92672">*</span> <span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">ngx_resolver_addr_t</span>));  
-</span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> (i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> naddrs; i<span style="color:#f92672">++</span>) {
-</span></span><span style="display:flex;"><span>		ctx<span style="color:#f92672">-&gt;</span>addrs[i].sockaddr <span style="color:#f92672">=</span> ...;  
-</span></span><span style="display:flex;"><span>		ctx<span style="color:#f92672">-&gt;</span>addrs[i].socklen <span style="color:#f92672">=</span> ...;  
-</span></span><span style="display:flex;"><span>		ctx<span style="color:#f92672">-&gt;</span>addrs[i].name <span style="color:#f92672">=</span> ...;  
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h2 id="nginx-hash-consistent" class="relative group">nginx hash consistent <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style="text-decoration-line: none !important;" href="#nginx-hash-consistent" aria-label="Anchor">#</a></span></h2><p>Рассмотрим реализацию команды <code>hash $something consistent;</code> в nginx. Данная команда выполняет consistent hashing.</p>
-
-      </div>
-    </section>
-    <footer class="max-w-prose pt-8 print:hidden">
-      
-  <div class="flex">
-    
-    
-    
-    <div class="place-self-center">
-      
-      
-      <div class="text-2xl sm:text-lg">
-</div>
-    </div>
-  </div>
-
-
-      
-
-      
-  
-    
-    
-    
-    <div class="pt-8">
-      <hr class="border-dotted border-neutral-300 dark:border-neutral-600" />
-      <div class="flex justify-between pt-3">
-        <span>
-          
-            <a class="group flex" href="http://localhost:1313/posts/kafka_rebalance_benchmark/">
-              <span
-                class="me-2 text-neutral-700 transition-transform group-hover:-translate-x-[2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
-                ><span class="ltr:inline rtl:hidden">&larr;</span
-                ><span class="ltr:hidden rtl:inline">&rarr;</span></span
-              >
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Apache Kafka Rebalancing Benchmark</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2024-07-25 10:00:00 &#43;0400 &#43;04">25 July 2024</time>
-                  
-                </span>
-              </span>
-            </a>
-          
-        </span>
-        <span>
-          
-            <a class="group flex text-right" href="http://localhost:1313/posts/consistent_rendezvous_hashing/">
-              <span class="flex flex-col">
-                <span
-                  class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500"
-                  >Consistent and Rendezvous Hashing</span
-                >
-                <span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400">
-                  
-                    <time datetime="2025-08-17 10:00:00 &#43;0400 &#43;04">17 August 2025</time>
-                  
-                </span>
-              </span>
-              <span
-                class="ms-2 text-neutral-700 transition-transform group-hover:-translate-x-[-2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"
-                ><span class="ltr:inline rtl:hidden">&rarr;</span
-                ><span class="ltr:hidden rtl:inline">&larr;</span></span
-              >
-            </a>
-          
-        </span>
-      </div>
-    </div>
-  
-
-
-      
-    </footer>
-  </article>
-
-      </main>
-      
-        <div
-          class="pointer-events-none absolute bottom-0 end-0 top-[100vh] w-12"
-          id="to-top"
-          hidden="true"
-        >
-          <a
-            href="#the-top"
-            class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 backdrop-blur hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400"
-            aria-label="Scroll to top"
-            title="Scroll to top"
-          >
-            &uarr;
-          </a>
-        </div>
-      <footer class="py-10 print:hidden">
-  
-  
-    <nav class="pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400">
-      <ul class="flex list-none flex-col sm:flex-row">
-        
-          
-          <li class="group mb-1 text-end sm:mb-0 sm:me-7 sm:last:me-0">
-            
-              <a
-                href="https://archive.swvit.dev"
-                title=""
-                
-                ><span
-                    class="decoration-primary-500 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2"
-                    >archive</span
-                  >
-                </a
-              >
-            
-          </li>
-        
-      </ul>
-    </nav>
-  
-  <div class="flex items-center justify-between">
-    <div>
-      
-      
-        <p class="text-sm text-neutral-500 dark:text-neutral-400">
-            &copy;
-            2026
-            
-        </p>
-      
-      
-      
-        <p class="text-xs text-neutral-500 dark:text-neutral-400">
-          
-          
-          Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500"
-            href="https://gohugo.io/" target="_blank" rel="noopener noreferrer">Hugo</a> &amp; <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href="https://github.com/jpanther/congo" target="_blank" rel="noopener noreferrer">Congo</a>
-        </p>
-      
-    </div>
-    <div class="flex flex-row items-center">
-      
-      
-      
-      
-    </div>
-  </div>
-  
-  
-</footer>
-
-    </div>
-  </body>
-</html>
+    '><link rel=canonical href=https://swvitaliy.github.io/posts/nginx_envoy_hash/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><meta property="og:url" content="https://swvitaliy.github.io/posts/nginx_envoy_hash/"><meta property="og:site_name" content="swvit's blog"><meta property="og:title" content="nginx vs envoy hash algorithms"><meta property="og:description" content='nginx hash #Рассмотрим реализацию команды hash $something; в nginx.
+Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin + retries + fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
+for ( ;; ) { /* * Hash expression is compatible with Cache::Memcached: * ((crc32([REHASH] KEY) >> 16) & 0x7fff) + PREV_HASH * with REHASH omitted at the first iteration. */ ngx_crc32_init(hash); if (hp->rehash > 0) { size = ngx_sprintf(buf, "%ui", hp->rehash) - buf; ngx_crc32_update(&amp;hash, buf, size); } ngx_crc32_update(&amp;hash, hp->key.data, hp->key.len); ngx_crc32_final(hash); hash = (hash >> 16) & 0x7fff; hp->hash += hash; hp->rehash++; w = hp->hash % hp->rrp.peers->total_weight; peer = hp->rrp.peers->peer; p = 0; while (w >= peer->weight) { w -= peer->weight; peer = peer->next; p++; } n = p / (8 * sizeof(uintptr_t)); m = (uintptr_t) 1 << p % (8 * sizeof(uintptr_t)); if (hp->rrp.tried[n] & m) { goto next; } ngx_http_upstream_rr_peer_lock(hp->rrp.peers, peer); ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc->log, 0, "get hash peer, value:%uD, peer:%ui", hp->hash, p); if (peer->down) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } if (peer->max_fails && peer->fails >= peer->max_fails && now - peer->checked <= peer->fail_timeout) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } if (peer->max_conns && peer->conns >= peer->max_conns) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } break; next: if (++hp->tries > 20) { ngx_http_upstream_rr_peers_unlock(hp->rrp.peers); return hp->get_rr_peer(pc, &amp;hp->rrp); } } В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.'><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta property="article:section" content="posts"><meta property="article:published_time" content="2025-08-17T10:00:00+04:00"><meta property="article:modified_time" content="2025-08-17T10:00:00+04:00"><meta property="article:tag" content="Nginx"><meta property="article:tag" content="Envoy"><meta property="article:tag" content="Consistent Hashing"><meta name=twitter:card content="summary"><meta name=twitter:title content="nginx vs envoy hash algorithms"><meta name=twitter:description content='nginx hash #Рассмотрим реализацию команды hash $something; в nginx.
+Реализация команды hash находится в модуле ngx_http_upstream_hash_module. Ключевая функция получения сервера (peer) ngx_http_upstream_get_hash_peer. В данной функции реализованы алгоритмы weighted round robin + retries + fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.
+for ( ;; ) { /* * Hash expression is compatible with Cache::Memcached: * ((crc32([REHASH] KEY) >> 16) & 0x7fff) + PREV_HASH * with REHASH omitted at the first iteration. */ ngx_crc32_init(hash); if (hp->rehash > 0) { size = ngx_sprintf(buf, "%ui", hp->rehash) - buf; ngx_crc32_update(&amp;hash, buf, size); } ngx_crc32_update(&amp;hash, hp->key.data, hp->key.len); ngx_crc32_final(hash); hash = (hash >> 16) & 0x7fff; hp->hash += hash; hp->rehash++; w = hp->hash % hp->rrp.peers->total_weight; peer = hp->rrp.peers->peer; p = 0; while (w >= peer->weight) { w -= peer->weight; peer = peer->next; p++; } n = p / (8 * sizeof(uintptr_t)); m = (uintptr_t) 1 << p % (8 * sizeof(uintptr_t)); if (hp->rrp.tried[n] & m) { goto next; } ngx_http_upstream_rr_peer_lock(hp->rrp.peers, peer); ngx_log_debug2(NGX_LOG_DEBUG_HTTP, pc->log, 0, "get hash peer, value:%uD, peer:%ui", hp->hash, p); if (peer->down) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } if (peer->max_fails && peer->fails >= peer->max_fails && now - peer->checked <= peer->fail_timeout) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } if (peer->max_conns && peer->conns >= peer->max_conns) { ngx_http_upstream_rr_peer_unlock(hp->rrp.peers, peer); goto next; } break; next: if (++hp->tries > 20) { ngx_http_upstream_rr_peers_unlock(hp->rrp.peers); return hp->get_rr_peer(pc, &amp;hp->rrp); } } В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.'><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","articleSection":"Posts","name":"nginx vs envoy hash algorithms","headline":"nginx vs envoy hash algorithms","abstract":"\u003ch2 id=\u0022nginx-hash\u0022 class=\u0022relative group\u0022\u003enginx hash \u003cspan class=\u0022absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100\u0022\u003e\u003ca class=\u0022group-hover:text-primary-300 dark:group-hover:text-neutral-700\u0022 style=\u0022text-decoration-line: none !important;\u0022 href=\u0022#nginx-hash\u0022 aria-label=\u0022Anchor\u0022\u003e#\u003c\/a\u003e\u003c\/span\u003e\u003c\/h2\u003e\u003cp\u003eРассмотрим реализацию команды \u003ccode\u003ehash $something;\u003c\/code\u003e в nginx.\u003c\/p\u003e\n\u003cp\u003eРеализация команды hash находится в модуле \u003ca href=\u0022https:\/\/github.com\/nginx\/nginx\/blob\/master\/src\/http\/modules\/ngx_http_upstream_hash_module.c\u0022 target=\u0022_blank\u0022 rel=\u0022noreferrer\u0022\u003engx_http_upstream_hash_module\u003c\/a\u003e. Ключевая функция получения сервера (peer) \u003ccode\u003engx_http_upstream_get_hash_peer\u003c\/code\u003e. В данной функции реализованы алгоритмы weighted round robin \u002b retries \u002b fallback to round robin w\\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.\u003c\/p\u003e\n\u003cdiv class=\u0022highlight\u0022\u003e\u003cpre tabindex=\u00220\u0022 style=\u0022color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;\u0022\u003e\u003ccode class=\u0022language-c\u0022 data-lang=\u0022c\u0022\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003efor\u003c\/span\u003e ( ;; ) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#75715e\u0022\u003e\/*\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * Hash expression is compatible with Cache::Memcached:\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * ((crc32([REHASH] KEY) \u0026gt;\u0026gt; 16) \u0026amp; 0x7fff) \u002b PREV_HASH\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         * with REHASH omitted at the first iteration.\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\u003cspan style=\u0022color:#75715e\u0022\u003e         *\/\u003c\/span\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_init\u003c\/span\u003e(hash);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            size \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_sprintf\u003c\/span\u003e(buf, \u003cspan style=\u0022color:#e6db74\u0022\u003e\u0026#34;%ui\u0026#34;\u003c\/span\u003e, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash) \u003cspan style=\u0022color:#f92672\u0022\u003e-\u003c\/span\u003e buf;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_update\u003c\/span\u003e(\u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehash, buf, size);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_update\u003c\/span\u003e(\u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehash, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ekey.data, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ekey.len);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_crc32_final\u003c\/span\u003e(hash);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hash \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e (hash \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e16\u003c\/span\u003e) \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0x7fff\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash \u003cspan style=\u0022color:#f92672\u0022\u003e\u002b=\u003c\/span\u003e hash;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003erehash\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        w \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash \u003cspan style=\u0022color:#f92672\u0022\u003e%\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003etotal_weight;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        peer \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003epeer;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        p \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003ewhile\u003c\/span\u003e (w \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003eweight) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            w \u003cspan style=\u0022color:#f92672\u0022\u003e-=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003eweight;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            peer \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003enext;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            p\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        n \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e p \u003cspan style=\u0022color:#f92672\u0022\u003e\/\u003c\/span\u003e (\u003cspan style=\u0022color:#ae81ff\u0022\u003e8\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003esizeof\u003c\/span\u003e(\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e));\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        m \u003cspan style=\u0022color:#f92672\u0022\u003e=\u003c\/span\u003e (\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e) \u003cspan style=\u0022color:#ae81ff\u0022\u003e1\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026lt;\u0026lt;\u003c\/span\u003e p \u003cspan style=\u0022color:#f92672\u0022\u003e%\u003c\/span\u003e (\u003cspan style=\u0022color:#ae81ff\u0022\u003e8\u003c\/span\u003e \u003cspan style=\u0022color:#f92672\u0022\u003e*\u003c\/span\u003e \u003cspan style=\u0022color:#66d9ef\u0022\u003esizeof\u003c\/span\u003e(\u003cspan style=\u0022color:#66d9ef\u0022\u003euintptr_t\u003c\/span\u003e));\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.tried[n] \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003e m) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_lock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_log_debug2\u003c\/span\u003e(NGX_LOG_DEBUG_HTTP, pc\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003elog, \u003cspan style=\u0022color:#ae81ff\u0022\u003e0\u003c\/span\u003e,\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e                       \u003cspan style=\u0022color:#e6db74\u0022\u003e\u0026#34;get hash peer, value:%uD, peer:%ui\u0026#34;\u003c\/span\u003e, hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003ehash, p);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003edown) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_fails\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003efails \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_fails\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e now \u003cspan style=\u0022color:#f92672\u0022\u003e-\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003echecked \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026lt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003efail_timeout)\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_conns \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u0026amp;\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003econns \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;=\u003c\/span\u003e peer\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003emax_conns) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peer_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers, peer);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003egoto\u003c\/span\u003e next;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003ebreak\u003c\/span\u003e;\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    next:\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        \u003cspan style=\u0022color:#66d9ef\u0022\u003eif\u003c\/span\u003e (\u003cspan style=\u0022color:#f92672\u0022\u003e\u002b\u002b\u003c\/span\u003ehp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003etries \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026gt;\u003c\/span\u003e \u003cspan style=\u0022color:#ae81ff\u0022\u003e20\u003c\/span\u003e) {\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#a6e22e\u0022\u003engx_http_upstream_rr_peers_unlock\u003c\/span\u003e(hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp.peers);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e            \u003cspan style=\u0022color:#66d9ef\u0022\u003ereturn\u003c\/span\u003e hp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003e\u003cspan style=\u0022color:#a6e22e\u0022\u003eget_rr_peer\u003c\/span\u003e(pc, \u003cspan style=\u0022color:#f92672\u0022\u003e\u0026amp;\u003c\/span\u003ehp\u003cspan style=\u0022color:#f92672\u0022\u003e-\u0026gt;\u003c\/span\u003errp);\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e        }\n\u003c\/span\u003e\u003c\/span\u003e\u003cspan style=\u0022display:flex;\u0022\u003e\u003cspan\u003e    }\n\u003c\/span\u003e\u003c\/span\u003e\u003c\/code\u003e\u003c\/pre\u003e\u003c\/div\u003e\u003cp\u003eВ данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.\u003c\/p\u003e","inLanguage":"en","url":"https:\/\/swvitaliy.github.io\/posts\/nginx_envoy_hash\/","author":{"@type":"Person","name":""},"copyrightYear":"2025","dateCreated":"2025-08-17T10:00:00\u002b04:00","datePublished":"2025-08-17T10:00:00\u002b04:00","dateModified":"2025-08-17T10:00:00\u002b04:00","keywords":["nginx","envoy","consistent hashing"],"mainEntityOfPage":"true","wordCount":"863"}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","item":"https://swvitaliy.github.io/","name":"Swvit's Blog","position":1},{"@type":"ListItem","item":"https://swvitaliy.github.io/posts/","name":"Posts","position":2},{"@type":"ListItem","name":"Nginx vs Envoy Hash Algorithms","position":3}]}</script></head><body class="m-auto flex h-screen max-w-7xl flex-col bg-neutral px-6 text-lg leading-7 text-neutral-900 dark:bg-neutral-800 dark:text-neutral sm:px-14 md:px-24 lg:px-32"><div id=the-top class="absolute flex self-center"><a class="-translate-y-8 rounded-b-lg bg-primary-200 px-3 py-1 text-sm focus:translate-y-0 dark:bg-neutral-600" href=#main-content><span class="pe-2 font-bold text-primary-600 dark:text-primary-400">&darr;</span>Skip to main content</a></div><header class="py-6 font-semibold text-neutral-900 dark:text-neutral sm:py-10 print:hidden"><nav class="flex items-start justify-between sm:items-center"><div class="flex flex-row items-center"><a class="decoration-primary-500 hover:underline hover:decoration-2 hover:underline-offset-2" rel=me href=/>swvit&rsquo;s blog</a></div><ul class="flex list-none flex-col text-end sm:flex-row"><li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5"><a href=/posts/ title=Posts><span class="decoration-primary-500 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2">Posts</span></a></li><li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5"><a href=https://github.com/swvitaliy title target=_blank><span class="group-dark:hover:text-primary-400 transition-colors group-hover:text-primary-600"><span class="icon relative inline-block px-1 align-text-bottom"><svg viewBox="0 0 496 512"><path fill="currentcolor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6.0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6.0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3.0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1.0-6.2-.3-40.4-.3-61.4.0.0-70 15-84.7-29.8.0.0-11.4-29.1-27.8-36.6.0.0-22.9-15.7 1.6-15.4.0.0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5.0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9.0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4.0 33.7-.3 75.4-.3 83.6.0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6.0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9.0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span></span></a></li><li class="group mb-1 sm:mb-0 sm:me-7 sm:last:me-0.5"></li></ul></nav></header><div class="relative flex grow flex-col"><main id=main-content class=grow><article><header class=max-w-prose><h1 class="mb-8 mt-0 text-4xl font-extrabold text-neutral-900 dark:text-neutral">nginx vs envoy hash algorithms</h1><div class="mb-10 text-base text-neutral-500 dark:text-neutral-400 print:hidden"><div class="flex flex-row flex-wrap items-center"><time datetime="2025-08-17 10:00:00 +0400 +04">17 August 2025</time><span class="px-2 text-primary-500">&#183;</span><span title="Reading time">5 mins</span></div></div></header><section class="prose mt-0 flex max-w-full flex-col dark:prose-invert lg:flex-row"><div class="min-h-0 min-w-0 max-w-prose grow"><h2 id=nginx-hash class="relative group">nginx hash <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style=text-decoration-line:none!important href=#nginx-hash aria-label=Anchor>#</a></span></h2><p>Рассмотрим реализацию команды <code>hash $something;</code> в nginx.</p><p>Реализация команды hash находится в модуле <a href=https://github.com/nginx/nginx/blob/master/src/http/modules/ngx_http_upstream_hash_module.c target=_blank rel=noreferrer>ngx_http_upstream_hash_module</a>. Ключевая функция получения сервера (peer) <code>ngx_http_upstream_get_hash_peer</code>. В данной функции реализованы алгоритмы weighted round robin + retries + fallback to round robin w\o weights. Рассмотрим код данной функции, который отвечает за выбор узла.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span> <span style=color:#66d9ef>for</span> ( ;; ) {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>         * Hash expression is compatible with Cache::Memcached:
+</span></span></span><span style=display:flex><span><span style=color:#75715e>         * ((crc32([REHASH] KEY) &gt;&gt; 16) &amp; 0x7fff) + PREV_HASH
+</span></span></span><span style=display:flex><span><span style=color:#75715e>         * with REHASH omitted at the first iteration.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>         */</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_crc32_init</span>(hash);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (hp<span style=color:#f92672>-&gt;</span>rehash <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>            size <span style=color:#f92672>=</span> <span style=color:#a6e22e>ngx_sprintf</span>(buf, <span style=color:#e6db74>&#34;%ui&#34;</span>, hp<span style=color:#f92672>-&gt;</span>rehash) <span style=color:#f92672>-</span> buf;
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ngx_crc32_update</span>(<span style=color:#f92672>&amp;</span>hash, buf, size);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_crc32_update</span>(<span style=color:#f92672>&amp;</span>hash, hp<span style=color:#f92672>-&gt;</span>key.data, hp<span style=color:#f92672>-&gt;</span>key.len);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_crc32_final</span>(hash);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        hash <span style=color:#f92672>=</span> (hash <span style=color:#f92672>&gt;&gt;</span> <span style=color:#ae81ff>16</span>) <span style=color:#f92672>&amp;</span> <span style=color:#ae81ff>0x7fff</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        hp<span style=color:#f92672>-&gt;</span>hash <span style=color:#f92672>+=</span> hash;
+</span></span><span style=display:flex><span>        hp<span style=color:#f92672>-&gt;</span>rehash<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        w <span style=color:#f92672>=</span> hp<span style=color:#f92672>-&gt;</span>hash <span style=color:#f92672>%</span> hp<span style=color:#f92672>-&gt;</span>rrp.peers<span style=color:#f92672>-&gt;</span>total_weight;
+</span></span><span style=display:flex><span>        peer <span style=color:#f92672>=</span> hp<span style=color:#f92672>-&gt;</span>rrp.peers<span style=color:#f92672>-&gt;</span>peer;
+</span></span><span style=display:flex><span>        p <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> (w <span style=color:#f92672>&gt;=</span> peer<span style=color:#f92672>-&gt;</span>weight) {
+</span></span><span style=display:flex><span>            w <span style=color:#f92672>-=</span> peer<span style=color:#f92672>-&gt;</span>weight;
+</span></span><span style=display:flex><span>            peer <span style=color:#f92672>=</span> peer<span style=color:#f92672>-&gt;</span>next;
+</span></span><span style=display:flex><span>            p<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        n <span style=color:#f92672>=</span> p <span style=color:#f92672>/</span> (<span style=color:#ae81ff>8</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>uintptr_t</span>));
+</span></span><span style=display:flex><span>        m <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uintptr_t</span>) <span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> p <span style=color:#f92672>%</span> (<span style=color:#ae81ff>8</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>uintptr_t</span>));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (hp<span style=color:#f92672>-&gt;</span>rrp.tried[n] <span style=color:#f92672>&amp;</span> m) {
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>goto</span> next;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_http_upstream_rr_peer_lock</span>(hp<span style=color:#f92672>-&gt;</span>rrp.peers, peer);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_log_debug2</span>(NGX_LOG_DEBUG_HTTP, pc<span style=color:#f92672>-&gt;</span>log, <span style=color:#ae81ff>0</span>,
+</span></span><span style=display:flex><span>                       <span style=color:#e6db74>&#34;get hash peer, value:%uD, peer:%ui&#34;</span>, hp<span style=color:#f92672>-&gt;</span>hash, p);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (peer<span style=color:#f92672>-&gt;</span>down) {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ngx_http_upstream_rr_peer_unlock</span>(hp<span style=color:#f92672>-&gt;</span>rrp.peers, peer);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>goto</span> next;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (peer<span style=color:#f92672>-&gt;</span>max_fails
+</span></span><span style=display:flex><span>            <span style=color:#f92672>&amp;&amp;</span> peer<span style=color:#f92672>-&gt;</span>fails <span style=color:#f92672>&gt;=</span> peer<span style=color:#f92672>-&gt;</span>max_fails
+</span></span><span style=display:flex><span>            <span style=color:#f92672>&amp;&amp;</span> now <span style=color:#f92672>-</span> peer<span style=color:#f92672>-&gt;</span>checked <span style=color:#f92672>&lt;=</span> peer<span style=color:#f92672>-&gt;</span>fail_timeout)
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ngx_http_upstream_rr_peer_unlock</span>(hp<span style=color:#f92672>-&gt;</span>rrp.peers, peer);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>goto</span> next;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (peer<span style=color:#f92672>-&gt;</span>max_conns <span style=color:#f92672>&amp;&amp;</span> peer<span style=color:#f92672>-&gt;</span>conns <span style=color:#f92672>&gt;=</span> peer<span style=color:#f92672>-&gt;</span>max_conns) {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ngx_http_upstream_rr_peer_unlock</span>(hp<span style=color:#f92672>-&gt;</span>rrp.peers, peer);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>goto</span> next;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    next:
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>++</span>hp<span style=color:#f92672>-&gt;</span>tries <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>20</span>) {
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>ngx_http_upstream_rr_peers_unlock</span>(hp<span style=color:#f92672>-&gt;</span>rrp.peers);
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> hp<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>get_rr_peer</span>(pc, <span style=color:#f92672>&amp;</span>hp<span style=color:#f92672>-&gt;</span>rrp);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>    }
+</span></span></code></pre></div><p>В данном коде происходит 20 попыток получить peer по ключу. Если количество попыток превысило 20, то берем по простому round robin.</p><p>В первых строках происходит вычисление хеша через crc32. Для каждой попытки к хешируемым данным добавляется индекс попытки (hp->rehash) за исключением первой.</p><p>После вычисления хеша текущей попытки он добавляется к общему хешу. Это, насколько я понимаю, делает выбор более равномерным.</p><p>Берем модуль хеша от суммарного веса всех узлов и получаем случайную точку w от 0 до total_weight-1:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>w <span style=color:#f92672>=</span> hp<span style=color:#f92672>-&gt;</span>hash <span style=color:#f92672>%</span> hp<span style=color:#f92672>-&gt;</span>rrp.peers<span style=color:#f92672>-&gt;</span>total_weight;
+</span></span></code></pre></div><p>Далее выполняется weighted round robin:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>        peer <span style=color:#f92672>=</span> hp<span style=color:#f92672>-&gt;</span>rrp.peers<span style=color:#f92672>-&gt;</span>peer;
+</span></span><span style=display:flex><span>        p <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> (w <span style=color:#f92672>&gt;=</span> peer<span style=color:#f92672>-&gt;</span>weight) {
+</span></span><span style=display:flex><span>            w <span style=color:#f92672>-=</span> peer<span style=color:#f92672>-&gt;</span>weight;
+</span></span><span style=display:flex><span>            peer <span style=color:#f92672>=</span> peer<span style=color:#f92672>-&gt;</span>next;
+</span></span><span style=display:flex><span>            p<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        }
+</span></span></code></pre></div><p>В данном коде мы последовательно обходим peers в связном списке и проверяем каждый на</p><p>// TODO тут он ходит последовательно по связному списку - как обеспечивается равные шансы на получение узла, если у всех веса одинаковые</p><p>Затем, мы смотрим, если мы этот сервер уже пробовали, чтобы не ходить к него снова (битовая магия):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>	n <span style=color:#f92672>=</span> p <span style=color:#f92672>/</span> (<span style=color:#ae81ff>8</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>uintptr_t</span>));  
+</span></span><span style=display:flex><span>	m <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uintptr_t</span>) <span style=color:#ae81ff>1</span> <span style=color:#f92672>&lt;&lt;</span> p <span style=color:#f92672>%</span> (<span style=color:#ae81ff>8</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>uintptr_t</span>));  
+</span></span><span style=display:flex><span>	  
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (hp<span style=color:#f92672>-&gt;</span>rrp.tried[n] <span style=color:#f92672>&amp;</span> m) {  
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>goto</span> next;  
+</span></span><span style=display:flex><span>	}
+</span></span></code></pre></div><p>В следующих строках происходит несколько проверок</p><p>// TODO описание магии битовой карты tried</p><p>Использование randezvous алгоритма при выборе узла, на мой взгляд, при реализации директивы <code>hash consistent</code> в nginx оправдано, поскольку мы редактируем список узлов руками, из-за этого он не можем быть очень большим и применение hash ring в данном случае привело бы к необходимости хранить его и усложнило бы процесс выбора. Однако, есть несколько нюансов реализации, которые могут ограничить область применения данной команды и о которых, на мой взгляд, было бы полезно знать.</p><h2 id=нюансы-реализации-команды-nginx-hash class="relative group">Нюансы реализации команды nginx hash <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style=text-decoration-line:none!important href=#%d0%bd%d1%8e%d0%b0%d0%bd%d1%81%d1%8b-%d1%80%d0%b5%d0%b0%d0%bb%d0%b8%d0%b7%d0%b0%d1%86%d0%b8%d0%b8-%d0%ba%d0%be%d0%bc%d0%b0%d0%bd%d0%b4%d1%8b-nginx-hash aria-label=Anchor>#</a></span></h2><p>Есть несколько интересных моментов реализации детерминированного хеширования в модуле <code>ngx_http_upstream_hash_module</code>.</p><p>Во-первых, при использовании директивы hash, если количество попыток взять сервер по hash превышает 20, то мы выбираем сервер по round robin. Вероятно, этот fallback сделан для обеспечения доступности в угоду правильности работы алгоритма. При этом нет никакой ручки, чтобы понять, что он выбрал не ту ноду. Такой trade-off, на мой взгляд, не позволяет применять данный модуль для систем, для которых нужна строгая гарантия отправки запроса на нужный узел. Например, для систем, которые хранят часть своего состояния относящегося к клиенту на узлах. Так же, кажется, не получится сделать какой-то самостоятельный механизм поиска нужного узла, поскольку данный модуль (а возможно и nginx в целом) не предполагает, что вы можете отправить обратный запрос. Это ограничивает применение данной команды для случая использования кешей на backend серверах, когда переход не в тот узел не приведет к нарушению работы системы.</p><p>Не менее важный момент не относится непосредственно реализации алгоритма рандеву, но затрагивает его. Если мы используем директиву <code>server any... resolve</code>, в которой содержится dns адрес, возвращающий несколько ip, то при изменении списка узлов, например, при изменении его порядка (dns не гарантирует порядок), мы получим другое распределение. При указании resolve периодически выполняется <code>ngx_http_upstream_resolve_handler</code>, описанный в файле <a href=https://github.com/nginx/nginx/blob/master/src/http/ngx_http_upstream.c#L1222 target=_blank rel=noreferrer>ngx_http_upstream.c</a> . Туда уже передается список адресов, после чего вызывается функция <code>ngx_http_upstream_create_round_robin_peer</code> - по этому списку происходит обход в цикле, в котором инициализируется массив <code>peer</code>:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>    <span style=color:#66d9ef>ngx_http_upstream_resolved_t</span>  <span style=color:#f92672>*</span>ur
+</span></span><span style=display:flex><span>    ...
+</span></span><span style=display:flex><span>    ur<span style=color:#f92672>-&gt;</span>naddrs <span style=color:#f92672>=</span> ctx<span style=color:#f92672>-&gt;</span>naddrs;
+</span></span><span style=display:flex><span>    ur<span style=color:#f92672>-&gt;</span>addrs <span style=color:#f92672>=</span> ctx<span style=color:#f92672>-&gt;</span>addrs;
+</span></span><span style=display:flex><span>	...
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>ngx_http_upstream_create_round_robin_peer</span>(r, ur) <span style=color:#f92672>!=</span> NGX_OK) {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>ngx_http_upstream_finalize_request</span>(r, u,
+</span></span><span style=display:flex><span>                                           NGX_HTTP_INTERNAL_SERVER_ERROR);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>goto</span> failed;
+</span></span><span style=display:flex><span>    }
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> ur<span style=color:#f92672>-&gt;</span>naddrs; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>...
+</span></span><span style=display:flex><span>	peer[i].sockaddr <span style=color:#f92672>=</span> sockaddr;
+</span></span><span style=display:flex><span>	peer[i].socklen <span style=color:#f92672>=</span> socklen;
+</span></span><span style=display:flex><span>	peer[i].name.len <span style=color:#f92672>=</span> len;
+</span></span><span style=display:flex><span>	peer[i].name.data <span style=color:#f92672>=</span> p;
+</span></span><span style=display:flex><span>	peer[i].weight <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	peer[i].effective_weight <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	peer[i].current_weight <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>	peer[i].max_conns <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>	peer[i].max_fails <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>	peer[i].fail_timeout <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>ctx->naddrs в ngx_http_upstream_resolve_handler берется из функции <code>ngx_resolver_process_a</code> в файле <code>src/core/ngx_resolver.c</code> (для AAA записей есть аналогичная функция), в которой так же сохраняется тот порядок адресов, который был передан от dns сервера:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span>  
+</span></span><span style=display:flex><span><span style=color:#a6e22e>ngx_resolver_process_a</span>(<span style=color:#66d9ef>ngx_resolver_t</span> <span style=color:#f92672>*</span>r, <span style=color:#66d9ef>ngx_resolver_ctx_t</span> <span style=color:#f92672>*</span>ctx, ...)  
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	ctx<span style=color:#f92672>-&gt;</span>addrs <span style=color:#f92672>=</span> <span style=color:#a6e22e>ngx_resolver_alloc</span>(r, naddrs <span style=color:#f92672>*</span> <span style=color:#66d9ef>sizeof</span>(<span style=color:#66d9ef>ngx_resolver_addr_t</span>));  
+</span></span><span style=display:flex><span>  
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>for</span> (i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> naddrs; i<span style=color:#f92672>++</span>) {
+</span></span><span style=display:flex><span>		ctx<span style=color:#f92672>-&gt;</span>addrs[i].sockaddr <span style=color:#f92672>=</span> ...;  
+</span></span><span style=display:flex><span>		ctx<span style=color:#f92672>-&gt;</span>addrs[i].socklen <span style=color:#f92672>=</span> ...;  
+</span></span><span style=display:flex><span>		ctx<span style=color:#f92672>-&gt;</span>addrs[i].name <span style=color:#f92672>=</span> ...;  
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=nginx-hash-consistent class="relative group">nginx hash consistent <span class="absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100"><a class="group-hover:text-primary-300 dark:group-hover:text-neutral-700" style=text-decoration-line:none!important href=#nginx-hash-consistent aria-label=Anchor>#</a></span></h2><p>Рассмотрим реализацию команды <code>hash $something consistent;</code> в nginx. Данная команда выполняет consistent hashing.</p></div></section><footer class="max-w-prose pt-8 print:hidden"><div class=flex><div class=place-self-center><div class="text-2xl sm:text-lg"></div></div></div><div class=pt-8><hr class="border-dotted border-neutral-300 dark:border-neutral-600"><div class="flex justify-between pt-3"><span><a class="group flex" href=https://swvitaliy.github.io/posts/skip-list/><span class="me-2 text-neutral-700 transition-transform group-hover:-translate-x-[2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"><span class="ltr:inline rtl:hidden">&larr;</span><span class="ltr:hidden rtl:inline">&rarr;</span></span>
+<span class="flex flex-col"><span class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500">Skip-list</span>
+<span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400"><time datetime="2024-01-14 08:07:07 +0400 +04">14 January 2024</time>
+</span></span></a></span><span><a class="group flex text-right" href=https://swvitaliy.github.io/posts/consistent_rendezvous_hashing/><span class="flex flex-col"><span class="mt-[0.1rem] leading-6 group-hover:underline group-hover:decoration-primary-500">Consistent and Rendezvous Hashing</span>
+<span class="mt-[0.1rem] text-xs text-neutral-500 dark:text-neutral-400"><time datetime="2025-08-17 10:00:00 +0400 +04">17 August 2025</time>
+</span></span><span class="ms-2 text-neutral-700 transition-transform group-hover:-translate-x-[-2px] group-hover:text-primary-600 dark:text-neutral dark:group-hover:text-primary-400"><span class="ltr:inline rtl:hidden">&rarr;</span><span class="ltr:hidden rtl:inline">&larr;</span></span></a></span></div></div></footer></article></main><div class="pointer-events-none absolute bottom-0 end-0 top-[100vh] w-12" id=to-top hidden=true><a href=#the-top class="pointer-events-auto sticky top-[calc(100vh-5.5rem)] flex h-12 w-12 items-center justify-center rounded-full bg-neutral/50 text-xl text-neutral-700 backdrop-blur hover:text-primary-600 dark:bg-neutral-800/50 dark:text-neutral dark:hover:text-primary-400" aria-label="Scroll to top" title="Scroll to top">&uarr;</a></div><footer class="py-10 print:hidden"><nav class="pb-4 text-base font-medium text-neutral-500 dark:text-neutral-400"><ul class="flex list-none flex-col sm:flex-row"><li class="group mb-1 text-end sm:mb-0 sm:me-7 sm:last:me-0"><a href=https://archive.swvit.dev title><span class="decoration-primary-500 group-hover:underline group-hover:decoration-2 group-hover:underline-offset-2">archive</span></a></li></ul></nav><div class="flex items-center justify-between"><div><p class="text-sm text-neutral-500 dark:text-neutral-400">&copy;
+2026</p><p class="text-xs text-neutral-500 dark:text-neutral-400">Powered by <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href=https://gohugo.io/ target=_blank rel="noopener noreferrer">Hugo</a> & <a class="hover:underline hover:decoration-primary-400 hover:text-primary-500" href=https://github.com/jpanther/congo target=_blank rel="noopener noreferrer">Congo</a></p></div><div class="flex flex-row items-center"></div></div></footer></div></body></html>
