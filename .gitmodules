@@ -1,7 +1,7 @@
-[submodule "themes/rocinante"]
-	path = themes/rocinante
-	url = https://github.com/mavidser/hugo-rocinante.git
 [submodule "themes/congo"]
 	path = themes/congo
 	url = https://github.com/jpanther/congo.git
 	branch = stable
+[submodule "static/archive"]
+	path = static/archive
+	url = git@github.com:swvitaliy/old-swvitaliy.github.io.git
