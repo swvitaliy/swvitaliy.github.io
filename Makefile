@@ -1,8 +1,9 @@
 develop: clean
 	hugo server --disableFastRender -D
 
-build:
+build: clean
 	hugo --minify
+	rm -rf public/archive/.git
 
 clean:
 	rm -rf public
