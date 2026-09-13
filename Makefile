@@ -1,4 +1,4 @@
-develop: clean
+develop:
 	hugo server --disableFastRender -D
 
 build-full: build download-archive
