@@ -1,1 +1,194 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tags on swvit's blog</title><link>https://swvitaliy.github.io/tags/</link><description>Recent content in Tags on swvit's blog</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Sun, 17 Aug 2025 10:00:00 +0400</lastBuildDate><atom:link href="https://swvitaliy.github.io/tags/index.xml" rel="self" type="application/rss+xml"/><item><title>Consistent Hashing</title><link>https://swvitaliy.github.io/tags/consistent-hashing/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/consistent-hashing/</guid><description/></item><item><title>Dsa</title><link>https://swvitaliy.github.io/tags/dsa/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/dsa/</guid><description/></item><item><title>Go</title><link>https://swvitaliy.github.io/tags/go/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/go/</guid><description/></item><item><title>Hash Ring</title><link>https://swvitaliy.github.io/tags/hash-ring/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/hash-ring/</guid><description/></item><item><title>Hashing</title><link>https://swvitaliy.github.io/tags/hashing/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/hashing/</guid><description/></item><item><title>Rendezvous</title><link>https://swvitaliy.github.io/tags/rendezvous/</link><pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate><guid>https://swvitaliy.github.io/tags/rendezvous/</guid><description/></item><item><title>Skip-List</title><link>https://swvitaliy.github.io/tags/skip-list/</link><pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate><guid>https://swvitaliy.github.io/tags/skip-list/</guid><description/></item><item><title>Excalidraw</title><link>https://swvitaliy.github.io/tags/excalidraw/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://swvitaliy.github.io/tags/excalidraw/</guid><description/></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on swvit&#39;s blog</title>
+    <link>http://localhost:1313/tags/</link>
+    <description>Recent content in Tags on swvit&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 02 Sep 2026 10:00:00 +0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Algorithms</title>
+      <link>http://localhost:1313/tags/algorithms/</link>
+      <pubDate>Wed, 02 Sep 2026 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/algorithms/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ClickHouse</title>
+      <link>http://localhost:1313/tags/clickhouse/</link>
+      <pubDate>Wed, 02 Sep 2026 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/clickhouse/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Roaring Bitmaps</title>
+      <link>http://localhost:1313/tags/roaring-bitmaps/</link>
+      <pubDate>Wed, 02 Sep 2026 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/roaring-bitmaps/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Apache Kafka</title>
+      <link>http://localhost:1313/tags/apache-kafka/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/apache-kafka/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Benchmarks</title>
+      <link>http://localhost:1313/tags/benchmarks/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/benchmarks/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Priority Queue</title>
+      <link>http://localhost:1313/tags/priority-queue/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/priority-queue/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Rebalansing</title>
+      <link>http://localhost:1313/tags/rebalansing/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/rebalansing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis</title>
+      <link>http://localhost:1313/tags/redis/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/redis/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Redis Streams</title>
+      <link>http://localhost:1313/tags/redis-streams/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/redis-streams/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Task Queue</title>
+      <link>http://localhost:1313/tags/task-queue/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/task-queue/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Burrows_wheeler</title>
+      <link>http://localhost:1313/tags/burrows_wheeler/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/burrows_wheeler/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>BWT</title>
+      <link>http://localhost:1313/tags/bwt/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/bwt/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>CMS</title>
+      <link>http://localhost:1313/tags/cms/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/cms/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Count-Min Sketch</title>
+      <link>http://localhost:1313/tags/count-min-sketch/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/count-min-sketch/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Go</title>
+      <link>http://localhost:1313/tags/go/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/go/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Strings</title>
+      <link>http://localhost:1313/tags/strings/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/strings/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Python</title>
+      <link>http://localhost:1313/tags/python/</link>
+      <pubDate>Sun, 28 Sep 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/python/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Simple Dns</title>
+      <link>http://localhost:1313/tags/simple-dns/</link>
+      <pubDate>Sun, 28 Sep 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/simple-dns/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Consistent Hashing</title>
+      <link>http://localhost:1313/tags/consistent-hashing/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/consistent-hashing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Dsa</title>
+      <link>http://localhost:1313/tags/dsa/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/dsa/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hash Ring</title>
+      <link>http://localhost:1313/tags/hash-ring/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/hash-ring/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hashing</title>
+      <link>http://localhost:1313/tags/hashing/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/hashing/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Rendezvous</title>
+      <link>http://localhost:1313/tags/rendezvous/</link>
+      <pubDate>Sun, 17 Aug 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/rendezvous/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Spaced-Repetition</title>
+      <link>http://localhost:1313/tags/spaced-repetition/</link>
+      <pubDate>Sun, 18 Aug 2024 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/tags/spaced-repetition/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Skip-List</title>
+      <link>http://localhost:1313/tags/skip-list/</link>
+      <pubDate>Sun, 14 Jan 2024 08:07:07 +0400</pubDate>
+      <guid>http://localhost:1313/tags/skip-list/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Excalidraw</title>
+      <link>http://localhost:1313/tags/excalidraw/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/tags/excalidraw/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

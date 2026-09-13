@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Redis on swvit&#39;s blog</title>
+    <link>http://localhost:1313/tags/redis/</link>
+    <description>Recent content in Redis on swvit&#39;s blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 19 Mar 2026 20:42:00 +0400</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Redis priority task queue</title>
+      <link>http://localhost:1313/posts/redis_prior_task_queue/</link>
+      <pubDate>Thu, 19 Mar 2026 20:42:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/redis_prior_task_queue/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Count-Min Sketch is redis</title>
+      <link>http://localhost:1313/posts/2025-12-13_cms_redis/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/2025-12-13_cms_redis/</guid>
+      <description>&lt;h3 id=&#34;count-min-sketch-algorithm&#34; class=&#34;relative group&#34;&gt;Count-Min Sketch Algorithm &lt;span class=&#34;absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100&#34;&gt;&lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34; style=&#34;text-decoration-line: none !important;&#34; href=&#34;#count-min-sketch-algorithm&#34; aria-label=&#34;Anchor&#34;&gt;#&lt;/a&gt;&lt;/span&gt;&lt;/h3&gt;&lt;p&gt;Count-Min Sketch - вероятностный алгоритм подсчета уникальных элементов, когда этих уникальных элементов большое количество и нет возможности поместить их всех в память. При этом можно посчитать с определенной точностью, например, 95 или 99%.&lt;/p&gt;&#xA;&lt;p&gt;К числу таких задач относятся подсчет количества просмотров видео на youtube, количество уникальных пользователей на сайте, количество обращений по ключу к кешу и многое другое.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Nearest Visit Date Index</title>
+      <link>http://localhost:1313/posts/nvd_index/</link>
+      <pubDate>Sun, 02 Nov 2025 10:00:00 +0400</pubDate>
+      <guid>http://localhost:1313/posts/nvd_index/</guid>
+      <description>&lt;h2 id=&#34;индексирование-даты-ближайщего-приема-в-redis&#34; class=&#34;relative group&#34;&gt;Индексирование даты ближайщего приема в Redis &lt;span class=&#34;absolute top-0 w-6 transition-opacity opacity-0 -start-6 not-prose group-hover:opacity-100&#34;&gt;&lt;a class=&#34;group-hover:text-primary-300 dark:group-hover:text-neutral-700&#34; style=&#34;text-decoration-line: none !important;&#34; href=&#34;#%d0%b8%d0%bd%d0%b4%d0%b5%d0%ba%d1%81%d0%b8%d1%80%d0%be%d0%b2%d0%b0%d0%bd%d0%b8%d0%b5-%d0%b4%d0%b0%d1%82%d1%8b-%d0%b1%d0%bb%d0%b8%d0%b6%d0%b0%d0%b9%d1%89%d0%b5%d0%b3%d0%be-%d0%bf%d1%80%d0%b8%d0%b5%d0%bc%d0%b0-%d0%b2-redis&#34; aria-label=&#34;Anchor&#34;&gt;#&lt;/a&gt;&lt;/span&gt;&lt;/h2&gt;</description>
+    </item>
+  </channel>
+</rss>
