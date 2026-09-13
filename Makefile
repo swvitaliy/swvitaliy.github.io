@@ -7,10 +7,7 @@ build: clean
 	hugo --minify
 
 download-archive: clear-archive
-	wget -O public/archive.zip https://github.com/swvitaliy/old-swvitaliy.github.io/archive/refs/heads/main.zip
-	unzip public/archive.zip -d public
-	mv public/old-swvitaliy.github.io-main public/archive
-	rm public/archive.zip
+	git clone git@github.com:swvitaliy/old-swvitaliy.github.io.git public/archive
 	rm -rf public/archive/.git
 
 clean:

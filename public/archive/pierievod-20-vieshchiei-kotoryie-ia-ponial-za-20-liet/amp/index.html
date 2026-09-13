@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html ⚡>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+    <title>20 вещей, которые я понял за 20 лет, будучи программным инженером</title>
+
+    <link rel="icon" href="../../favicon.png" type="image/png" />
+    <link rel="canonical" href="../index.html" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    
+    <meta property="og:site_name" content="swvitaliy&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="20 вещей, которые я понял за 20 лет, будучи программным инженером" />
+    <meta property="og:description" content="Перевод. Мои советы от того, кто...
+1. почти всегда работал в небольших командах.
+2. ценит больше работающую программу, чем какой-то инструмент.
+3 .постоянно начинает новые проекты, при этом поддерживает несколько существующих.
+4. ценит производительность инженеров выше, чем другие соображения." />
+    <meta property="og:url" content="https://swvitaliy.site/pierievod-20-vieshchiei-kotoryie-ia-ponial-za-20-liet/" />
+    <meta property="og:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta property="article:published_time" content="2021-11-06T23:47:35.000Z" />
+    <meta property="article:modified_time" content="2021-12-06T16:54:35.000Z" />
+    <meta property="article:tag" content="translation" />
+    
+    <meta property="article:publisher" content="https://www.facebook.com/sw.vitaliy" />
+    <meta property="article:author" content="https://www.facebook.com/swvitaly" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="20 вещей, которые я понял за 20 лет, будучи программным инженером" />
+    <meta name="twitter:description" content="Перевод. Мои советы от того, кто...
+1. почти всегда работал в небольших командах.
+2. ценит больше работающую программу, чем какой-то инструмент.
+3 .постоянно начинает новые проекты, при этом поддерживает несколько существующих.
+4. ценит производительность инженеров выше, чем другие соображения." />
+    <meta name="twitter:url" content="https://swvitaliy.site/pierievod-20-vieshchiei-kotoryie-ia-ponial-za-20-liet/" />
+    <meta name="twitter:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="swvitaliy" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="translation" />
+    <meta name="twitter:site" content="@swvitaliy" />
+    <meta name="twitter:creator" content="@swvitaly" />
+    <meta property="og:image:width" content="2709" />
+    <meta property="og:image:height" content="938" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "swvitaliy&#x27;s blog",
+        "url": "https://swvitaliy.site/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "swvitaliy",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "https://swvitaliy.site/author/swvitaly/",
+        "sameAs": [
+            "https://www.facebook.com/swvitaly",
+            "https://twitter.com/swvitaly"
+        ]
+    },
+    "headline": "20 вещей, которые я понял за 20 лет, будучи программным инженером",
+    "url": "https://swvitaliy.site/pierievod-20-vieshchiei-kotoryie-ia-ponial-za-20-liet/",
+    "datePublished": "2021-11-06T23:47:35.000Z",
+    "dateModified": "2021-12-06T16:54:35.000Z",
+    "keywords": "translation",
+    "description": "Перевод. Мои советы от того, кто...\n1. почти всегда работал в небольших командах.\n2. ценит больше работающую программу, чем какой-то инструмент.\n3 .постоянно начинает новые проекты, при этом поддерживает несколько существующих.\n4. ценит производительность инженеров выше, чем другие соображения.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://swvitaliy.site/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 4.1" />
+    <link rel="alternate" type="application/rss+xml" title="swvitaliy&#x27;s blog" href="../../rss/index.html" />
+
+    <style amp-custom>
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        font-size: 62.5%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: #3a4145;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        font-size: 1.7rem;
+        line-height: 1.55em;
+        font-weight: 400;
+        font-style: normal;
+        background: #fff;
+        scroll-behavior: smooth;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    p,
+    ul,
+    ol,
+    li,
+    dl,
+    dd,
+    hr,
+    pre,
+    form,
+    table,
+    video,
+    figure,
+    figcaption,
+    blockquote {
+        margin: 0;
+        padding: 0;
+    }
+
+    ul[class],
+    ol[class] {
+        padding: 0;
+        list-style: none;
+    }
+
+    img {
+        display: block;
+        max-width: 100%;
+    }
+
+    input,
+    button,
+    select,
+    textarea {
+        font: inherit;
+        -webkit-appearance: none;
+    }
+
+    fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    label {
+        display: block;
+        font-size: 0.9em;
+        font-weight: 700;
+    }
+
+    hr {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 1px;
+        border: 0;
+        border-top: 1px solid currentcolor;
+        opacity: 0.1;
+    }
+
+    ::selection {
+        text-shadow: none;
+        background: #cbeafb;
+    }
+
+    mark {
+        background-color: #fdffb6;
+    }
+
+    small {
+        font-size: 80%;
+    }
+
+    sub,
+    sup {
+        position: relative;
+        font-size: 75%;
+        line-height: 0;
+        vertical-align: baseline;
+    }
+    sup {
+        top: -0.5em;
+    }
+    sub {
+        bottom: -0.25em;
+    }
+
+    ul li + li {
+        margin-top: 0.6em;
+    }
+
+    a {
+        color: var(--ghost-accent-color, #1292EE);
+        text-decoration-skip-ink: auto;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0;
+        font-weight: 700;
+        color: #121212;
+        line-height: 1.4em;
+    }
+
+    h1 {
+        font-size: 3.4rem;
+        line-height: 1.1em;
+    }
+
+    h2 {
+        font-size: 2.4rem;
+        line-height: 1.2em;
+    }
+
+    h3 {
+        font-size: 1.8rem;
+    }
+
+    h4 {
+        font-size: 1.7rem;
+    }
+
+    h5 {
+        font-size: 1.6rem;
+    }
+
+    h6 {
+        font-size: 1.6rem;
+    }
+
+    amp-img {
+        height: 100%;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    amp-img img {
+        object-fit: cover;
+    }
+
+    .page-header {
+        padding: 50px 5vmin 30px;
+        text-align: center;
+        font-size: 2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .page-header a {
+        color: #121212;
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.6rem;
+        letter-spacing: -0.1px;
+    }
+
+    .post {
+        max-width: 680px;
+        margin: 0 auto;
+    }
+
+    .post-header {
+        margin: 0 5vmin 5vmin;
+        text-align: center;
+    }
+
+    .post-meta {
+        margin: 1rem 0 0 0;
+        text-transform: uppercase;
+        color: #738a94;
+        font-weight: 500;
+        font-size: 1.3rem;
+    }
+
+    .post-image {
+        margin: 0 0 5vmin;
+    }
+
+    .post-image img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    .post-content {
+        padding: 0 5vmin;
+    }
+
+    .post-content > * + * {
+        margin-top: 1.5em;
+    }
+
+    .post-content [id]:not(:first-child) {
+        margin: 2em 0 0;
+    }
+
+    .post-content > [id] + * {
+        margin-top: 1rem;
+    }
+
+    .post-content [id] + .kg-card,
+    .post-content blockquote + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content > ul,
+    .post-content > ol,
+    .post-content > dl {
+        padding-left: 1.9em;
+    }
+
+    .post-content hr {
+        margin-top: 40px;
+    }
+
+    .post .post-content hr + * {
+        margin-top: 40px;
+    }
+
+    .post-content amp-img {
+        background-color: #f8f8f8;
+    }
+
+    .post-content blockquote {
+        position: relative;
+        font-style: italic;
+    }
+
+    .post-content blockquote::before {
+        content: "";
+        position: absolute;
+        left: -1.5em;
+        top: 0;
+        bottom: 0;
+        width: 0.3rem;
+        background: var(--ghost-accent-color, #1292EE);
+    }
+
+    .post-content :not(.kg-card):not([id]) + .kg-card {
+        margin-top: 40px;
+    }
+
+    .post-content .kg-card + :not(.kg-card) {
+        margin-top: 40px;
+    }
+
+    .kg-card figcaption {
+        padding: 1.5rem 1.5rem 0;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.4em;
+        opacity: 0.6;
+    }
+
+    .kg-card figcaption strong {
+        color: rgba(0,0,0,0.8);
+    }
+
+    .post-content :not(pre) code {
+        vertical-align: middle;
+        padding: 0.15em 0.4em 0.15em;
+        border: #e1eaef 1px solid;
+        font-weight: 400;
+        font-size: 0.9em;
+        line-height: 1em;
+        color: #15171a;
+        background: #f0f6f9;
+        border-radius: 0.25em;
+    }
+
+    .post-content > pre {
+        overflow: scroll;
+        padding: 16px 20px;
+        color: #fff;
+        background: #1F2428;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0,0,0,.1), 0 0 1px rgba(0,0,0,.4);
+    }
+
+    .kg-embed-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .kg-image-card img {
+        margin: auto;
+    }
+
+    .kg-gallery-card + .kg-gallery-card {
+        margin-top: 0.75em;
+    }
+
+    .kg-gallery-container {
+        position: relative;
+    }
+
+    .kg-gallery-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .kg-gallery-image {
+        width: 100%;
+        height: 100%;
+    }
+
+    .kg-gallery-row:not(:first-of-type) {
+        margin: 0.75em 0 0 0;
+    }
+
+    .kg-gallery-image:not(:first-of-type) {
+        margin: 0 0 0 0.75em;
+    }
+
+    .kg-bookmark-card,
+    .kg-bookmark-publisher {
+        position: relative;
+    }
+
+    .kg-bookmark-container,
+    .kg-bookmark-container:hover {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row-reverse;
+        color: currentColor;
+        background: rgba(255,255,255,0.6);
+        font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Open Sans,Helvetica Neue,sans-serif;
+        text-decoration: none;
+        border-radius: 5px;
+        box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.4);
+        overflow: hidden;
+    }
+
+    .kg-bookmark-content {
+        flex-basis: 0;
+        flex-grow: 999;
+        padding: 20px;
+        order: 1;
+    }
+
+    .kg-bookmark-title {
+        font-weight: 600;
+        font-size: 1.5rem;
+        line-height: 1.3em;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        max-height: 45px;
+        margin: 0.5em 0 0 0;
+        font-size: 1.4rem;
+        line-height: 1.55em;
+        overflow: hidden;
+        opacity: 0.8;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .kg-bookmark-metadata {
+        margin-top: 20px;
+    }
+
+    .kg-bookmark-metadata {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1.3rem;
+        line-height: 1.3em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .kg-bookmark-description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-metadata amp-img {
+        width: 18px;
+        height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        margin-right: 10px;
+    }
+
+    .kg-bookmark-thumbnail {
+        display: flex;
+        flex-basis: 20rem;
+        flex-grow: 1;
+        justify-content: flex-end;
+    }
+
+    .kg-bookmark-thumbnail amp-img {
+        max-height: 200px;
+    }
+
+    .kg-bookmark-author {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    .kg-bookmark-publisher::before {
+        content: "•";
+        margin: 0 .5em;
+    }
+
+    .kg-width-full.kg-card-hascaption {
+        display: grid;
+        grid-template-columns: inherit;
+    }
+
+    .post-content table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .post-content th {
+        padding: 0.5em 0.8em;
+        text-align: left;
+        font-size: .75em;
+        text-transform: uppercase;
+    }
+
+    .post-content td {
+        padding: 0.4em 0.7em;
+    }
+
+    .post-content tbody tr:nth-child(2n + 1) {
+        background-color: rgba(0,0,0,0.1);
+        padding: 1px;
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td:last-child {
+        box-shadow:
+            inset 1px 0 rgba(0,0,0,0.1),
+            inset -1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:nth-child(2n + 2) td {
+        box-shadow: inset 1px 0 rgba(0,0,0,0.1);
+    }
+
+    .post-content tbody tr:last-child {
+        border-bottom: 1px solid rgba(0,0,0,.1);
+    }
+
+    .page-footer {
+        padding: 60px 5vmin;
+        margin: 60px auto 0;
+        text-align: center;
+        background-color: #f8f8f8;
+    }
+
+    .page-footer h3 {
+        margin: 0.5rem 0 0 0;
+    }
+
+    .page-footer p {
+        max-width: 500px;
+        margin: 1rem auto 1.5rem;
+        font-size: 1.7rem;
+        line-height: 1.5em;
+        color: rgba(0,0,0,0.6)
+    }
+
+    .powered {
+        display: inline-flex;
+        align-items: center;
+        margin: 30px 0 0;
+        padding: 6px 9px 6px 6px;
+        border: rgba(0,0,0,0.1) 1px solid;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: -0.2px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+        font-weight: 500;
+        color: #222;
+        text-decoration: none;
+        background: #fff;
+        border-radius: 6px;
+    }
+
+    .powered svg {
+        height: 16px;
+        width: 16px;
+        margin: 0 6px 0 0;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            font-size: 1.6rem;
+        }
+        h1 {
+            font-size: 3rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        h1 {
+            font-size: 2.6rem;
+            line-height: 1.15em;
+        }
+        h2 {
+            font-size: 2rem;
+            line-height: 1.2em;
+        }
+        h3 {
+            font-size: 1.7rem;
+        }
+    }
+
+    :root {--ghost-accent-color: #15171A;}
+    </style>
+
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+
+    
+
+</head>
+
+<body class="amp-template">
+    <header class="page-header">
+        <a href="../../index.html">
+                <amp-img class="site-icon" src="https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649.png" width="50" height="50" layout="fixed"></amp-img>
+        </a>
+    </header>
+
+    <main class="content" role="main">
+        <article class="post">
+
+            <header class="post-header">
+                <h1 class="post-title">20 вещей, которые я понял за 20 лет, будучи программным инженером</h1>
+                <section class="post-meta">
+                    swvitaliy -
+                    <time class="post-date" datetime="2021-11-06">06 нояб. 2021</time>
+                </section>
+            </header>
+            <section class="post-content">
+
+                <p>Перевод. Оригинал <a href="https://www.simplethread.com/20-things-ive-learned-in-my-20-years-as-a-software-engineer/?utm_source=pocket_mylist">тут</a>.</p><h2 id="%D0%B2%D0%B0%D0%B6%D0%BD%D0%BE-%D1%81%D0%BD%D0%B0%D1%87%D0%B0%D0%BB%D0%B0-%D0%BF%D1%80%D0%BE%D1%87%D1%82%D0%B8-%D1%8D%D1%82%D0%BE">Важно. Сначала прочти это</h2><p>Вы собираетесь прочитать статью с большим количеством советов. Изучение опыта наших предшественников является важным инструментом для достижения успеха. При этом мы часто упускаем из виду одно важное правило. Почти все советы зависят от контекста, но есть и такие, которые применимы в любом контексте.</p><p>"Тебе надо быть более заряженным" – говорят компании, кто крутится в бизнесе уже 20 лет и тратят годы "заряжаясь понемногу" для привлечения клиентов и для того, чтобы стать успешными.</p><p>"Тебе надо писать все, как микросервисы" – говорят те компании, кто построил быстрый монолит, приобрел тысячи клиентов и, затем, "повернулся" к микросервисам, когда столкнулся с проблемой масштабирования.</p><p>Без понимания контекста советы бессмысленны или даже хуже, вредны. Если бы эти парни последовали своим собственным советам в самом начале, они, скорее всего, пострадали бы от этого. Сложно избежать этой ловушки. Мы можем быть кульминацией наших переживаний, но мы расматриваем их через призму настоящего.</p><p>Поэтому, чтобы дать вам немного контекста откуда мои советы появились, я провел первую часть своей карьеры, работая программным инженером в различных небольших бизнесах и стартатах. Потом я перешел в консалтинг и работал на некоторое количество действительно больших бизнесов. Затем я основал "Single Thread" и мы выросли из команды в 2 человека в команду из 25 человек. 10 лет назад мы работали в основном с небольшими и средними бизнесами. Сейчас же мы имеем дело со смесью больших и малых бизнесов.</p><p>Мои советы от того, кто...</p><ol><li>почти всегда работал в небольших, "стройных" командах, где предстояло многое сделать при ограниченных средствах на достижение этих целей.</li><li>ценит больше работающую программу, чем какой-то специфический инструмент.</li><li>постоянно начинает новые проекты, при этом поддерживает несколько существующих систем</li><li>ценит производительность инженеров выше, чем другие соображения.</li></ol><p>Мой более чем 20 летний опыт сформировал мои взгляды на программы и привел меня к некоторым убеждениям, которые я попытался сократить до вменяемого списка. Надеюсь, вы сочтете его полезным.</p><h3 id="1-%D1%8F-%D0%B2%D1%81%D0%B5-%D0%B5%D1%89%D0%B5-%D0%BD%D0%B5-%D0%B7%D0%BD%D0%B0%D1%8E-%D0%BE%D1%87%D0%B5%D0%BD%D1%8C-%D0%BC%D0%BD%D0%BE%D0%B3%D0%BE%D0%B3%D0%BE">1. Я все еще не знаю очень многого</h3><p>"Как ты можешь не знать, что такое BGP?", "Ты никогда не слышал о Rust?". Большинство из нас слышали слышали что-то  подобное, возможно даже слишком часто. Причина, по которой многим из нас нравится разработка программ, потому, что мы учимся всю жизнь и неважно в каком направлении вы развиваетесь, существуют широкие возможности для получения знаний во всех направлениях и они расширяются день за днем. Это значит, что вы можете потратить десятилетия в вашей карьере м все еще иметь большие пробелы в знаниях по сравнению в тем, кто так же десятилетиями был на, казалось бы, такой же позиции. Чем скорее вы это поймете, тем скорее вы начнете избавляться от синдрома самозванца и вместо этого получать удовольствие от того, чтобы учиться самому и учить других.</p><h3 id="2-%D1%81%D0%B0%D0%BC%D0%BE%D0%B5-%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D0%B5-%D0%B2-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%BA%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC-%E2%80%93-%D1%8D%D1%82%D0%BE-%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BF%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D1%8C%D0%BD%D1%8B%D1%85-%D0%B2%D0%B5%D1%89%D0%B5%D0%B9">2. Самое сложное в разработке программ – это создание правильных вещей</h3><p>Я знаю, что это клише на данный момент, но причина по которой большинство программных инженеров не верят в это является то, что они думают это обесценит их работу. Лично я думаю, что это нонсэнс. Вы можете разработать самую технически впечатляющую вещь в мире, а потом никто не сможет в ней работать. Такое случается постоянно. Разработка программного обеспечения – это в основном слушание. Нам часто приходится быть не столько программными инженерами, сколько психологами и антропологами. Вложение в процесс дизайна, либо с помощью членов команды UX, либо обучаясь самостоятельно, принесет огромные дивиденты. Потому что, как правильно вычислить стоимость неправильно спроектированной программы? Она стоит больше, чем время, потраченное инженером на ее разработку.</p><h3 id="3-%D0%BB%D1%83%D1%87%D1%88%D0%B8%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%BD%D1%8B%D0%B5-%D0%B8%D0%BD%D0%B6%D0%B5%D0%BD%D0%B5%D1%80%D1%8B-%D0%B4%D1%83%D0%BC%D0%B0%D1%8E%D1%82-%D0%BA%D0%B0%D0%BA-%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D0%B5%D1%80%D1%8B">3. Лучшие программные инженеры думают как дизайнеры</h3><p>Лучшие программные инженеры думают глубже об опыте пользователя, чем о программном коде. Они могут думать об этом не в таких терминах, но будь то внешне API, программное API, интерфейс пользователя, протокол или любой другой интерфейс – они учитывают, кто будет использовать его и почему они будут его использовать и что важно для этих людей. Держать в уме потребности пользователей – это основа для хорошего пользовательского интерфейса.</p><h3 id="4-%D0%BB%D1%83%D1%87%D1%88%D0%B8%D0%B9-%D0%BA%D0%BE%D0%B4-%E2%80%93-%D1%8D%D1%82%D0%BE-%D0%BE%D1%82%D1%81%D1%83%D1%82%D1%81%D1%82%D0%B2%D0%B8%D0%B5-%D0%BA%D0%BE%D0%B4%D0%B0-%D0%B8%D0%BB%D0%B8-%D0%BA%D0%BE%D0%B4-%D0%BA%D0%BE%D1%82%D0%BE%D1%80%D1%8B%D0%B9-%D0%B2%D0%B0%D0%BC-%D0%BD%D0%B5-%D0%BD%D1%83%D0%B6%D0%BD%D0%BE-%D0%BF%D0%BE%D0%B4%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D0%B2%D0%B0%D1%82%D1%8C">4. Лучший код – это отсутствие кода или код, который вам не нужно поддерживать</h3><p>Все, что я хочу сказать, так это то, что "кодеры будут кодить". Точно так же вы можете спросить кого-то в любой другой профессии как решить ту или иную проблему и он будет ошибаться в том, в чем он хорош. Это человеческая натура. Большинсво программистов всегда ошибаются при написании кода, особенно когда нетехническое решение неочевидно. Инженерные команды склонны изобретать колесо, когда уже есть много колес. Это вопрос баланса. Есть много причин сделать свое решение, но остерегайтесь "Не Изобретай Тут" синдрома.</p><h3 id="5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B-%E2%80%93-%D1%8D%D1%82%D0%BE-%D1%81%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B2%D0%BE-%D0%B4%D0%BB%D1%8F-%D0%B4%D0%BE%D1%81%D1%82%D0%B8%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D1%86%D0%B5%D0%BB%D0%B8">5. Программы – это средство для достижения цели</h3><p>Основная работа программного инженера – это создание ценности. Очень мало программистов понимают это. Еще меньше людей усваивает это. Действительное понимание этого принципа ведет к другому способу решения задач и другому взгляду на твои инструменты. Если ты действительно веришь, что программы подчинены результату, ты будешь готов найти "правильный инструмент для работы", который может быть и вовсе даже не программой.</p><h3 id="6-%D0%B8%D0%BD%D0%BE%D0%B3%D0%B4%D0%B0-%D0%B2%D0%B0%D0%BC-%D0%BD%D1%83%D0%B6%D0%BD%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D1%81%D1%82%D0%B0%D1%82%D1%8C-%D0%B7%D0%B0%D1%82%D0%B0%D1%87%D0%B8%D0%B2%D0%B0%D1%82%D1%8C-%D0%BF%D0%B8%D0%BB%D1%83-%D0%B8-%D0%BD%D0%B0%D1%87%D0%B0%D1%82%D1%8C-%D0%BF%D0%B8%D0%BB%D0%B8%D1%82%D1%8C">6. Иногда вам нужно перестать затачивать пилу и начать пилить</h3><p>Некоторые люди склонны погружаться в проблему и просто начать писать код. Другие склонны исследовать и исследовать и попадают в "аналитический паралич". В этих случаях установите себе дедлайны и просто начните изучение решений. Вы быстро узнаете больше, когда начнете решать проблему и это приведет вас к лучшему решению.</p><h3 id="7-%D0%B5%D1%81%D0%BB%D0%B8-%D1%83-%D0%B2%D0%B0%D1%81-%D0%BD%D0%B5%D1%82-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D0%B5%D0%B3%D0%BE-%D0%BF%D1%80%D0%B5%D0%B4%D1%81%D1%82%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BC%D0%B8%D1%80%D0%B5-%D0%B2%D1%8B-%D0%BD%D0%B5-%D1%81%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5-%D1%80%D0%B0%D0%B7%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D0%B0%D1%82%D1%8C-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D1%83%D1%8E-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D1%83">7. Если у вас нет хорошего представления о мире, вы не сможете разработать хорошую систему</h3><p>Это то, с чем я борюсь – с тем, что мои обязанности уводят меня все дальше день за днем от разработки. Держать работающей экосистему разработки – это большой объем работы и важно понимать, что в ней доступно. Если вы не понимаете, что возможно и что доступно в данной экосистеме, то вы обнаружите, что невозможно разработать разумное решение всех проблем, кроме самых простых. Будьте осторожны с людьми, разрабатывающими системы, которые долгое время не писали никакого кода.</p><h3 id="8-%D0%BA%D0%B0%D0%B6%D0%B4%D0%B0%D1%8F-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0-%D0%B2-%D0%BA%D0%BE%D0%BD%D1%86%D0%B5-%D0%BA%D0%BE%D0%BD%D1%86%D0%BE%D0%B2-%D0%B4%D0%B5%D1%80%D1%8C%D0%BC%D0%BE-%D0%B6%D0%B8%D0%B2%D0%B8-%D1%81-%D1%8D%D1%82%D0%B8%D0%BC">8. Каждая система в конце концов дерьмо, живи с этим</h3><p>У Бьярне Страуструпа есть цитата, которая гласит "Есть только два вида языков: те, на которые люди жалуются, и те, которыми никто не пользуется". Это может быть расширено для больших систем в целом. Нет "правильной" арзитектуры, ты никогда не выплатишься все технические долги, ты никогда не сделаешь совершенный интерфейс, ваши тесты всегда будут слишком медленными. Это не оправдание для того, чтобы никогда не делать вещи лучше, но вместо этого способ дать вам перспективу. Меньше беспокойтесь об элегантности и совершенстве; вместо этого стремитесь к постоянному совершенствованию и созданию пригодной для жизни системы, в которой вашей команде нравится работать и которая стабильно приносит пользу.</p><h3 id="9-%D0%B7%D1%80%D0%B8-%D0%B2-%D0%BA%D0%BE%D1%80%D0%B5%D0%BD%D1%8C">9. "Зри в корень"</h3><p>Всегда подвергайте сомнению подход "так делалось всегда". Есть новый член команды? Обратите внимание на то, где он путается и какие вопросы задает. Есть новая фича, которая не имеет смысла? Убедитесь, что вы понимаете цели и что движет желанием иметь этот функционал. Если вы не достаточно ясно понимаете ответ, продолжайте искать, пока не проясните полностью ситуацию.</p><h3 id="10-%D0%B2%D1%8B-%D0%B4%D0%BE%D0%BB%D0%B6%D0%BD%D1%8B-%D0%B1%D1%8B%D1%82%D1%8C-%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%B5-%D1%81%D1%84%D0%BE%D0%BA%D1%83%D1%81%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D1%8B-%D0%BD%D0%B0-%D0%B8%D0%B7%D0%B1%D0%B5%D0%B3%D0%B0%D0%BD%D0%B8%D0%B8-01x-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82%D0%BE%D0%B2-%D1%87%D0%B5%D0%BC-%D0%BD%D0%B0-%D0%BF%D0%BE%D0%B8%D1%81%D0%BA%D0%B5-10x">10. Вы должны быть больше сфокусированы на избегании 0.1x программистов, чем на поиске 10x</h3><p>10x программисты – это глупый миф. Идея, что кто-то может за один день сделать столько, сколько другой программист, такой же усердный, компетентный и с аналогичным опытом сделает за 2 глупа. Я видел программистов, которые писали в 10 раз больше кода и в 10 раз дольше исправляли ошибки. Единственный способ быть 10x программистом если тебя сравнивают с 0.1x программистом. С тем, кто тратит время, не спрашивает фидбек, не тестит свой код, не проверяет граничные случаи и прочее... Мы должны быть значительно встревожены избегать 0.1x программистов в нашей команде, чем искать мифических 10x программистов.</p><h3 id="11-%D0%BE%D0%B4%D0%BD%D0%BE-%D0%B8%D0%B7-%D0%B7%D0%BD%D0%B0%D1%87%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85-%D0%BE%D1%82%D0%BB%D0%B8%D1%87%D0%B8%D0%B9-%D0%BC%D0%B5%D0%B6%D0%B4%D1%83-%D1%81%D0%B5%D1%80%D0%B8%D0%BE%D1%80%D0%BE%D0%BC-%D0%B8-%D0%B4%D0%B6%D1%83%D0%BD%D0%BE%D0%BC-%D1%81%D0%BE%D1%81%D1%82%D0%BE%D0%B8%D1%82-%D0%B2-%D1%82%D0%BE%D0%BC-%D1%87%D1%82%D0%BE-%D1%83-%D1%81%D0%B5%D0%BD%D0%B8%D0%BE%D1%80%D0%B0-%D0%B5%D1%81%D1%82%D1%8C-%D1%81%D1%84%D0%BE%D1%80%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%BD%D0%BE%D0%B5-%D0%BC%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BE-%D1%82%D0%BE%D0%BC-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D0%B5-%D0%B4%D0%BE%D0%BB%D0%B6%D0%BD%D0%BE-%D0%B1%D1%8B%D1%82%D1%8C">11. Одно из значительных отличий между сериором и джуном состоит в том, что у сениора есть сформированное мнение о том, как все должно быть</h3><p>Ничего меня так не напрягает, как сениор, который не имеет мнения о своих инструментах или о том, как сделать программу. Я бы предпочел, чтобы кто-либо высказал мне свое мне, с которым я категорически не согласен, чем с тем, что кто-то не имеет своего мнения вовсе. Если ты используешь свои инструменты, и ты не любишь или ненавидишь их тебе нужно практиковаться больше. Тебе нужно изучать другие языки, библиотеки и парадигмы. Есть множество способов увеличить свой скил быстрее, чем активно искать, как другие решают задачи с помощью других инструментов и техник, отличных от ваших.</p><h3 id="12-%D0%BB%D1%8E%D0%B4%D0%B8-%D0%B2-%D0%B4%D0%B5%D0%B9%D1%81%D1%82%D0%B2%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D1%81%D1%82%D0%B8-%D0%BD%D0%B5-%D0%BE%D1%87%D0%B5%D0%BD%D1%8C-%D1%85%D0%BE%D1%82%D1%8F%D1%82-%D0%B8%D0%BD%D0%BD%D0%BE%D0%B2%D0%B0%D1%86%D0%B8%D0%B9">12. Люди в действительности не очень хотят инноваций</h3><p>Люди много говорят об инновациях, но что они обычно ищут, так это дешевые победы и новизна. Если ты действительно инновационен и изменяешь способы людей делать вещи, готовься к негативному фидбеку. Если ты веришь в то, что ты делаешь и это действительно улучшает вещи, тогда готовься к затяжной битве.</p><h3 id="13-%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5-%E2%80%93-%D1%8D%D1%82%D0%BE-%D1%81%D0%B0%D0%BC%D0%B0%D1%8F-%D0%B2%D0%B0%D0%B6%D0%BD%D0%B0%D1%8F-%D1%87%D0%B0%D1%81%D1%82%D1%8C-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D1%8B">13. Данные – это самая важная часть системы</h3><p>Я видел много систем, в которых ставка делалась на основной механизм целостности данных. В таких системах, все, что случалось вне "золотого пути" создавало частичные и грязные данные. Работа с этими данными в будущем может стать кошмаром. Просто помни, что данные вероятно проживут дольше, чем твой код. Тратьте энергию на поддержание порядка и чистоты – это хорошо окупится в будущем.</p><h3 id="14-%D0%B8%D1%89%D0%B8%D1%82%D0%B5-%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85-%D0%B0%D0%BA%D1%83%D0%BB">14. Ищите технологических акул</h3><p>Старые технологии, которые нас окружают – это акулы, ане динозавры. Они решают задачи настолько хорошо, что они выжили в условиях постоянных изменений в технологическом мире.  Не ставьте против этих тезнологий и меняйте их только по весомым причинам. Эти инструменты не будут бросаться в глаза и не будут будоражить общественность, но при этом они будут работать хорошо и без множества бессонных ночей для вас.</p><h3 id="15-%D0%BD%D0%B5-%D0%BF%D1%80%D0%B8%D0%BD%D0%B8%D0%BC%D0%B0%D0%B9%D1%82%D0%B5-%D1%81%D0%BC%D0%B8%D1%80%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0-%D0%BD%D0%B5%D0%B2%D0%B5%D0%B6%D0%B5%D1%81%D1%82%D0%B2%D0%BE">15. Не принимайте смирение за невежество</h3><p>Есть множество программистов, кто не будет высказывать свое мнение, кога его не спросят. Никогда не думайте, что только потому, что кто-то не бросает вам в лицо свое мнение, ему нечего добавить. Иногда самые шумные люди - это те, кого мы меньше всего хотим слушать. Поговорите с окружающими вас людьми, поинтересуйтесь их отзывами и советами. Ты будешь рад, что сделал это.</p><h3 id="16-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82%D1%8B-%D0%B4%D0%BE%D0%BB%D0%B6%D0%BD%D1%8B-%D0%BF%D0%B8%D1%81%D0%B0%D1%82%D1%8C-%D0%BF%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%BD%D0%BE">16. Программисты должны писать постоянно</h3><p>Инженеры-программисты должны регулярно вести блоги, вести дневники, писать документацию и вообще делать все, что требует от них отточенных навыков письменной коммуникации. Написание помогает вам думать о своих проблемах и помогает вам более эффективно общаться с вашей командой и самим собой в будущем. Хорошая письменная коммуникация - один из важнейших навыков, которым должен овладеть любой инженер-программист.</p><h3 id="17-%D0%B4%D0%B5%D1%80%D0%B6%D0%B8%D1%82%D0%B5-%D0%B2%D0%B0%D1%88%D0%B8-%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D1%8B-%D0%BD%D0%B0%D1%81%D1%82%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE-%D0%BB%D0%B5%D0%B3%D0%BA%D0%BE%D0%B2%D0%B5%D1%81%D0%BD%D1%8B%D0%BC%D0%B8-%D0%BD%D0%B0%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE-%D1%8D%D1%82%D0%BE-%D0%B2%D0%BE%D0%B7%D0%BC%D0%BE%D0%B6%D0%BD%D0%BE">17.  Держите ваши процессы настолько легковесными, насколько это возможно</h3><p>В наши дни все хотят быть гибкими, но быть “гибкими” – значит создавать вещи небольшими порциями, учиться, а затем повторять. Если кто-то пытается вложить в процесс гораздо больше, чем это, то он, вероятно, что-то продает. Это не значит, что людям не нужна ответственность или помощь, чтобы работать таким образом, но сколько раз вы слышали, как кто-то из вашей любимой технологической компании или крупного проекта с открытым исходным кодом хвастался тем, насколько велик их процесс Scrum? Продолжайте полагаться на процесс, пока не поймете, что вам нужно больше. Доверяйте своей команде, и они справятся.</p><h3 id="18-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%81%D1%82%D1%8B-%D0%BA%D0%B0%D0%BA-%D0%B8-%D0%B2%D1%81%D0%B5-%D0%BB%D1%8E%D0%B4%D0%B8-%D0%B4%D0%BE%D0%BB%D0%B6%D0%BD%D1%8B-%D1%87%D1%83%D0%B2%D1%81%D1%82%D0%B2%D0%BE%D0%B2%D0%B0%D1%82%D1%8C-%D1%81%D0%B5%D0%B1%D1%8F-%D1%81%D0%BE%D1%83%D1%87%D0%B0%D1%81%D1%82%D0%BD%D1%8B%D0%BC%D0%B8">18. Программисты, как и все люди, должны чувствовать себя соучастными</h3><p>Если вы оторвете кого-то от результатов его работы, он будет меньше заботиться о своей работе. Воспринимайте это почти как тавтологию. Это основная причина, по которой межфункциональные команды работают так хорошо, и почему DevOps стал таким популярным. Речь идет не только о передаче полномочий и неэффективности, речь идет о том, чтобы владеть всем процессом от начала до конца и нести прямую ответственность за обеспечение ценности. Дайте группе увлеченных людей полную ответственность за разработку, создание и доставку программного обеспечения (или чего-либо действительно), и произойдут удивительные вещи.</p><h3 id="19-%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B2%D1%8C%D1%8E-%D0%BF%D0%BE%D1%87%D1%82%D0%B8-%D0%B1%D0%B5%D1%81%D0%BF%D0%BE%D0%BB%D0%B5%D0%B7%D0%BD%D1%8B-%D0%B4%D0%BB%D1%8F-%D1%82%D0%BE%D0%B3%D0%BE-%D1%87%D1%82%D0%BE%D0%B1%D1%8B-%D1%80%D0%B0%D1%81%D1%81%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C-%D0%BD%D0%B0%D1%81%D0%BA%D0%BE%D0%BB%D1%8C%D0%BA%D0%BE-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D0%B8%D0%BC-%D1%87%D0%BB%D0%B5%D0%BD%D0%BE%D0%BC-%D0%BA%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D1%8B-%D0%BA%D1%82%D0%BE-%D1%82%D0%BE-%D0%B1%D1%83%D0%B4%D0%B5%D1%82">19. Интервью почти бесполезны для того, чтобы рассказать, насколько хорошим членом команды кто-то будет</h3><p>Интервью значительно лучше потратить на понимание кто есть кто и насколько претенденту интересна область знаний, в которой ему предстоит работать. Пытаться понять, насколько хорошим членом команды он будет на интервью – это бесполезное занятие. Никто не собирается говорить вам в интервью, что они будут ненадежными, оскорбительными, напыщенными или никогда не придут на встречи вовремя. Люди могут утверждать, что у них есть “сигналы” для этих вещей... "Если они спросят об отпуске на первом собеседовании, то их там никогда не будет!" Но это все ерунда. Если вы используете сигналы подобно этим, то вы просто гадаете и упустите хорошего кандидата.</p><h3 id="20-%D0%B2%D1%81%D0%B5%D0%B3%D0%B4%D0%B0-%D0%B1%D0%BE%D1%80%D0%B8%D1%82%D0%B5%D1%81%D1%8C-%D0%B7%D0%B0-%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BC%D0%B5%D0%BD%D1%8C%D1%88%D0%B8%D1%85-%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC">20. Всегда боритесь за создание меньших систем</h3><p>Есть много сил, которые будут вас подталкивать на создание больших систем "про запас". Распределение бюджета, неспособность решить, какие функции следует сократить, желание предоставить “лучшую версию” системы. Все эти вещи очень сильно подталкивают нас к созданию слишком многого. Ты должен бороться с этим. Вы узнаете так много, создавая систему, что в конечном итоге создадите гораздо лучшую систему, чем вы когда-либо могли создать в первую очередь. Это удивительно трудно объяснить большинству людей.</p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p><p></p>
+
+            </section>
+
+        </article>
+    </main>
+    <footer class="page-footer">
+            <amp-img class="site-icon" src="https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649.png" width="50" height="50" layout="fixed"></amp-img>
+        <h3>swvitaliy&#x27;s blog</h3>
+            <p>Заметки о программировании</p>
+        <p><a href="../../index.html">Read more posts →</a></p>
+        <a class="powered" href="https://ghost.org" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 156"><g fill="none" fill-rule="evenodd"><rect fill="#15212B" width="156" height="156" rx="27"/><g transform="translate(36 36)" fill="#F6F8FA"><path d="M0 71.007A4.004 4.004 0 014 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0130 84H4a4 4 0 01-4-4.007v-8.986zM50 71.007A4.004 4.004 0 0154 67h26a4 4 0 014 4.007v8.986A4.004 4.004 0 0180 84H54a4 4 0 01-4-4.007v-8.986z"/><rect y="34" width="84" height="17" rx="4"/><path d="M0 4.007A4.007 4.007 0 014.007 0h41.986A4.003 4.003 0 0150 4.007v8.986A4.007 4.007 0 0145.993 17H4.007A4.003 4.003 0 010 12.993V4.007z"/><rect x="67" width="17" height="17" rx="4"/></g></g></svg> Published with Ghost</a>
+    </footer>
+    
+</body>
+</html>
