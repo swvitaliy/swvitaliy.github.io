@@ -1,0 +1,1739 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Roaring под AVX-512</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root {
+  --ground: #eef1f4;
+  --surface: #ffffff;
+  --surface-sunk: #e3e8ed;
+  --ink: #14181d;
+  --ink-soft: #3c4550;
+  --muted: #626d7b;
+  --line: #d2d9e0;
+  --line-strong: #b4bfca;
+  --accent: #0d6b7d;
+  --accent-soft: #d9ecef;
+  --gain: #2c6e4b;
+  --cost: #9b5a12;
+  --paper: #ffffff;
+  --shadow: 0 1px 2px rgba(20, 24, 29, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0f1216;
+    --surface: #171b21;
+    --surface-sunk: #10141a;
+    --ink: #e7ecf2;
+    --ink-soft: #bcc5d0;
+    --muted: #8b96a3;
+    --line: #262d36;
+    --line-strong: #38414c;
+    --accent: #4fb3c6;
+    --accent-soft: #10333a;
+    --gain: #6ec394;
+    --cost: #d9a05c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0f1216;
+  --surface: #171b21;
+  --surface-sunk: #10141a;
+  --ink: #e7ecf2;
+  --ink-soft: #bcc5d0;
+  --muted: #8b96a3;
+  --line: #262d36;
+  --line-strong: #38414c;
+  --accent: #4fb3c6;
+  --accent-soft: #10333a;
+  --gain: #6ec394;
+  --cost: #d9a05c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sheet {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: 20px;
+  padding-block: 48px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* ---- masthead ---- */
+.masthead { display: flex; flex-direction: column; gap: 20px; }
+.eyebrow {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0;
+}
+h1 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(30px, 5vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -.015em;
+  margin: 0;
+  text-wrap: balance;
+}
+.standfirst {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+
+.runmeta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.runmeta div { background: var(--surface); padding: 12px 14px; }
+.runmeta dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 3px;
+}
+.runmeta dd {
+  margin: 0;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---- findings ---- */
+h2 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: -.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+.section-intro { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+
+.findings { display: flex; flex-direction: column; gap: 0; margin-top: 24px; }
+.finding {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+.finding:last-child { border-bottom: 1px solid var(--line); }
+.finding .metric {
+  font-family: "IBM Plex Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+.finding .metric.gain { color: var(--gain); }
+.finding .metric.cost { color: var(--cost); }
+.finding .metric small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.finding h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.finding p { margin: 0; color: var(--ink-soft); max-width: 68ch; }
+code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: .88em;
+  background: var(--surface-sunk);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+/* ---- chart grid ---- */
+.plots { display: flex; flex-direction: column; gap: 32px; }
+.op { display: flex; flex-direction: column; gap: 14px; }
+.op-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--line-strong);
+}
+.op-head h3 {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -.01em;
+}
+.op-head p { margin: 0; color: var(--muted); font-size: 14px; }
+.op-note { margin: 0; color: var(--ink-soft); font-size: 14px; max-width: 76ch; }
+.op-note b { font-weight: 600; color: var(--ink); }
+.op-note.measure { color: var(--muted); }
+
+/* ---- prose ---- */
+.prose { display: flex; flex-direction: column; gap: 10px; max-width: 72ch; margin-top: 20px; }
+.prose h3 {
+  font-family: "IBM Plex Serif", Georgia, serif;
+  font-weight: 600;
+  font-size: 19px;
+  margin: 22px 0 2px;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+.prose h3:first-child { margin-top: 0; }
+.prose p { margin: 0; color: var(--ink-soft); }
+.prose strong { color: var(--ink); font-weight: 600; }
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+figure {
+  margin: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+figure img { display: block; width: 100%; height: auto; }
+figcaption {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: #5a6472;
+  border-top: 1px solid #e6eaee;
+  padding: 7px 10px;
+}
+
+
+@media (max-width: 560px) {
+  .finding { grid-template-columns: 1fr; gap: 8px; }
+  .finding .metric { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <header class="masthead">
+    <p class="eyebrow">goalgo / roaring_bitmaps</p>
+    <h1>Roaring под AVX-512</h1>
+    <p class="standfirst">
+      Один Roaring bitmap на SIMD-примитивах, каждый замер — с <code>RunOptimize</code> и без.
+      Разница между столбиками — цена и выигрыш каждой оптимизации.
+    </p>
+    <dl class="runmeta">
+      <div><dt>CPU</dt><dd>Ryzen AI 9 HX PRO 370</dd></div>
+      <div><dt>Векторы</dt><dd>512 бит, AVX-512</dd></div>
+      <div><dt>Go</dt><dd>1.27.0, GOEXPERIMENT=simd</dd></div>
+      <div><dt>Данных</dt><dd>200 000 значений на датасет</dd></div>
+      <div><dt>Прогон</dt><dd>benchtime=200ms, count=10</dd></div>
+      <div><dt>Статистика</dt><dd>benchstat, медиана и CI 95%</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>Варианты и датасеты</h2>
+    <div class="findings">
+      <div class="finding">
+        <div class="metric">off</div>
+        <div><h3>Без RunOptimize</h3><p>Только массивы и битмапы. Базовая линия.</p></div>
+      </div>
+      <div class="finding">
+        <div class="metric">on</div>
+        <div><h3>С RunOptimize</h3><p>Серии значений схлопнуты в интервалы. Тот же код, одним вызовом больше. Сериализация и Rank/Select сравниваются со своими альтернативами.</p></div>
+      </div>
+    </div>
+    <div class="findings" style="margin-top:0;border-top:0">
+      <div class="finding">
+        <div class="metric" style="font-size:18px">sparse</div>
+        <div><p>200k случайных значений на 2³¹. Все контейнеры — крошечные массивы. Доминируют накладные расходы на контейнер.</p></div>
+      </div>
+      <div class="finding">
+        <div class="metric" style="font-size:18px">runs</div>
+        <div><p>Серии по 512 значений с разрывами. Без <code>RunOptimize</code> — битмапы, с ним — интервалы. Данные, ради которых сделаны run-контейнеры.</p></div>
+      </div>
+      <div class="finding">
+        <div class="metric" style="font-size:18px">zipf</div>
+        <div><p>Плотная голова, редкий хвост. Все три вида контейнеров в одном битмапе. Ближе всего к реальным данным.</p></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Операции</h2>
+    <p class="section-intro">
+      Один график на пару «операция × датасет»: между датасетами порядки величины. Ось X — вызывался ли <code>RunOptimize</code>.
+    </p>
+    <div class="plots">
+      <section class="op" id="contains">
+        <div class="op-head">
+          <h3>Contains</h3>
+          <p>точечная проверка принадлежности</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает проверка, есть ли одно значение в наборе.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Contains — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="154.87" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, sparse</text>
+<text x="87.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="69.486" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="44.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">50 ns</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 ns</text>
+<path d="M63.508,26.814L71.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,96.746L71.508,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,166.68L71.508,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,40.801L71.508,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,54.787L71.508,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,68.773L71.508,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,82.759L71.508,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,110.73L71.508,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,124.72L71.508,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,138.7L71.508,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,152.69L71.508,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M71.508,26.814L71.508,166.81" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.997,26.814L77.997,166.81L108,166.81L108,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.997,26.814L77.997,26.814L108,26.814L108,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,165.25L369.2,165.25L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Contains — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="159.53" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, runs</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-65.88" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ns</text>
+<text x="34.616" y="-109.67" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ns</text>
+<text x="34.616" y="-153.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">15 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,70.602L66.508,70.602" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,114.39L66.508,114.39" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,158.18L66.508,158.18" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,35.572L66.508,35.572" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,44.329L66.508,44.329" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,53.087L66.508,53.087" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,61.844L66.508,61.844" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,79.359L66.508,79.359" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,88.117L66.508,88.117" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,96.874L66.508,96.874" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,105.63L66.508,105.63" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,123.15L66.508,123.15" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,131.9L66.508,131.9" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,140.66L66.508,140.66" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,149.42L66.508,149.42" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,166.93L66.508,166.93" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.997,26.814L72.997,77.674L103,77.674L103,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M72.997,26.814L72.997,26.814L103,26.814L103,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Contains — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="160.54" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Contains, zipf</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-89.963" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">40 ns</text>
+<text x="34.616" y="-157.83" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">80 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,94.685L66.508,94.685" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,162.56L66.508,162.56" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,43.782L66.508,43.782" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,60.75L66.508,60.75" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,77.717L66.508,77.717" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,111.65L66.508,111.65" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,128.62L66.508,128.62" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,145.59L66.508,145.59" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.997,26.814L72.997,171.58L103,171.58L103,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M72.997,26.814L72.997,26.814L103,26.814L103,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,167.29L369.2,167.29L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Contains — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="and">
+        <div class="op-head">
+          <h3>And</h3>
+          <p>пересечение</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает построение пересечения двух наборов.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="And — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="165.87" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, sparse</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-82.555" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<text x="34.616" y="-143.02" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,87.277L64.286,87.277" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,147.74L64.286,147.74" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,57.046L64.286,57.046" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,117.51L64.286,117.51" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,157.93L369.2,157.93L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="And — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="170.53" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, runs</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-83.217" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 µs</text>
+<text x="34.616" y="-144.34" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">20 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,87.939L67.269,87.939" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,149.06L67.269,149.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,39.039L67.269,39.039" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,51.264L67.269,51.264" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,63.489L67.269,63.489" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,75.714L67.269,75.714" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,100.16L67.269,100.16" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,112.39L67.269,112.39" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,124.61L67.269,124.61" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,136.84L67.269,136.84" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,161.29L67.269,161.29" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,36.114L369.2,36.114L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="And — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="171.54" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">And, zipf</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-80.477" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">300 µs</text>
+<text x="34.616" y="-138.86" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">600 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,85.199L72.269,85.199" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,143.58L72.269,143.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,46.276L72.269,46.276" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,65.738L72.269,65.738" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,104.66L72.269,104.66" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.12L72.269,124.12" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,163.05L72.269,163.05" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,171.58L108.76,171.58L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,165.43L369.2,165.43L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>And — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="or">
+        <div class="op-head">
+          <h3>Or</h3>
+          <p>объединение</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает построение объединения двух наборов.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Or — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="170.12" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, sparse</text>
+<text x="87.536" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="44.894" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-85.377" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2.5 ms</text>
+<text x="42.116" y="-148.66" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ms</text>
+<path d="M63.786,26.814L71.786,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.786,90.099L71.786,90.099" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.786,153.38L71.786,153.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,39.471L71.786,39.471" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,52.128L71.786,52.128" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,64.785L71.786,64.785" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,77.442L71.786,77.442" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,102.76L71.786,102.76" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,115.41L71.786,115.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,128.07L71.786,128.07" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,140.73L71.786,140.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.786,166.04L71.786,166.04" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M71.786,26.814L71.786,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.276,26.814L78.276,171.58L108.28,171.58L108.28,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.276,26.814L78.276,26.814L108.28,26.814L108.28,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,162.72L369.2,162.72L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Or — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="174.78" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, runs</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-62.875" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 µs</text>
+<text x="39.616" y="-103.66" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 µs</text>
+<text x="34.616" y="-144.44" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">12 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,67.597L67.269,67.597" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,108.38L67.269,108.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,149.16L67.269,149.16" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,37.01L67.269,37.01" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,47.206L67.269,47.206" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,57.401L67.269,57.401" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,77.792L67.269,77.792" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,87.988L67.269,87.988" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,98.183L67.269,98.183" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,118.57L67.269,118.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,128.77L67.269,128.77" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,138.97L67.269,138.97" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,159.36L67.269,159.36" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,169.55L67.269,169.55" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,51.132L369.2,51.132L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Or — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="175.78" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Or, zipf</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="70.367" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1 ms</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,96.746L64.286,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,166.68L64.286,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,40.801L64.286,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,54.787L64.286,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,68.773L64.286,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,82.759L64.286,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,110.73L64.286,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,124.72L64.286,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,138.7L64.286,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,152.69L64.286,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,168.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,160.27L100.78,160.27L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,168.57L369.2,168.57L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Or — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="andnot">
+        <div class="op-head">
+          <h3>AndNot</h3>
+          <p>разность</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает построение разности двух наборов.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="AndNot — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="156.87" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, sparse</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-86.6" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
+<text x="34.616" y="-151.11" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,91.322L64.286,91.322" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,155.83L64.286,155.83" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,48.317L64.286,48.317" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,69.819L64.286,69.819" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,112.82L64.286,112.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,134.33L64.286,134.33" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,160.59L369.2,160.59L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndNot — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="161.53" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, runs</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-82.363" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 µs</text>
+<text x="34.616" y="-142.63" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">12 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,87.084L67.269,87.084" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,147.35L67.269,147.35" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,56.949L67.269,56.949" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,117.22L67.269,117.22" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,45.803L369.2,45.803L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="AndNot — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="162.54" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">AndNot, zipf</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-88.094" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">900 µs</text>
+<text x="35.099" y="-154.09" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.8 ms</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,92.815L72.269,92.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,158.82L72.269,158.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,59.815L72.269,59.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,125.82L72.269,125.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,154.62L108.76,154.62L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>AndNot — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="xor">
+        <div class="op-head">
+          <h3>Xor</h3>
+          <p>симметрическая разность</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает построение симметрической разности двух наборов.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Xor — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="167.12" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, sparse</text>
+<text x="80.036" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="37.394" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-82.761" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">3 ms</text>
+<text x="34.616" y="-143.43" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 ms</text>
+<path d="M56.286,26.814L64.286,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,87.483L64.286,87.483" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M56.286,148.15L64.286,148.15" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,47.037L64.286,47.037" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,67.26L64.286,67.26" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,107.71L64.286,107.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,127.93L64.286,127.93" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M60.286,168.37L64.286,168.37" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.286,26.814L64.286,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M70.776,26.814L70.776,171.58L100.78,171.58L100.78,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M70.776,26.814L70.776,26.814L100.78,26.814L100.78,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,170.3L369.2,170.3L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Xor — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="171.78" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, runs</text>
+<text x="83.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="40.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-81.339" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">6 µs</text>
+<text x="34.616" y="-140.59" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">12 µs</text>
+<path d="M59.269,26.814L67.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,86.061L67.269,86.061" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M59.269,145.31L67.269,145.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,56.438L67.269,56.438" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.269,115.68L67.269,115.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.269,26.814L67.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M73.759,26.814L73.759,171.58L103.76,171.58L103.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M73.759,26.814L73.759,26.814L103.76,26.814L103.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,80.597L369.2,80.597L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Xor — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="172.78" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Xor, zipf</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">off</text>
+<text x="349.2" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">on</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-83.487" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">800 µs</text>
+<text x="35.099" y="-144.88" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.6 ms</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,88.208L72.269,88.208" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,149.6L72.269,149.6" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,57.511L72.269,57.511" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,118.91L72.269,118.91" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M78.759,26.814L78.759,164.24L108.76,164.24L108.76,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M78.759,26.814L78.759,26.814L108.76,26.814L108.76,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Xor — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section>
+    <h2>Сериализация</h2>
+    <p class="section-intro">
+      <code>raw</code> — отсортированная копия значений рядом с битмапом: записывается как есть и
+      читается обратно в такой же срез. <code>roaring</code> — портируемый формат Roaring, из
+      контейнеров в контейнеры.
+    </p>
+    <div class="plots">
+      <section class="op">
+        <div class="op-head">
+          <h3>Размер</h3>
+          <p>байт на значение</p>
+        </div>
+        <p class="op-note">
+          Сколько байт сериализованного потока приходится на одно значение набора.
+        </p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Размер — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="141.72" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Serialised size, sparse</text>
+<text x="65.866" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="69.42" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">bytes/value</text>
+</g>
+<text x="34.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4</text>
+<path d="M42.116,26.814L50.116,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,96.746L50.116,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,166.68L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,61.78L50.116,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,131.71L50.116,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M50.116,26.814L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.361,26.814L58.361,166.68L88.361,166.68L88.361,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M58.361,26.814L58.361,26.814L88.361,26.814L88.361,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,142.48L369.2,142.48L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Размер — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Размер — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="146.38" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Serialised size, runs</text>
+<text x="65.866" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="69.42" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">bytes/value</text>
+</g>
+<text x="34.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4</text>
+<path d="M42.116,26.814L50.116,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,96.746L50.116,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,166.68L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,61.78L50.116,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,131.71L50.116,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M50.116,26.814L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.361,26.814L58.361,166.68L88.361,166.68L88.361,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M58.361,26.814L58.361,26.814L88.361,26.814L88.361,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,27.095L369.2,27.095L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Размер — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Размер — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="147.38" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Serialised size, zipf</text>
+<text x="65.866" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="69.42" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">bytes/value</text>
+</g>
+<text x="34.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">2</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4</text>
+<path d="M42.116,26.814L50.116,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,96.746L50.116,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M42.116,166.68L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,61.78L50.116,61.78" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M46.116,131.71L50.116,131.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M50.116,26.814L50.116,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.361,26.814L58.361,166.68L88.361,166.68L88.361,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M58.361,26.814L58.361,26.814L88.361,26.814L88.361,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,101.57L369.2,101.57L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Размер — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op">
+        <div class="op-head">
+          <h3>ToBytes</h3>
+          <p>запись</p>
+        </div>
+        <p class="op-note">
+          Сколько времени занимает превращение битмапа в памяти в срез байт.
+        </p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="ToBytes — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="156.29" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToBytes, sparse</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.633" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">300 µs</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">600 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,96.746L72.269,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,166.68L72.269,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,50.125L72.269,50.125" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,73.435L72.269,73.435" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,120.06L72.269,120.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,143.37L72.269,143.37" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.1" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,64.847L110.51,64.847L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.1L369.2,171.1L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToBytes — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="ToBytes — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="160.95" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToBytes, runs</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-91.756" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">50 µs</text>
+<text x="34.616" y="-161.42" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,96.477L72.269,96.477" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,166.14L72.269,166.14" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,40.747L72.269,40.747" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,54.68L72.269,54.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,68.612L72.269,68.612" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,82.545L72.269,82.545" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,110.41L72.269,110.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.34L72.269,124.34" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,138.28L72.269,138.28" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,152.21L72.269,152.21" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,171.58L110.51,171.58L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,27.609L369.2,27.609L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToBytes — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="ToBytes — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="161.96" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">ToBytes, zipf</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-65.407" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">40 µs</text>
+<text x="39.616" y="-108.72" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">80 µs</text>
+<text x="34.616" y="-152.03" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">120 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,70.128L72.269,70.128" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,113.44L72.269,113.44" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,156.76L72.269,156.76" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,37.643L72.269,37.643" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,48.471L72.269,48.471" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,59.3L72.269,59.3" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,80.957L72.269,80.957" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,91.785L72.269,91.785" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,102.61L72.269,102.61" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.27L72.269,124.27" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,135.1L72.269,135.1" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,145.93L72.269,145.93" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,167.58L72.269,167.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,150.74L110.51,150.74L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>ToBytes — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op">
+        <div class="op-head">
+          <h3>FromBytes</h3>
+          <p>разбор и восстановление битмапа</p>
+        </div>
+        <p class="op-note">
+          Сколько времени занимает восстановление из среза байт битмапа, с которым уже можно работать.
+        </p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="FromBytes — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="149.54" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">FromBytes, sparse</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-87.435" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">800 µs</text>
+<text x="35.099" y="-152.78" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">1.6 ms</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,92.157L72.269,92.157" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,157.5L72.269,157.5" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,59.485L72.269,59.485" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,124.83L72.269,124.83" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,50.258L110.51,50.258L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>FromBytes — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="FromBytes — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="154.2" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">FromBytes, runs</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-85.97" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 µs</text>
+<text x="34.616" y="-149.85" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">200 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,90.692L72.269,90.692" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,154.57L72.269,154.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,39.59L72.269,39.59" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,52.365L72.269,52.365" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,65.141L72.269,65.141" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,77.916L72.269,77.916" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,103.47L72.269,103.47" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,116.24L72.269,116.24" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,129.02L72.269,129.02" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,141.79L72.269,141.79" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,167.34L72.269,167.34" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,171.58L110.51,171.58L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,28.011L369.2,28.011L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>FromBytes — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="FromBytes — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="155.2" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">FromBytes, zipf</text>
+<text x="88.019" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">raw</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="45.378" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-83.99" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">200 µs</text>
+<text x="34.616" y="-145.89" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">400 µs</text>
+<path d="M64.269,26.814L72.269,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,88.711L72.269,88.711" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M64.269,150.61L72.269,150.61" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,57.763L72.269,57.763" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M68.269,119.66L72.269,119.66" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M72.269,26.814L72.269,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M80.514,26.814L80.514,106.48L110.51,106.48L110.51,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M80.514,26.814L80.514,26.814L110.51,26.814L110.51,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>FromBytes — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+  </section>
+
+
+  <section>
+    <h2>Rank / Select</h2>
+    <p class="section-intro">
+      <code>array</code> — отсортированная копия значений рядом с битмапом: бинарный поиск
+      для <code>Rank</code>, индекс для <code>Select</code>. <code>roaring</code> — ответ из
+      контейнеров плюс кэш префиксных сумм, по одному числу на контейнер.
+    </p>
+    <div class="plots">
+      <section class="op" id="rank">
+        <div class="op-head">
+          <h3>Rank</h3>
+          <p>сколько значений не больше данного</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает ответ, сколько значений набора не превышают данное.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Rank — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="163.54" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Rank, sparse</text>
+<text x="87.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="70.773" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="44.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-92.024" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">50 ns</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">100 ns</text>
+<path d="M63.508,26.814L71.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,96.746L71.508,96.746" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M63.508,166.68L71.508,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,40.801L71.508,40.801" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,54.787L71.508,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,68.773L71.508,68.773" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,82.759L71.508,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,110.73L71.508,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,124.72L71.508,124.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,138.7L71.508,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M67.508,152.69L71.508,152.69" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M71.508,26.814L71.508,169.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M82.526,26.814L82.526,132.03L112.53,132.03L112.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M82.526,26.814L82.526,26.814L112.53,26.814L112.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,169.38L369.2,169.38L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Rank — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Rank — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="168.2" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Rank, runs</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="69.432" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-68.714" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ns</text>
+<text x="34.616" y="-115.33" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">20 ns</text>
+<text x="34.616" y="-161.96" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">30 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,73.435L66.508,73.435" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,120.06L66.508,120.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,166.68L66.508,166.68" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,36.139L66.508,36.139" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,45.463L66.508,45.463" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,54.787L66.508,54.787" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,64.111L66.508,64.111" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,82.759L66.508,82.759" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,92.084L66.508,92.084" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,101.41L66.508,101.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,110.73L66.508,110.73" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,129.38L66.508,129.38" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,138.7L66.508,138.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,148.03L66.508,148.03" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,157.35L66.508,157.35" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,166.7" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.526,26.814L77.526,166.7L107.53,166.7L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,89.282L369.2,89.282L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Rank — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Rank — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="169.21" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Rank, zipf</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-88.967" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">40 ns</text>
+<text x="34.616" y="-155.84" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">80 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,93.689L66.508,93.689" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,160.56L66.508,160.56" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,43.533L66.508,43.533" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,60.252L66.508,60.252" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,76.97L66.508,76.97" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,110.41L66.508,110.41" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,127.13L66.508,127.13" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,143.84L66.508,143.84" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.526,26.814L77.526,154.86L107.53,154.86L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Rank — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="op" id="select">
+        <div class="op-head">
+          <h3>Select</h3>
+          <p>i-е по порядку значение</p>
+        </div>
+        <p class="op-note measure">Сколько времени занимает поиск i-го по порядку значения набора.</p>
+        <div class="charts">
+          <figure>
+            <svg role="img" aria-label="Select — sparse" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="161.55" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Select, sparse</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="34.616" y="-81.781" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">30 ns</text>
+<text x="34.616" y="-141.47" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">60 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,86.503L66.508,86.503" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,146.19L66.508,146.19" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,46.71L66.508,46.71" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,66.607L66.508,66.607" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,106.4L66.508,106.4" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,126.29L66.508,126.29" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,166.09L66.508,166.09" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.526,26.814L77.526,29.72L107.53,29.72L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Select — sparse</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Select — runs" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="166.21" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Select, runs</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-62.636" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">4 ns</text>
+<text x="39.616" y="-103.18" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">8 ns</text>
+<text x="34.616" y="-143.72" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">12 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,67.358L66.508,67.358" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,107.9L66.508,107.9" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,148.44L66.508,148.44" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,36.95L66.508,36.95" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,47.086L66.508,47.086" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,57.222L66.508,57.222" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,77.493L66.508,77.493" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,87.629L66.508,87.629" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,97.765L66.508,97.765" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,118.04L66.508,118.04" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,128.17L66.508,128.17" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,138.31L66.508,138.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,158.58L66.508,158.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,168.72L66.508,168.72" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.526,26.814L77.526,42.039L107.53,42.039L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Select — runs</figcaption>
+          </figure>
+          <figure>
+            <svg role="img" aria-label="Select — zipf" style="display:block;width:100%;height:auto" viewBox="0 0 388.4 199"
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+<g transform="scale(1, -1) translate(0, -199)">
+<path d="M19.2,12L369.2,12L369.2,187L19.2,187Z" style="fill:#FFFFFF" />
+<text x="167.21" y="-175.45" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">Select, zipf</text>
+<text x="82.258" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">array</text>
+<text x="339.76" y="-12.186" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">roaring</text>
+<g transform="rotate(90)">
+<text x="71.874" y="30.755" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:12px">time per op</text>
+</g>
+<text x="39.616" y="-22.093" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">0 ns</text>
+<text x="39.616" y="-65.843" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">5 ns</text>
+<text x="34.616" y="-109.59" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">10 ns</text>
+<text x="34.616" y="-153.34" transform="scale(1, -1)"
+	style="font-family:Times;font-weight:normal;font-style:normal;font-size:10px">15 ns</text>
+<path d="M58.508,26.814L66.508,26.814" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,70.565L66.508,70.565" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,114.31L66.508,114.31" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M58.508,158.07L66.508,158.07" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,35.565L66.508,35.565" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,44.315L66.508,44.315" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,53.065L66.508,53.065" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,61.815L66.508,61.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,79.315L66.508,79.315" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,88.065L66.508,88.065" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,96.815L66.508,96.815" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,105.56L66.508,105.56" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,123.06L66.508,123.06" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,131.82L66.508,131.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,140.57L66.508,140.57" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,149.32L66.508,149.32" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M62.508,166.82L66.508,166.82" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M66.508,26.814L66.508,171.58" style="fill:none;stroke:#000000;stroke-width:0.5" />
+<path d="M77.526,26.814L77.526,39.929L107.53,39.929L107.53,26.814Z" style="fill:#F15A60" />
+<path d="M339.2,26.814L339.2,26.814L369.2,26.814L369.2,26.814Z" style="fill:#F15A60" />
+<path d="M77.526,26.814L77.526,26.814L107.53,26.814L107.53,26.814Z" style="fill:#7AC36A" />
+<path d="M339.2,26.814L339.2,171.58L369.2,171.58L369.2,26.814Z" style="fill:#7AC36A" />
+</g>
+</svg>
+
+            <figcaption>Select — zipf</figcaption>
+          </figure>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что показали замеры</h2>
+    <div class="prose">
+      <p>
+        Медианы десяти прогонов, 200 000 значений в наборе. Разброс до <strong>23%</strong>: разница
+        меньше полутора раз — шум.
+      </p>
+
+      <h3>Run-контейнеры ускоряют операции над сериями в разы</h3>
+      <p>
+        <code>And</code> на runs — <strong>в 16 раз быстрее</strong> с <code>RunOptimize</code>.
+        Серия значений — один интервал вместо цепочки битов, и пересечение интервалов не заглядывает
+        в значения. <code>Or</code>, <code>AndNot</code>, <code>Xor</code> — от 3 до 8 раз.
+      </p>
+
+      <h3>Но точечные проверки становятся медленнее</h3>
+      <p>
+        <code>Contains</code> на runs — <strong>почти втрое медленнее</strong>. Бинарный поиск по
+        интервалам вместо битового теста. При сплошных точечных запросах run-кодировка может не
+        окупиться.
+      </p>
+
+      <h3>На случайных и смешанных данных разницы нет</h3>
+      <p>
+        На sparse и zipf <code>RunOptimize</code> не находит, что схлопывать, и оба варианта — один и
+        тот же битмап. Все отличия — в пределах шума. Вызов сам по себе ничего не ускоряет, пока в
+        данных нет серий.
+      </p>
+
+      <h3>Сериализация окупается только там, где есть серии</h3>
+      <p>
+        runs: поток <strong>в 500 раз меньше</strong> сырого дампа, запись и чтение —
+        <strong>в 120–180 раз быстрее</strong>. На sparse и zipf готовая копия — просто проход по
+        памяти, и она обгоняет формат по скорости; формат выигрывает лишь 0.7–1.9 байта на значение.
+      </p>
+
+      <h3>Rank/Select — это обмен скорости на память</h3>
+      <p>
+        Отсортированная копия отвечает на <code>Select</code> за <strong>1.5 нс</strong> против 14–76 —
+        индекс не обыграть. Зато она стоит <strong>4 байта на значение</strong>, а кэш префиксов — от
+        тысячных до 1.3. <code>Rank</code> вровень: на runs формат даже вдвое быстрее.
+      </p>
+
+      <h3>Что из этого следует</h3>
+      <p>
+        Есть серии — <code>RunOptimize</code>: выигрыш в разы по скорости, размеру и сериализации.
+        Данные случайные — не вызывать: чуть быстрее точечные проверки, а сохранять дешевле сырым
+        дампом. Нужна позиция без копии в памяти — <code>Rank</code>/<code>Select</code>.
+      </p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
