@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Конкурентность в Go: общая память</title>
+    <link rel="stylesheet" href="../assets/built/screen.css%3Fv=d83250423b.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:400,400i,700,700i,800">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap">
+
+    <script>
+        if (localStorage.getItem('alto_dark') == 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+
+    <link rel="icon" href="../favicon.png" type="image/png" />
+    <link rel="canonical" href="index.html" />
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+    <link rel="amphtml" href="amp/index.html" />
+    
+    <meta property="og:site_name" content="swvitaliy&#x27;s blog" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="Конкурентность в Go: общая память" />
+    <meta property="og:description" content="Данная статья является переводом статьи Фредерико Биттенкарта (Frederico Bittencourt).
+Я поэкспериментировал с несколькими примерами для лучшего понимания как модель памяти в Go ведет себя в конкурентных программах. Я попробую объяснить, что я изучил по поводу порядка операций на мульти-ядерных CPU." />
+    <meta property="og:url" content="https://swvitaliy.site/concurrency-in-go-shared-memory/" />
+    <meta property="og:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta property="article:published_time" content="2023-08-30T09:50:19.000Z" />
+    <meta property="article:modified_time" content="2023-08-30T13:34:05.000Z" />
+    <meta property="article:tag" content="translation" />
+    
+    <meta property="article:publisher" content="https://www.facebook.com/sw.vitaliy" />
+    <meta property="article:author" content="https://www.facebook.com/swvitaly" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Конкурентность в Go: общая память" />
+    <meta name="twitter:description" content="Данная статья является переводом статьи Фредерико Биттенкарта (Frederico Bittencourt).
+Я поэкспериментировал с несколькими примерами для лучшего понимания как модель памяти в Go ведет себя в конкурентных программах. Я попробую объяснить, что я изучил по поводу порядка операций на мульти-ядерных CPU." />
+    <meta name="twitter:url" content="https://swvitaliy.site/concurrency-in-go-shared-memory/" />
+    <meta name="twitter:image" content="https://static.ghost.org/v3.0.0/images/publication-cover.png" />
+    <meta name="twitter:label1" content="Written by" />
+    <meta name="twitter:data1" content="swvitaliy" />
+    <meta name="twitter:label2" content="Filed under" />
+    <meta name="twitter:data2" content="translation" />
+    <meta name="twitter:site" content="@swvitaliy" />
+    <meta name="twitter:creator" content="@swvitaly" />
+    <meta property="og:image:width" content="2709" />
+    <meta property="og:image:height" content="938" />
+    
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "swvitaliy&#x27;s blog",
+        "url": "https://swvitaliy.site/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://swvitaliy.site/content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg",
+            "width": 60,
+            "height": 60
+        }
+    },
+    "author": {
+        "@type": "Person",
+        "name": "swvitaliy",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "https://swvitaliy.site/author/swvitaly/",
+        "sameAs": [
+            "https://www.facebook.com/swvitaly",
+            "https://twitter.com/swvitaly"
+        ]
+    },
+    "headline": "Конкурентность в Go: общая память",
+    "url": "https://swvitaliy.site/concurrency-in-go-shared-memory/",
+    "datePublished": "2023-08-30T09:50:19.000Z",
+    "dateModified": "2023-08-30T13:34:05.000Z",
+    "keywords": "translation",
+    "description": "Данная статья является переводом статьи Фредерико Биттенкарта (Frederico Bittencourt).\nЯ поэкспериментировал с несколькими примерами для лучшего понимания как модель памяти в Go ведет себя в конкурентных программах. Я попробую объяснить, что я изучил по поводу порядка операций на мульти-ядерных CPU.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://swvitaliy.site/"
+    }
+}
+    </script>
+
+    <meta name="generator" content="Ghost 4.1" />
+    <link rel="alternate" type="application/rss+xml" title="swvitaliy&#x27;s blog" href="../rss/index.html" />
+    <script defer src="https://unpkg.com/@tryghost/portal@~1.0.0/umd/portal.min.js" data-ghost="https://swvitaliy.site/"></script><style> .gh-post-upgrade-cta-content,
+.gh-post-upgrade-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    text-align: center;
+    width: 100%;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.gh-post-upgrade-cta-content {
+    border-radius: 8px;
+    padding: 40px 4vw;
+}
+
+.gh-post-upgrade-cta h2 {
+    color: #ffffff;
+    font-size: 28px;
+    letter-spacing: -0.2px;
+    margin: 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta p {
+    margin: 20px 0 0;
+    padding: 0;
+}
+
+.gh-post-upgrade-cta small {
+    font-size: 16px;
+    letter-spacing: -0.2px;
+}
+
+.gh-post-upgrade-cta a {
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a:hover {
+    color: #ffffff;
+    opacity: 0.8;
+    box-shadow: none;
+    text-decoration: underline;
+}
+
+.gh-post-upgrade-cta a.gh-btn {
+    display: block;
+    background: #ffffff;
+    text-decoration: none;
+    margin: 28px 0 0;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.gh-post-upgrade-cta a.gh-btn:hover {
+    opacity: 0.92;
+}</style>
+    <!-- link tag -->
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css" /> -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/a11y-light.min.css">
+<link href="https://unpkg.com/octomments/build/ocs-ui.min.css" rel="stylesheet">
+
+<!--
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+	<style>
+      body {
+          font-family: 'Source Sans 3', sans-serif;
+          font-size: 18px;
+      }
+        .post-footer, section.author, .site-footer>.copyright, .site-footer>.logo {
+            display: none;
+        }
+        .dark-mode .logo-image:not(.white) {
+            opacity: 1;
+        }
+        /*.comment-container {
+        	background-color: white;
+        }*/
+        .O_comments, .O_comments>.O_summary,.O_comment_left,.O_comment_right,.O_comment_heading,
+        .O_comment_body,.O_new-comment,.O_comment,.O__textarea,.O_new-comment textarea,.O__submit_comment,.O_new-comment button {
+         	font-size:1em;   
+        }
+        .u-text-format ol>li:before {
+        	border-radius: unset;
+            color: inherit;
+        }
+        .u-text-format ol li:before, .u-text-format ul li:before {
+    		background-color: inherit;
+        }
+        
+        /* for block of code */
+        /*.hljs-ln td.hljs-ln-code {
+            padding-left: 10px;
+        }*/
+        .hljs-ln tr td.hljs-ln-numbers {
+          padding-right: 10px;
+        }
+        .post-feed>.post .post-excerpt {
+        	font-size: 16px;
+        }
+        .single-post .post-content {
+          font-size: 16px;
+        }
+    </style>
+<!-- <script defer data-domain="swvitaliy.site" src="https://plausible.io/js/plausible.js"></script> -->
+<script data-goatcounter="https://swvitaliy.goatcounter.com/count"
+        async src="https://gc.zgo.at/count.js"></script>
+
+<style>:root {--ghost-accent-color: #15171A;}</style>
+</head>
+
+<body class="post-template tag-translation">
+    <div class="site">
+        <header class="site-header container">
+    <div class="navbar">
+        <div class="navbar-left">
+            <div class="burger hidden-lg hidden-xl"></div>
+            <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>            <div class="sep hidden-xs hidden-sm hidden-sm"></div>
+                <nav class="main-menu hidden-xs hidden-sm hidden-md">
+                    <ul class="nav-list u-plain-list">
+        <li class="menu-item menu-item-zamietki"><a class="menu-item-link"
+                href="../index.html">Заметки</a></li>
+        <li class="menu-item menu-item-obo-mnie"><a class="menu-item-link"
+                href="../about/index.html">Обо мне</a></li>
+        <li class="menu-item menu-item-github"><a class="menu-item-link"
+                href="https://github.com/swvitaliy">Github</a></li>
+</ul>
+                </nav>
+        </div>
+        <div class="navbar-right">
+            <div class="toggle-track">
+                <div class="toggle-moon"><i class="icon icon-brightness-2"></i></div>
+                <div class="toggle-sun"><i class="icon icon-white-balance-sunny"></i></div>
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+    </div>
+</header>        <div class="site-content">
+            
+<div class="content-area">
+    <main class="site-main">
+            <article class="post tag-translation no-image no-image single-post" postid="64d766301956d006d1beb251">
+                <header class="post-header big-title container medium">
+        <h1 class="post-title">Конкурентность в Go: общая память</h1>
+                <div class="post-meta">
+            <span class="post-meta-item post-meta-date">
+                <time datetime="2023-08-30">
+                        30 авг. 2023 г.
+                </time>
+            </span>
+            <!-- <span class="post-meta-item post-meta-length">
+                5 min read
+            </span> -->
+                <span class="post-meta-item post-meta-tags">
+                    <a href="../tag/translation/index.html" title="translation">translation</a>
+                </span>
+        </div>
+</header>
+                                <!-- <div class="post-content kg-canvas u-text-format"> -->
+                <div class="post-content container medium u-text-format">
+                    <p><em>Данная статья является переводом статьи Фредерико Биттенкарта (</em>Frederico Bittencourt<em>).</em></p><p><em>Original: <a href="https://levelup.gitconnected.com/concurrency-in-go-shared-memory-a2ef201b396b">https://levelup.gitconnected.com/concurrency-in-go-shared-memory-a2ef201b396b</a></em></p><p><em>Original link2: <a href="https://blog.fredrb.com/2022/10/15/go-concurrency-shared-memory/">https://blog.fredrb.com/2022/10/15/go-concurrency-shared-memory/</a></em></p><p>Я поэкспериментировал с несколькими примерами для лучшего понимания как модель памяти в Go ведет себя в конкурентных программах. Я попробую объяснить, что я изучил по поводу порядка операций на мульти-ядерных CPU.</p><p>Пример, который я собираюсь показать – это расширение того примера передачи сообщений, написанного Расом Коксом в его посте <a href="https://research.swtch.com/hwmm">Hardware Model</a>. После его прочтения я захотел поэкспериментировать с поведением модели памяти и посмотреть на это поведение своими глазами. Данный пост – это результат этих экспериментов.</p><h2 id="%D0%B0%D0%BB%D0%B8%D1%81%D0%B0-%D0%B8-%D0%B1%D0%BE%D0%B1-%D0%B2-%D0%BE%D1%84%D0%B8%D1%81%D0%B5">Алиса и Боб в офисе</h2><p>Алиса и Боб делят офис. Их смены иногда пересекаются, но так же они могут начинать и заканчивать в разное время. Они приходят, выполняют свою работу и уходят. Однако, они имеют правило: последний кто уходит должен выключить свет. Проблема в том, что Алиса приходит очень рано и уходит перед тем, когда приходит Боб, так что когда Боб уходит он не знает если Алиса уже пришла или еще не ушла. Они придумали систему, чтобы дать друг другу знать, что их работа сделана: они ставят флаг на своей стороне офиса, когда уходят. Таким обрахом, каждый из них перед уходом может выключить свет и опустить оба флага, если видит, что флаг оппонента поднят.</p><p>Давайте смоделируем это в коде:</p><figure class="kg-card kg-code-card"><pre><code class="language-golang">type Worker int
+
+const (
+	Alice Worker = iota
+	Bob          = iota
+)
+
+type Office struct {
+	// 0 =&gt; Alice's flag
+	// 1 =&gt; Bob's flag
+	flag [2]bool
+
+	lights bool
+}
+
+func (f *Office) Work(w Worker, wg *sync.WaitGroup) {
+	// Do work 
+	// ...
+  
+	// Set your own flag up
+	f.flag[w] = true
+
+	// If both flags are up, turn the lights off and put the flags down
+	if f.flag[w] &amp;&amp; f.flag[1-w] {
+		f.lights = false
+		f.flag = []bool{false, false}
+	}
+
+	wg.Done()
+}</code></pre><figcaption>Это неправильный код. Но почему он неправильный?..</figcaption></figure><p><em>Ради плавности повествования, давайте сейчас проигнорируем <code>sync.WaitGroup</code>. Суть этого примера – это подсветить где Go модель прерывается, так что мы можем лучше понимать как и почему конкурентно-безопасный код построен</em>.</p><p>Этот прямолинейный код. Задано, что <code>Office</code> начинает свой день с включенным светом, После всех вызовов <code>Work</code> <code>Office.lights</code> должен быть выключен.</p><p>Логически, есть только 3 сценария:</p><ol><li>Алиса выключает свет: горутина Боба завершается первой</li><li>Боб выключает свет: горутина Алисы завершается первой</li><li>Они оба выключают свет: они одновременно поднимают свои флаги</li></ol><p>Условимся, что горутины ставятся в планировщик "честно", те. существует ряд взаимосвязанных операций, которые можно рассматривать как последовательные с внешней точки зрения. Каждое событие происходит в единой глобальной упорядоченности. Это делает 3-й сценарий возможным. В последовательно согласованной среде не может быть 4-го сценария, когда никто не выключил свет (почему?).</p><p>Для случая, когда Боб уходит последним и выключает за собой свет, предположим, что Боб – это последняя горутина, которая достигает выражения <code>if</code>. Мы знаем точно, что <code>f.flog[Bob]</code> установлен <code>true</code>, потому что он был только что установлен в горутине.  Для того, чтобы Боб НЕ выключал свет, флаг <code>f.flag[Alice]</code> должен быть <code>false</code>, что значит Алиса не закончила свою работу. А это значит, что Боб не последний человек, уходящий из офиса – противоречие.</p><p>Давайте посмотрим на это в действии в следующем тесте:</p><pre><code class="language-golang">func Test_WorkingDays(t *testing.T) {
+	office := new(Office)
+	// Lights on in the beginning of the day
+	office.lights = true
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+
+	go office.Work(Alice, &amp;wg)
+	go office.Work(Bob, &amp;wg)
+
+	wg.Wait()
+
+	if office.lights {
+		t.Errorf("lights shouldn't be on after both finished their work")
+	}
+}</code></pre><p>При индивидуальном запуске тест, скорее всего, пройдет. Но есть ошибка в нашем коде. Очевидно, что мы должны использовать параллельные структуры, такие как канал, мьютекс, атомные операции или группы ожидания, чтобы правильно указать, что их рабочий день закончен и свет должен быть выключен. Однако сначала мне не было ясно, почему этот код неверен, и какие проблемы могут возникнуть, если так его и оставить.</p><p>Чтобы проблема проявилась, я запустил этот тест 1 миллион раз:</p><pre><code class="language-text">$ go test -count=1000000 .
+--- FAIL: Test_WorkingDays (0.00s)
+    mem_test.go:49: lights shouldn\'t be on after both finished their work
+--- FAIL: Test_WorkingDays (0.00s)
+    mem_test.go:49: lights shouldn\'t be on after both finished their work
+... (x15)
+FAIL
+FAIL	github.com/fredrb/concurrency/memory	10.114s
+FAIL</code></pre><p>Этот тест проваливался 17 раз, но прошёл 999983 раза. Как такое возможно?</p><p>Основная причина заключается в кэшировании данных в многоядерных CPU перед синхронизацией с основной памятью. Поведение (и причины, по которым это происходит) могут различаться в разных архитектурах. В x86 есть буферная очередь записи для каждого потока, работающего с общей памятью. Всякий раз, когда поток читает из общей памяти, значение сначала читается из очереди. Это означает, что текущий поток видит свои собственные записи раньше других потоков.</p><figure class="kg-card kg-image-card kg-card-hascaption"><img src="https://miro.medium.com/v2/resize:fit:700/1*JgvGIqLroJF1PNi-kvElaw.png" class="kg-image" alt loading="lazy"><figcaption><a href="https://research.swtch.com/hwmm" rel="noopener ugc nofollow">Russ Cox: Hardware Memory Model post</a></figcaption></figure><p>Другой причиной является изменение порядка выполнения операций с целью оптимизации их выполнения на некоторых архитектурах, например arm (<em>Прим. переводчика</em>). </p><p>Если обе горутины запланированы на разные ядра, возможно следующее состояние флагов после выполнения программы (хотя и маловероятно):</p><ul><li>поток 1: <code>flag: [true, false]</code> =&gt; свет выключен</li><li>поток 2: <code>flag: [false, true]</code> =&gt; свет выключен</li></ul><p>Это может произойти, если:</p><ol><li>Операция записи не была применена к основной памяти и находится в буфере записи другого потока</li><li>Операция записи была применена к основной памяти, но поток считывает данные из своего кэша</li></ol><p>Современные архитектуры процессоров не гарантируют последовательного выполнения операций, что делает возможным четвертый случай для этого примера: никто не выключает свет.</p><p>Интересный способ доказать, что ЦП является причиной некорректного поведения программы – это проведение одинакового количества тестов только с одним процессором:</p><pre><code class="language-bash">$ go test -cpu 1 -count=1000000 . 
+ok github.com/fredrb/concurrency/memory	6.824s</code></pre><p>Вы можете указать сколь угодно большое число итераций – тесты всегда будут проходить, если указан один CPU (потому что все горутины запланированы на один поток ОС).</p><h2 id="%D0%B8%D1%81%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5-%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D1%8B">Исправление программы</h2><p>Мы хотим, чтобы наша программа работала на нескольких ядрах, поэтому мы должны исправить эту проблему. К счастью, исправление довольно тривиальное. В конкурентном программировании существует концепция, называемая барьером памяти или забором памяти, который используется под капотом параллельных API для синхронизации кэша процессора и основной памяти. Go имеет превосходную поддержку для конкурентных операций. Есть много способов решить эту проблему, но самый простой способ использовать блокировки.</p><p><em>UPD. Как мне было указано, первоначальное решение, предложенное мною ниже, по-прежнему сопряжено с проблемами. Даже думая, что тесты пройдут, есть race condition при устанавке общих переменных в горутине – даже если нет никакой другой активной горутины. Плюс есть риск, что данные обновятся внутри блока <code>if</code>  и эти обновления не будут замечены другими горутинами поскольку нет никакого механизма синхронизации. Вот оригинальное решение, которое содержит race condition:</em></p><figure class="kg-card kg-code-card"><pre><code class="language-golang">func (f *Office) Work(w Worker, wg *sync.WaitGroup) {
+  defer wg.Done()
+	atomic.StoreUint32(&amp;f.flag[w], 1)
+	if atomic.LoadUint32(&amp;f.flag[w]) == atomic.LoadUint32(&amp;f.flag[1-w]) {
+		// DATA RACE:
+		f.lights = false
+		f.flag = [2]bool{false, false}
+	}
+}</code></pre><figcaption>Это пока неправильное решение</figcaption></figure><p>Я пытался быть умным. Не будь умным.</p><p>Вот лучшее решение проблемы с использованием мьютекса:</p><pre><code class="language-golang">type Office struct {
+	flag     [2]bool
+	flagLock sync.Mutex
+	lights   bool
+}
+
+func (f *Office) DoWork(w Worker, wg *sync.WaitGroup) {
+	defer wg.Done()
+	// Do work
+	// ...
+
+	f.flagLock.Lock()
+	defer f.flagLock.Unlock()
+	f.flag[w] = true
+	if f.flag[w] &amp;&amp; f.flag[1-w] {
+		f.lights = false
+		f.flag = [2]bool{false, false}
+	}
+}</code></pre><p>Единичный запуск может быть медленнее, так как барьеры памяти добавляются перед операциями хранения и загрузки, но это ничтожно мало для нашего примера.</p><h2 id="%D0%B4%D0%B0%D0%BB%D1%8C%D0%BD%D0%B5%D0%B9%D1%88%D0%B5%D0%B5-%D1%87%D1%82%D0%B5%D0%BD%D0%B8%D0%B5">Дальнейшее чтение</h2><p>Если вы нашли эту статью интересной и хотите узнать больше об этой теме, я использовал следующие ресурсы для понимания поведения моей программы:</p><ul><li>Russ Cox Memory Models series: <a href="https://research.swtch.com/mm" rel="noopener ugc nofollow">https://research.swtch.com/mm</a></li><li>Go’s memory model entry: <a href="https://go.dev/ref/mem" rel="noopener ugc nofollow">https://go.dev/ref/mem</a></li><li>The Art of Multiprocess Programming (book): Chapter 7. <em>Even though this chapter is specifically about locks, it offers some examples that are pretty close to the office example I showed above.</em></li></ul>
+                </div>
+                <div class="container medium">
+                    <div class="share u-hover-wrapper">
+    <a class="share-item share-facebook u-hover-item"
+        href="https://www.facebook.com/sharer.php?u=https://swvitaliy.site/concurrency-in-go-shared-memory/" target="_blank" rel="noopener"><i
+            class="icon icon-facebook"></i></a>
+    <a class="share-item share-twitter u-hover-item"
+        href="https://twitter.com/intent/tweet?url=https://swvitaliy.site/concurrency-in-go-shared-memory/&text=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C" target="_blank" rel="noopener"><i
+            class="icon icon-twitter"></i></a>
+    <a class="share-item share-pinterest u-hover-item"
+        href="https://pinterest.com/pin/create/button/?url=https://swvitaliy.site/concurrency-in-go-shared-memory/&media=&description=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C"
+        target="_blank" rel="noopener" data-pin-do="none"><i class="icon icon-pinterest"></i></a>
+    <a class="share-item share-linkedin u-hover-item"
+        href="https://www.linkedin.com/shareArticle?mini=true&url=https://swvitaliy.site/concurrency-in-go-shared-memory/&title=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C"
+        target="_blank" rel="noopener"><i class="icon icon-linkedin"></i></a>
+    <a class="share-item share-reddit u-hover-item"
+        href="https://reddit.com/submit?url=https://swvitaliy.site/concurrency-in-go-shared-memory/&title=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C" target="_blank" rel="noopener"><i
+            class="icon icon-reddit"></i></a>
+    <a class="share-item share-tumblr u-hover-item"
+        href="https://www.tumblr.com/widgets/share/tool?canonicalUrl=https://swvitaliy.site/concurrency-in-go-shared-memory/&title=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C"
+        target="_blank" rel="noopener"><i class="icon icon-tumblr"></i></a>
+    <a class="share-item share-vk u-hover-item"
+        href="http://vk.com/share.php?url=https://swvitaliy.site/concurrency-in-go-shared-memory/&title=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C" target="_blank" rel="noopener"><i
+            class="icon icon-vk"></i></a>
+    <a class="share-item share-pocket u-hover-item" href="https://getpocket.com/edit?url=https://swvitaliy.site/concurrency-in-go-shared-memory/"
+        target="_blank" rel="noopener"><i class="icon icon-pocket"></i></a>
+    <a class="share-item share-telegram u-hover-item"
+        href="https://t.me/share/url?url=https://swvitaliy.site/concurrency-in-go-shared-memory/&text=%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%82%D0%BD%D0%BE%D1%81%D1%82%D1%8C%20%D0%B2%20Go%3A%20%D0%BE%D0%B1%D1%89%D0%B0%D1%8F%20%D0%BF%D0%B0%D0%BC%D1%8F%D1%82%D1%8C" target="_blank" rel="noopener"><i
+            class="icon icon-telegram"></i></a>
+</div>                        <section class="author">
+        <div class="author-image-placeholder u-placeholder">
+            <img class="author-image lazyload u-object-fit"
+                data-srcset="//www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s&#x3D;250&amp;d&#x3D;mm&amp;r&#x3D;x"
+                src="https://www.gravatar.com/avatar/906c83772a8df1eae4363776617e48ec?s=250&amp;d=mm&amp;r=x"
+                srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                alt="swvitaliy">
+        </div>
+        <div class="author-wrapper">
+            <header class="author-header">
+                <div class="author-header-wrapper">
+                    <h4 class="author-name">swvitaliy</h4>
+                    <div class="author-social">
+                            <a class="author-social-item author-facebook"
+                                href="https://www.facebook.com/swvitaly"
+                                target="_blank" rel="noopener">Facebook</a>
+                            <a class="author-social-item author-twitter"
+                                href="https://twitter.com/@swvitaly"
+                                target="_blank" rel="noopener">Twitter</a>
+                        <a class="author-social-item author-more"
+                            href="../author/swvitaly/index.html">More posts</a>
+                    </div>
+                </div>
+            </header>
+            <div class="author-bio"></div>
+        </div>
+    </section>
+                </div>
+            </article>
+            <div class="navigation container medium">
+        <div class="navigation-item navigation-previous">
+            <a class="navigation-item-link button-arrow button-arrow-left" href="../unobvious-code-rules/index.html">
+                <i class="button-arrow-icon icon icon-arrow-left"></i> Previous Post
+            </a>
+        </div>
+
+        <div class="navigation-item navigation-next">
+            <a class="navigation-item-link button-arrow button-arrow-right" href="../limits-in-go/index.html">
+                Next Post <i class="button-arrow-icon icon icon-arrow-right"></i>
+            </a>
+        </div>
+</div>                    <section class="related-posts container medium">
+            <h3 class="related-title"><span class="text">You might also like...</span></h3>
+            <div class="row">
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../in-defense-of-linked-lists/index.html">В защиту связных списков</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../how-to-do-distributed-locking-ru/index.html">Как сделать распределенную блокировку</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+                    <div class="col-md-4 related-column">
+                        <article class="post tag-translation no-image no-image">
+                                                        <header class="post-header">
+        <h2 class="post-title">
+            <a class="post-title-link" href="../pierievod-20-vieshchiei-kotoryie-ia-ponial-za-20-liet/index.html">20 вещей, которые я понял за 20 лет, будучи программным инженером</a>
+        </h2>
+</header>
+                        </article>
+                    </div>
+            </div>
+        </section>
+            <div class="comment-container">
+    <div class="comment container medium">
+        <div id="comments"></div>
+
+    </div>
+</div>
+    </main>
+</div>
+
+        </div>
+        <footer class="site-footer container large">
+    <div class="copyright">
+        Powered by <a href="https://ghost.org/" target="_blank" rel="noopener">Ghost</a>
+    </div>
+
+        <a class="logo" href="../index.html">
+        <img class="logo-image" src="../content/images/2023/04/kisspng-robotics-computer-icons-bota-industrial-5b05dafa591541.1754764515271103943649-1.svg" alt="swvitaliy&#x27;s blog">
+</a>
+    <div class="footer-social">
+            <a class="footer-social-item footer-social-item-facebook" href="https://www.facebook.com/sw.vitaliy"
+                target="_blank" rel="noopener" aria-label="Facebook">
+                <i class="icon icon-facebook"></i>
+            </a>
+            <a class="footer-social-item footer-social-item-twitter" href="https://twitter.com/swvitaliy"
+                target="_blank" rel="noopener" aria-label="Twitter">
+                <i class="icon icon-twitter"></i>
+            </a>
+        <a class="footer-social-item footer-social-item-rss"
+            href="https://feedly.com/i/subscription/feed/https://swvitaliy.site/rss/" target="_blank" rel="noopener"
+            aria-label="RSS">
+            <i class="icon icon-rss"></i>
+        </a>
+    </div>
+</footer>    </div>
+
+    <div class="dimmer"></div>
+
+    <div class="off-canvas">
+        <div class="canvas-close">
+            <i class="canvas-icon icon icon-window-close"></i>
+        </div>
+        <div class="mobile-menu"></div>
+    </div>
+
+    <script
+        src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+        crossorigin="anonymous">
+    </script>
+    <script src="../assets/built/main.min.js%3Fv=d83250423b"></script>
+
+    
+
+    <!-- script tag -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+
+<script>
+    hljs.highlightAll();
+    hljs.initLineNumbersOnLoad();
+</script>
+
+<script src="https://unpkg.com/octomments/build/ocs.min.js"></script>
+<script>
+    
+  var PostIdToIssuesMap = {
+  	  "60cca8ec3f692249e53661c6": 1,
+      "61c128843f692249e5366f19": 2,
+      "61b8f1ad3f692249e5366e40": 3, 
+      "6141b7023f692249e53663f3": 4,
+      "616b2f043f692249e536665d": 5,
+      "6141c62f3f692249e53664be": 6,
+      "612d14c93f692249e53663b2": 7,
+      "6065a7d53f692249e53660a3": 8,
+      "6141ce5c3f692249e53664ed": 9,
+      "61b5c96e3f692249e5366e12": 10, 
+      "61ebdf693f692249e5367744": 11,
+      "624000583f692249e53678a6": 12,
+      "612ca4783f692249e5366382": 13,
+      "61746abd3f692249e536667c": 14,
+      "612ca5f33f692249e53663a2": 15,
+      "612ca6253f692249e53663a8": 16,
+      "624213e53f692249e53679cf": 17,
+      "626472fb3f692249e5367a71": 18,
+      "6240cf053f692249e53679ba": 19
+  };
+    
+  var post = document.getElementsByTagName('article')[0];
+  var postId = post?.getAttribute('postId') || 'undef_key';
+  if (PostIdToIssuesMap[postId])
+      Octomments({
+        github: {
+          owner: 'swvitaliy',
+          repo: 'blog',
+        },
+        issueNumber: PostIdToIssuesMap[postId],
+        renderer: [OctommentsRenderer, '#comments']
+      }).init();
+    else {
+      var comments = document.getElementsByClassName('comment-container')[0];
+      if (comments) comments.style.display = 'none';
+    }
+</script>
+</body>
+
+</html>

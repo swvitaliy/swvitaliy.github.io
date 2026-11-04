@@ -1,14 +1,18 @@
 develop:
 	hugo server --disableFastRender -D
 
-build-full: build download-archive
+build-full: build publish-archive
 
 build: clean
 	hugo --minify
 
-download-archive: clear-archive
-	git clone git@github.com:swvitaliy/old-swvitaliy.github.io.git public/archive
-	rm -rf public/archive/.git
+download-archive:
+	[ -d static/archive ] || \
+		git clone git@github.com:swvitaliy/old-swvitaliy.github.io.git static/archive && \
+		rm -rf static/archive/.git
+
+publish-archive: clear-archive download-archive
+	cp -pr static/archive public/archive
 
 clean:
 	rm -rf public
