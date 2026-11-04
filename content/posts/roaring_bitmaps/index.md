@@ -1,7 +1,7 @@
 +++
 title = 'Roaring bitmaps'
 date = 2026-09-07T10:00:00+04:00
-tags = [ "roaring bitmaps", "clickhouse", "redis", "data structures", "algorithms" ]
+tags = [ "dsa", "go", "roaring bitmaps" ]
 +++
 
 
